@@ -15,10 +15,13 @@ import { Apif29BioService } from 'app/shared/services/api-f29bio.service';
 import { Apif29NcrService } from 'app/shared/services/api-f29ncr.service';
 import { DateService } from 'app/shared/services/date.service';
 import { SearchFilterPipe } from 'app/shared/services/search-filter.service';
+import { NgbModal, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { TextTransform } from 'app/shared/services/transform-text.service';
 import { Subscription } from 'rxjs/Subscription';
 import Swal from 'sweetalert2';
 import * as chartsData from 'app/shared/configs/general-charts.config';
 import { DateAdapter } from '@angular/material/core';
+import { IBlobAccessToken } from 'app/shared/services/blob-storage.service';
 
 @Component({
   selector: 'app-patient',
@@ -96,6 +99,9 @@ export class PatientComponent implements OnInit, OnDestroy {
    feels: any = [];
    events: any = [];
    medications: any = [];
+
+   loadedDocs: boolean = false;
+  docs: any = [];
    timeformat = "";
   lang = 'en';
   formatDate: any = [];
@@ -106,6 +112,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   selectedPatient: any = {};
   userName: string = '';
   loadedInfoPatient: boolean = false;
+  patientDataInfo: any = {};
   basicInfoPatient: any;
   basicInfoPatientCopy: any;
   age: number = null;
@@ -161,12 +168,31 @@ export class PatientComponent implements OnInit, OnDestroy {
   showNotiSeizu: boolean = false;
   showNotiFeel: boolean = false;
   showNotiDrugs: boolean = false;
-  generalShare: any = {
+  patientPermissions: any = {
     data:{patientInfo:false, medicalInfo:false,devicesInfo:false, genomicsInfo:false},
     notes:''
   };
 
-  constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router) {
+  loadedSymptoms: boolean = false;
+  phenotype: any = {};
+  phenotypeCopy: any = {};
+  selectedInfoSymptomIndex: number = -1;
+  modalReference: NgbModalRef;
+
+  accessToken: IBlobAccessToken = {
+    // tslint:disable-next-line:max-line-length
+    sasToken: environment.blobAccessToken.sasToken,
+    blobAccountUrl: environment.blobAccessToken.blobAccountUrl,
+    containerName: '',
+    patientId: ''
+  };
+  nameTitle: string = '';
+  resultTextNcr: string = '';
+
+  infoOneDisease: any = {};
+  
+
+  constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform) {
     this.adapter.setLocale(this.authService.getLang());
     this.lang = this.authService.getLang();
     switch (this.authService.getLang()) {
@@ -210,9 +236,6 @@ export class PatientComponent implements OnInit, OnDestroy {
   loadEnvironment() {
     this.medications = [];
     this.actualMedications = [];
-    this.group = this.authService.getGroup();
-    this.patient = {
-    };
 
     this.selectedHeight = {
       value: null,
@@ -234,8 +257,8 @@ export class PatientComponent implements OnInit, OnDestroy {
     };
 
     this.loadTranslations();
-    this.adapter.setLocale(this.authService.getLang());
-    switch (this.authService.getLang()) {
+    this.adapter.setLocale(this.lang);
+    switch (this.lang) {
       case 'en':
         this.timeformat = "M/d/yy";
         break;
@@ -395,27 +418,6 @@ export class PatientComponent implements OnInit, OnDestroy {
 
   }
 
-  /*getInfoPatient2() {
-    this.loadedInfoPatient = false;
-    
-    this.subscription.add(this.http.get(environment.api + '/api/patients/' + this.authService.getCurrentPatient().sub)
-      .subscribe((res: any) => {
-        console.log(res);
-        this.basicInfoPatient = res.patient;
-        this.basicInfoPatient.birthDate = this.dateService.transformDate(res.patient.birthDate);
-        this.basicInfoPatientCopy = JSON.parse(JSON.stringify(res.patient));
-        this.loadedInfoPatient = true;
-        if (this.basicInfoPatient.birthDate != null && this.basicInfoPatient.birthDate != '') {
-          this.ageFromDateOfBirthday(res.patient.birthDate);
-        } else if (this.basicInfoPatient.birthDate == null || this.basicInfoPatient.birthDate == '') {
-        }
-      }, (err) => {
-        console.log(err);
-        this.loadedInfoPatient = true;
-        this.toastr.error('', this.translate.instant("generics.error try again"));
-      }));
-  }*/
-
   getInfoPatient(){
     this.loadedInfoPatient = false;
     this.subscription.add( this.patientService.getPatientData(this.authService.getCurrentPatient().sub)
@@ -423,20 +425,22 @@ export class PatientComponent implements OnInit, OnDestroy {
       console.log(res);
       if(!res.message){
         console.log(res);
-        this.basicInfoPatient = res.patient;
-        this.basicInfoPatient.birthDate = this.dateService.transformDate(res.patient.birthDate);
-        this.basicInfoPatientCopy = JSON.parse(JSON.stringify(res.patient));
-        
-        if (this.basicInfoPatient.birthDate != null && this.basicInfoPatient.birthDate != '') {
+        this.patientDataInfo = res.patient;
+        this.patientDataInfo.birthDate = this.dateService.transformDate(res.patient.birthDate);
+        this.patientDataInfo = JSON.parse(JSON.stringify(res.patient));
+        if(this.patientDataInfo.previousDiagnosis!=null){
+          this.loadDiseaseInfo();
+        }
+        if (this.patientDataInfo.birthDate != null && this.patientDataInfo.birthDate != '') {
           this.ageFromDateOfBirthday(res.patient.birthDate);
-        } else if (this.basicInfoPatient.birthDate == null || this.basicInfoPatient.birthDate == '') {
+        } else if (this.patientDataInfo.birthDate == null || this.patientDataInfo.birthDate == '') {
         }
 
-        this.generalShare = res.patient.generalShare;
+        this.patientPermissions = res.patient.generalShare;
       }else{
-        this.generalShare = res.generalShare;
+        this.patientPermissions = res.generalShare;
       }
-      if(this.generalShare.data.medicalInfo){
+      if(this.patientPermissions.data.medicalInfo){
         this.loadTranslationsElements();
       }
       this.loadedInfoPatient = true;
@@ -445,32 +449,130 @@ export class PatientComponent implements OnInit, OnDestroy {
     }));
   }
 
+  loadDiseaseInfo(){
+    var param = [this.patientDataInfo.previousDiagnosis];
+    this.subscription.add(this.apif29BioService.getInfoOfDiseasesLang(param, this.lang)
+      .subscribe((res1: any) => {
+          this.infoOneDisease = res1[this.patientDataInfo.previousDiagnosis];
+          this.cleanxrefs();
+      }, (err) => {
+          console.log(err);
+      }));
+  }
+
+  cleanxrefs() {
+    if (this.infoOneDisease.xrefs != undefined) {
+        if (this.infoOneDisease.xrefs.length == 0) {
+            this.infoOneDisease.xrefs.push(this.infoOneDisease.id);
+        }
+        this.infoOneDisease.xrefs.sort((one, two) => (one > two ? -1 : 1));
+        var xrefs = this.cleanOrphas(this.infoOneDisease.xrefs)
+        this.infoOneDisease.xrefs = xrefs;
+    }
+    this.infoOneDisease.name = this.textTransform.transform(this.infoOneDisease.name);
+}
+
+cleanOrphas(xrefs) {
+  var res = [];
+  var count = 0;
+  for (var i = 0; i < xrefs.length; i++) {
+      if (xrefs[i].indexOf('ORPHA') != -1 || xrefs[i].indexOf('ORPHANET') != -1 || xrefs[i].indexOf('OMIM') != -1 || xrefs[i].indexOf('Orphanet') != -1) {
+          if (xrefs[i].indexOf('ORPHA') != -1 || xrefs[i].indexOf('ORPHANET') != -1 || xrefs[i].indexOf('Orphanet') != -1) {
+              count++;
+          }
+          if (count <= 1) {
+              var value = xrefs[i].split(':');
+              if (xrefs[i].indexOf('ORPHA') != -1 || xrefs[i].indexOf('ORPHANET') != -1 || xrefs[i].indexOf('Orphanet') != -1) {
+                  res.push({ name: 'Orphanet', id: value[1] });
+              } else if (xrefs[i].indexOf('OMIM') != -1) {
+                  res.push({ name: 'OMIM', id: value[1] });
+              }
+              count++;
+          }
+      }
+  }
+  return res;
+}
+
+
   ageFromDateOfBirthday(dateOfBirth: any) {
+    var res: any;
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+    var months;
+    months = (today.getFullYear() - birthDate.getFullYear()) * 12;
+    months -= birthDate.getMonth();
+    months += today.getMonth();
+    var age = 0;
+    if (months > 0) {
+      age = Math.floor(months / 12)
     }
-    this.age = age;
+    var res = months <= 0 ? 0 : months;
+    var m = res % 12;
+    res = { years: age, months: m };
+    return res;
+  }
+
+
+  calculateMinDate() {
+    var period = 31;
+    if (this.rangeDate == 'quarter') {
+      period = 90;
+    } else if (this.rangeDate == 'year') {
+      period = 365;
+    }
+    var actualDate = new Date();
+    var pastDate = new Date(actualDate);
+    pastDate.setDate(pastDate.getDate() - period);
+    this.minDateRange = pastDate;
   }
 
   loadData() {
     //cargar los datos del usuario
     this.loadedFeels = false;
-    if(this.generalShare.data.medicalInfo){
-      this.getFeels();
-      this.getSeizures(); 
-      this.calculateMinDate();
+    if (this.patientPermissions.data.medicalInfo) {
+      this.loadPartData();
+      this.getDocs();
+      this.loadSymptoms();
       this.getWeightAndAge();
     }
   }
 
+  loadPartData() {
+    //cargar los datos del usuario
+    this.loadedFeels = false;
+    if (this.patientPermissions.data.medicalInfo) {
+      this.getFeels();
+      this.getSeizures();
+      this.calculateMinDate();
+    }
+  }
+
+  getWeightAndAge() {
+    if (this.patientDataInfo.birthDate == null) {
+      this.age = null;
+    } else {
+      this.ageFromDateOfBirthday(this.patientDataInfo.birthDate);
+    }
+    this.subscription.add(this.patientService.getPatientWeightOpen(this.authService.getCurrentPatient().sub)
+      .subscribe((res: any) => {
+        console.log(res);
+        if (res.message == 'There are no weight') {
+        } else if (res.message == 'old weight') {
+          console.log(res.weight)
+          this.weight = res.weight.value
+        } else {
+          this.weight = res.weight.value
+        }
+      }, (err) => {
+        console.log(err);
+        this.toastr.error('', this.translate.instant("generics.error try again"));
+      }));
+  }
+
   getFeels() {
     this.feels = [];
-    var info = {rangeDate: this.rangeDate}
+    var info = { rangeDate: this.rangeDate }
     this.subscription.add(this.http.post(environment.api + '/api/feels/dates/' + this.authService.getCurrentPatient().sub, info)
       .subscribe((resFeels: any) => {
         if (resFeels.message) {
@@ -478,39 +580,34 @@ export class PatientComponent implements OnInit, OnDestroy {
         } else {
           resFeels.sort(this.sortService.DateSortInver("date"));
           this.feels = resFeels;
-          if(this.feels.length>0){
-            this.showNotiFeel = this.showNotifications(this.feels[this.feels.length-1].date, 7)
-          }else{
-            this.showNotiFeel = false;
-          }
-          
+
           var datagraphheight = [];
           for (var i = 0; i < resFeels.length; i++) {
             var splitDate = new Date(resFeels[i].date);
             var numAnswers = 0;
             var value = 0;
-            if(resFeels[i].a1!=""){
+            if (resFeels[i].a1 != "") {
               numAnswers++;
-              value = value+parseInt(resFeels[i].a1);
+              value = value + parseInt(resFeels[i].a1);
             }
-            if(resFeels[i].a2!=""){
+            if (resFeels[i].a2 != "") {
               numAnswers++;
-              value = value+parseInt(resFeels[i].a2);
+              value = value + parseInt(resFeels[i].a2);
             }
-            if(resFeels[i].a3!=""){
+            if (resFeels[i].a3 != "") {
               numAnswers++;
-              value = value+parseInt(resFeels[i].a3);
+              value = value + parseInt(resFeels[i].a3);
             }
-            var value = value/numAnswers;
+            var value = value / numAnswers;
             var foundDateIndex = this.searchService.searchIndex(datagraphheight, 'name', splitDate.toDateString());
-            if(foundDateIndex != -1){
+            if (foundDateIndex != -1) {
               //There cannot be two on the same day
               datagraphheight[foundDateIndex].name = splitDate.toDateString();
               datagraphheight[foundDateIndex].value = value;
-            }else{
+            } else {
               datagraphheight.push({ value: value, name: splitDate.toDateString() });
             }
-            
+
           }
 
           this.lineChartHeight = [
@@ -530,26 +627,11 @@ export class PatientComponent implements OnInit, OnDestroy {
       }));
   }
 
-  showNotifications(date, period){
-    //this.today
-    var pastDate=new Date(date);
-    pastDate.setDate(pastDate.getDate() + period);
-    if(pastDate<this.today){
-      console.log(pastDate);
-      console.log(this.today);
-      console.log('Han pasado '+period+' dias');
-      return true;
-    }else{
-      console.log('No han pasado '+period+' dias');
-      return false;
-    }
-  }
-
   getSeizures() {
     this.events = [];
     this.lineChartSeizures = [];
-    this.drugsBefore=false;
-    var info = {rangeDate: this.rangeDate}
+    this.drugsBefore = false;
+    var info = { rangeDate: this.rangeDate }
     this.subscription.add(this.http.post(environment.api + '/api/seizures/dates/' + this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
         if (res.message) {
@@ -558,23 +640,22 @@ export class PatientComponent implements OnInit, OnDestroy {
         } else {
           if (res.length > 0) {
             res.sort(this.sortService.DateSortInver("date"));
-            this.showNotiSeizu = this.showNotifications(res[res.length-1].date, 7)
             res.sort(this.sortService.DateSortInver("start"));
             this.events = res;
             var datagraphseizures = [];
-            
+
             datagraphseizures = this.getStructure2(res);
             var respseizures = this.add0Seizures(datagraphseizures);
-            if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
+            if (this.rangeDate == 'quarter' || this.rangeDate == 'year') {
               respseizures = this.groupPerWeek(respseizures);
             }
             var maxValue = this.getMaxValue(respseizures);
-            if(maxValue>1){
-              this.yAxisTicksSeizures = [0,Math.round(maxValue/2),maxValue];
-            }else{
-              this.yAxisTicksSeizures = [0,maxValue];
+            if (maxValue > 1) {
+              this.yAxisTicksSeizures = [0, Math.round(maxValue / 2), maxValue];
+            } else {
+              this.yAxisTicksSeizures = [0, maxValue];
             }
-            
+
             this.lineChartSeizures = [
               {
                 "name": this.titleSeizures,
@@ -584,7 +665,6 @@ export class PatientComponent implements OnInit, OnDestroy {
             this.getDrugs();
           } else {
             this.events = [];
-            this.showNotiSeizu = false;
             this.getDrugs();
           }
 
@@ -596,150 +676,7 @@ export class PatientComponent implements OnInit, OnDestroy {
       }));
   }
 
-  getMaxValue(array){
-    var max= 0;
-    for (var i=0; i < array.length; i++)
-    {
-      if(max<array[i].value){
-        max= array[i].value;
-      }
-    }
-    return max;
-  }
-
-  groupPerWeek(seizures){
-    
-    var respseizures = [];
-    for (var i=0; i < seizures.length; i++)
-    {
-      var varweek = new Date(seizures[i].stringDate)
-      seizures[i].name = this.getWeek(varweek, 1);
-    }
-    var copyseizures = JSON.parse(JSON.stringify(seizures));
-    for (var i=0; i < copyseizures.length; i++){
-      var foundElementIndex = this.searchService.searchIndex(respseizures, 'name', copyseizures[i].name);
-      
-      if(foundElementIndex!=-1){
-        respseizures[foundElementIndex].value = respseizures[foundElementIndex].value+copyseizures[i].value;
-        for (var j=0; j < copyseizures[i].types.length; j++){
-          var foundElementIndexType = this.searchService.searchIndex(respseizures[foundElementIndex].types, 'types', copyseizures[i].types[j].type);
-          if (foundElementIndexType != -1) {
-            respseizures[foundElementIndex].types[foundElementIndexType].count++;
-          } else {
-            respseizures[foundElementIndex].types.push({ type: copyseizures[i].types[j].type, count: 1 });
-          }
-        }
-        
-      }else{
-        respseizures.push(copyseizures[i]);
-      }
-    }
-    return respseizures;
-}
-
-getWeek(newdate, dowOffset?) {
-  /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
-  
-      dowOffset = typeof(dowOffset) == 'number' ? dowOffset : 0; //default dowOffset to zero
-      var newYear = new Date(newdate.getFullYear(),0,1);
-      var day = newYear.getDay() - dowOffset; //the day of week the year begins on
-      day = (day >= 0 ? day : day + 7);
-      var daynum = Math.floor((newdate.getTime() - newYear.getTime() - 
-      (newdate.getTimezoneOffset()-newYear.getTimezoneOffset())*60000)/86400000) + 1;
-      var weeknum;
-      //if the year starts before the middle of a week
-      if(day < 4) {
-          weeknum = Math.floor((daynum+day-1)/7) + 1;
-          if(weeknum > 52) {
-              var nYear = new Date(newdate.getFullYear() + 1,0,1);
-              var nday = nYear.getDay() - dowOffset;
-              nday = nday >= 0 ? nday : nday + 7;
-              /*if the next year starts before the middle of
-                the week, it is week #1 of that year*/
-              weeknum = nday < 4 ? 1 : 53;
-          }
-      }
-      else {
-          weeknum = Math.floor((daynum+day-1)/7);
-      }
-      var formatDate = this.getDateOfISOWeek(weeknum, newYear.getFullYear())
-      var pastDate=new Date(formatDate);
-      pastDate.setDate(pastDate.getDate() +7);
-      var res = this.tickFormattingDay(formatDate)+ ' - ' +this.tickFormattingDay(pastDate);
-      return res;
-  };
-
-  getDateOfISOWeek(w, y) {
-    var simple = new Date(y, 0, 1 + (w - 1) * 7);
-    var dow = simple.getDay();
-    var ISOweekStart = simple;
-    if (dow <= 4)
-        ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-    else
-        ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-    return ISOweekStart;
-}
-
-  add0Seizures(datagraphseizures){
-    //var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
-    var maxDateTemp = new Date();
-    var maxDate = maxDateTemp.toDateString();
-    
-    var minDate = this.minDateRange.toDateString();
-    
-    var splitLastDate = datagraphseizures[datagraphseizures.length-1].stringDate;
-    var splitFirstDate = datagraphseizures[0].stringDate;
-      if(splitLastDate<maxDate){
-        datagraphseizures.push({value: 0,name:maxDate,stringDate:maxDate, types: []})
-      }
-      if(new Date(minDate)<new Date(splitFirstDate)){
-        datagraphseizures.push({value: 0,name:minDate,stringDate:minDate, types: []})
-      }
-      var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
-      datagraphseizures.sort(this.sortService.DateSortInver("stringDate"));
-    for (var j = 0; j < datagraphseizures.length; j=j+1) {
-      var foundDate = false;
-      var actualDate = datagraphseizures[j].stringDate;
-      if(datagraphseizures[j+1]!=undefined){
-        var nextDate = datagraphseizures[j+1].stringDate;
-        //stringDate
-        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
-          var theDate = new Date(actualDate);
-          theDate.setDate(theDate.getDate()+1);
-          actualDate = theDate.toDateString();
-          if(actualDate != nextDate){
-            copydatagraphseizures.push({value: 0,name:actualDate,stringDate:actualDate, types: []})
-          }else{
-            foundDate = true;
-          }
-          
-        }
-        if(datagraphseizures[j+2]!=undefined){
-        var actualDate = datagraphseizures[j+1].stringDate;
-        var nextDate = datagraphseizures[j+2].stringDate;
-        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
-          var theDate = new Date(actualDate);
-          theDate.setDate(theDate.getDate()+1);
-          actualDate = theDate.toDateString();
-          if(actualDate != nextDate){
-            copydatagraphseizures.push({value: 0,name:actualDate,stringDate:actualDate, types: []})
-          }
-          
-        }
-  
-        }
-      }
-    }
-    copydatagraphseizures.sort(this.sortService.DateSortInver("stringDate"));
-    for (var j = 0; j < copydatagraphseizures.length; j++) {
-      copydatagraphseizures[j].name = copydatagraphseizures[j].stringDate
-      var theDate = new Date(copydatagraphseizures[j].name);
-      copydatagraphseizures[j].name = this.tickFormattingDay(theDate)
-    }
-    return copydatagraphseizures;
-  }
-
-  getStructure2(res){
+  getStructure2(res) {
     var datagraphseizures = [];
     for (var i = 0; i < res.length; i++) {
       var splitDate = new Date(res[i].start);
@@ -762,278 +699,192 @@ getWeek(newdate, dowOffset?) {
     return datagraphseizures;
   }
 
+  add0Seizures(datagraphseizures) {
+    //var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
+    var maxDateTemp = new Date();
+    var maxDate = maxDateTemp.toDateString();
+
+    var minDate = this.minDateRange.toDateString();
+
+    var splitLastDate = datagraphseizures[datagraphseizures.length - 1].stringDate;
+    var splitFirstDate = datagraphseizures[0].stringDate;
+    if (splitLastDate < maxDate) {
+      datagraphseizures.push({ value: 0, name: maxDate, stringDate: maxDate, types: [] })
+    }
+    if (new Date(minDate) < new Date(splitFirstDate)) {
+      datagraphseizures.push({ value: 0, name: minDate, stringDate: minDate, types: [] })
+    }
+    var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
+    datagraphseizures.sort(this.sortService.DateSortInver("stringDate"));
+    for (var j = 0; j < datagraphseizures.length; j = j + 1) {
+      var foundDate = false;
+      var actualDate = datagraphseizures[j].stringDate;
+      if (datagraphseizures[j + 1] != undefined) {
+        var nextDate = datagraphseizures[j + 1].stringDate;
+        //stringDate
+        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+          var theDate = new Date(actualDate);
+          theDate.setDate(theDate.getDate() + 1);
+          actualDate = theDate.toDateString();
+          if (actualDate != nextDate) {
+            copydatagraphseizures.push({ value: 0, name: actualDate, stringDate: actualDate, types: [] })
+          } else {
+            foundDate = true;
+          }
+
+        }
+        if (datagraphseizures[j + 2] != undefined) {
+          var actualDate = datagraphseizures[j + 1].stringDate;
+          var nextDate = datagraphseizures[j + 2].stringDate;
+          for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+            var theDate = new Date(actualDate);
+            theDate.setDate(theDate.getDate() + 1);
+            actualDate = theDate.toDateString();
+            if (actualDate != nextDate) {
+              copydatagraphseizures.push({ value: 0, name: actualDate, stringDate: actualDate, types: [] })
+            }
+
+          }
+
+        }
+      }
+    }
+    copydatagraphseizures.sort(this.sortService.DateSortInver("stringDate"));
+    for (var j = 0; j < copydatagraphseizures.length; j++) {
+      copydatagraphseizures[j].name = copydatagraphseizures[j].stringDate
+      var theDate = new Date(copydatagraphseizures[j].name);
+      copydatagraphseizures[j].name = this.tickFormattingDay(theDate)
+    }
+    return copydatagraphseizures;
+  }
+
+  tickFormattingDay(d: any) {
+    if (sessionStorage.getItem('lang') == 'es') {
+      this.formatDate = 'es-ES'
+    } else {
+      this.formatDate = 'en-EN'
+    }
+    //var options = { year: 'numeric', month: 'short' };
+    var options = { year: 'numeric', month: 'short', day: 'numeric' };
+    var res = d.toLocaleString(this.formatDate, options)
+    return res;
+  }
+
+  groupPerWeek(seizures) {
+
+    var respseizures = [];
+    for (var i = 0; i < seizures.length; i++) {
+      var varweek = new Date(seizures[i].stringDate)
+      seizures[i].name = this.getWeek(varweek, 1);
+    }
+    var copyseizures = JSON.parse(JSON.stringify(seizures));
+    for (var i = 0; i < copyseizures.length; i++) {
+      var foundElementIndex = this.searchService.searchIndex(respseizures, 'name', copyseizures[i].name);
+
+      if (foundElementIndex != -1) {
+        respseizures[foundElementIndex].value = respseizures[foundElementIndex].value + copyseizures[i].value;
+        for (var j = 0; j < copyseizures[i].types.length; j++) {
+          var foundElementIndexType = this.searchService.searchIndex(respseizures[foundElementIndex].types, 'types', copyseizures[i].types[j].type);
+          if (foundElementIndexType != -1) {
+            respseizures[foundElementIndex].types[foundElementIndexType].count++;
+          } else {
+            respseizures[foundElementIndex].types.push({ type: copyseizures[i].types[j].type, count: 1 });
+          }
+        }
+
+      } else {
+        respseizures.push(copyseizures[i]);
+      }
+    }
+    return respseizures;
+  }
+
+  getWeek(newdate, dowOffset?) {
+    /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
+
+    dowOffset = typeof (dowOffset) == 'number' ? dowOffset : 0; //default dowOffset to zero
+    var newYear = new Date(newdate.getFullYear(), 0, 1);
+    var day = newYear.getDay() - dowOffset; //the day of week the year begins on
+    day = (day >= 0 ? day : day + 7);
+    var daynum = Math.floor((newdate.getTime() - newYear.getTime() -
+      (newdate.getTimezoneOffset() - newYear.getTimezoneOffset()) * 60000) / 86400000) + 1;
+    var weeknum;
+    //if the year starts before the middle of a week
+    if (day < 4) {
+      weeknum = Math.floor((daynum + day - 1) / 7) + 1;
+      if (weeknum > 52) {
+        var nYear = new Date(newdate.getFullYear() + 1, 0, 1);
+        var nday = nYear.getDay() - dowOffset;
+        nday = nday >= 0 ? nday : nday + 7;
+        /*if the next year starts before the middle of
+          the week, it is week #1 of that year*/
+        weeknum = nday < 4 ? 1 : 53;
+      }
+    }
+    else {
+      weeknum = Math.floor((daynum + day - 1) / 7);
+    }
+    var formatDate = this.getDateOfISOWeek(weeknum, newYear.getFullYear())
+    var pastDate = new Date(formatDate);
+    pastDate.setDate(pastDate.getDate() + 7);
+    var res = this.tickFormattingDay(formatDate) + ' - ' + this.tickFormattingDay(pastDate);
+    return res;
+  };
+
+  getDateOfISOWeek(w, y) {
+    var simple = new Date(y, 0, 1 + (w - 1) * 7);
+    var dow = simple.getDay();
+    var ISOweekStart = simple;
+    if (dow <= 4)
+      ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    else
+      ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    return ISOweekStart;
+  }
+
+  getMaxValue(array) {
+    var max = 0;
+    for (var i = 0; i < array.length; i++) {
+      if (max < array[i].value) {
+        max = array[i].value;
+      }
+    }
+    return max;
+  }
+
   getDrugs() {
     this.lineChartDrugs = [];
     this.lineChartDrugsCopy = [];
     this.maxValue = 0;
     this.medications = [];
-    var info = {rangeDate: this.rangeDate}
-      this.subscription.add(this.http.post(environment.api + '/api/medications/dates/' + this.authService.getCurrentPatient().sub, info)
+    var info = { rangeDate: this.rangeDate }
+
+    this.subscription.add(this.http.post(environment.api + '/api/medications/dates/' + this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
-        
+
         this.medications = res;
         console.log(res);
         if (this.medications.length > 0) {
           res.sort(this.sortService.DateSortInver("date"));
-          this.showNotiDrugs = this.showNotifications(res[res.length-1].date, 14)
           this.searchTranslationDrugs();
           this.groupMedications();
-          var datagraphseizures = [];
-          
           this.lineChartDrugs = this.getStructure(res);
-          
-          
           this.lineChartDrugs = this.add0Drugs(this.lineChartDrugs);
           this.lineChartDrugsCopy = JSON.parse(JSON.stringify(this.lineChartDrugs));
           this.normalizedChanged(this.normalized);
-          if(this.events.length>0){
+          if (this.events.length > 0) {
             this.getDataNormalizedDrugsVsSeizures();
           }
-        }else{
-          this.showNotiDrugs = false;
+        } else {
+
         }
         this.loadedDrugs = true;
       }, (err) => {
         console.log(err);
         this.loadedDrugs = true;
       }));
-  }
 
-  getStructure(res){
-    console.log(res);
-    var lineChartDrugs = [];
-    for (var i = 0; i < res.length; i++) {
-      console.log(res[i].drugTranslate);
-      var foundElementDrugIndex = this.searchService.searchIndex(lineChartDrugs, 'name', res[i].drugTranslate);
-      var splitDate = new Date(res[i].startDate);
-      if(splitDate<this.minDateRange){
-        splitDate = this.minDateRange
-      }
-        
-        var splitDateEnd = null;
-  
-  
-        if (foundElementDrugIndex != -1) {
-          if(this.maxValue<Number(res[i].dose)){
-            this.maxValue=Number(res[i].dose);
-          }
-          lineChartDrugs[foundElementDrugIndex].series.push({ value: parseInt(res[i].dose), name: splitDate.toDateString() });
-          if (res[i].endDate == null) {
-            splitDateEnd = new Date();
-            lineChartDrugs[foundElementDrugIndex].series.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
-          } else {
-            splitDateEnd = new Date(res[i].endDate);
-            lineChartDrugs[foundElementDrugIndex].series.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
-          }
-        } else {
-          if(this.maxValue<Number(res[i].dose)){
-            this.maxValue=Number(res[i].dose);
-          }
-          var seriesfirst = [{ value: parseInt(res[i].dose), name: splitDate.toDateString() }];
-          if (res[i].endDate == null) {
-            splitDateEnd = new Date();
-            seriesfirst.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
-          } else {
-            splitDateEnd = new Date(res[i].endDate);
-            seriesfirst.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
-          }
-          lineChartDrugs.push({ name: res[i].drugTranslate, series: seriesfirst });
-  
-        }     
-      
-    }
-    console.log(lineChartDrugs);
-    var copymeds = JSON.parse(JSON.stringify(lineChartDrugs));
-    for (var i = 0; i < lineChartDrugs.length; i++) {
-      for (var j = 0; j < lineChartDrugs[i].series.length; j=j+2) {
-        var foundDate = false;
-        var actualDate = lineChartDrugs[i].series[j].name;
-        var nextDate = lineChartDrugs[i].series[j+1].name;
-        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
-          var theDate = new Date(actualDate);
-          theDate.setDate(theDate.getDate()+1);
-          actualDate = theDate.toDateString();
-          if(actualDate != nextDate){
-            copymeds[i].series.push({value: lineChartDrugs[i].series[j].value,name:actualDate})
-          }
-          
-        }
-        if(lineChartDrugs[i].series[j+2]!=undefined){
-        var actualDate = lineChartDrugs[i].series[j+1].name;
-        var nextDate = lineChartDrugs[i].series[j+2].name;
-        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
-          var theDate = new Date(actualDate);
-          theDate.setDate(theDate.getDate()+1);
-          actualDate = theDate.toDateString();
-          if(actualDate != nextDate){
-            copymeds[i].series.push({value: 0,name:actualDate})
-          }
-          
-        }
 
-        }
-        
-      }
-      copymeds[i].series.sort(this.sortService.DateSortInver("name"));
-    }
-    lineChartDrugs = JSON.parse(JSON.stringify(copymeds));
-    return lineChartDrugs;
-  }
-
-  add0Drugs(datagraphdrugs){
-    //var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
-    var maxDateTemp = new Date();
-    var maxDate = maxDateTemp.toDateString();
-    
-    var minDate = this.minDateRange.toDateString();
-    var copydatagraphseizures = [];
-    for (var i = 0; i < datagraphdrugs.length; i++) {
-      copydatagraphseizures.push({name:datagraphdrugs[i].name, series:[]});
-      var splitLastDate = datagraphdrugs[i].series[datagraphdrugs[i].series.length-1].name;
-      var splitFirstDate = datagraphdrugs[i].series[0].name;
-        if(splitLastDate<maxDate){
-          datagraphdrugs[i].series.push({value: 0,name:maxDate})
-        }
-        if(new Date(minDate)<new Date(splitFirstDate)){
-          datagraphdrugs[i].series.push({value: 0,name:minDate})
-        }
-        copydatagraphseizures[i].series = JSON.parse(JSON.stringify(datagraphdrugs[i].series));
-        datagraphdrugs[i].series.sort(this.sortService.DateSortInver("name"));
-      for (var j = 0; j < datagraphdrugs[i].series.length; j=j+1) {
-        var foundDate = false;
-        var actualDate = datagraphdrugs[i].series[j].name;
-        if(datagraphdrugs[i].series[j+1]!=undefined){
-          var nextDate = datagraphdrugs[i].series[j+1].name;
-          //stringDate
-          for (var k = 0; actualDate != nextDate && !foundDate; k++) {
-            var theDate = new Date(actualDate);
-            theDate.setDate(theDate.getDate()+1);
-            actualDate = theDate.toDateString();
-            if(actualDate != nextDate){
-              copydatagraphseizures[i].series.push({value: 0,name:actualDate})
-            }else{
-              foundDate = true;
-            }
-            
-          }
-          if(datagraphdrugs[i].series[j+2]!=undefined){
-          var actualDate = datagraphdrugs[i].series[j+1].name;
-          var nextDate = datagraphdrugs[i].series[j+2].name;
-          for (var k = 0; actualDate != nextDate && !foundDate; k++) {
-            var theDate = new Date(actualDate);
-            theDate.setDate(theDate.getDate()+1);
-            actualDate = theDate.toDateString();
-            if(actualDate != nextDate){
-              copydatagraphseizures[i].series.push({value: 0,name:actualDate})
-            }
-            
-          }
-    
-          }
-        }
-      }
-      copydatagraphseizures[i].series.sort(this.sortService.DateSortInver("name"));
-      for (var j = 0; j < copydatagraphseizures[i].series.length; j++) {
-        copydatagraphseizures[i].series[j].name = copydatagraphseizures[i].series[j].name
-        var theDate = new Date(copydatagraphseizures[i].series[j].name);
-        copydatagraphseizures[i].series[j].name = this.tickFormattingDay(theDate)
-      }
-    }
-    return copydatagraphseizures;
-  }
-
-  getDataNormalizedDrugsVsSeizures(){
-    var meds = this.getStructure(this.medications);
-    var seizu = this.getStructure2(this.events);
-    seizu = this.add0Seizures(seizu);
-    meds = this.add0Drugs(meds);
-    var copymeds = JSON.parse(JSON.stringify(meds));
-    
-    if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
-      //meds = this.groupPerWeekDrugs(meds)
-      
-    }
-    if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
-      seizu = this.groupPerWeek(seizu);
-      seizu = this.add0Seizures(seizu);
-    }
-
-    this.maxValueDrugsVsSeizu = 0;
-    for (var i = 0; i < this.lineChartSeizures[0].series.length; i++) {
-      if(this.maxValueDrugsVsSeizu<Number(this.lineChartSeizures[0].series[i].value)){
-        this.maxValueDrugsVsSeizu=Number(this.lineChartSeizures[0].series[i].value);
-      }
-    }
-    
-    var percen = 0;
-    if(this.maxValue>this.maxValueDrugsVsSeizu){
-      percen = this.maxValue/this.maxValueDrugsVsSeizu
-    }else{
-      percen = this.maxValueDrugsVsSeizu/this.maxValue
-    }
-    
-
-    this.barChart = seizu;
-    console.log(copymeds);
-    this.lineChartSeries = copymeds;
-    if(this.normalized2){
-
-      var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartSeries));
-      console.log(this.lineChartSeries);
-      var maxValue = 0;
-      for (var i = 0; i < this.lineChartSeries.length; i++) {
-        var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartSeries[i].name);
-        if(maxValueRecommededDrug==0){
-          maxValueRecommededDrug = this.maxValue;
-        }
-        for (var j = 0; j < this.lineChartSeries[i].series.length; j++) {
-          if(this.normalized){
-            templineChartDrugs[i].series[j].value = this.normalize(this.lineChartSeries[i].series[j].value, 0, maxValueRecommededDrug);
-          }
-          templineChartDrugs[i].series[j].name = this.lineChartSeries[i].series[j].name;
-          if(maxValue<this.lineChartSeries[i].series[j].value){
-            maxValue= this.lineChartSeries[i].series[j].value;
-          }
-        }
-        templineChartDrugs[i].series.sort(this.sortService.DateSortInver("name"));
-      }
-      this.lineChartSeries = JSON.parse(JSON.stringify(templineChartDrugs));
-      console.log(this.lineChartSeries);
-      
-      /*var templineChartDrugs = JSON.parse(JSON.stringify(this.lineDrugsVsSeizures));
-      for (var i = 0; i < this.lineDrugsVsSeizures.length; i++) {
-        for (var j = 0; j < this.lineDrugsVsSeizures[i].series.length; j++) {
-          if(this.lineDrugsVsSeizures[i].name==this.titleSeizures){
-            templineChartDrugs[i].series[j].value = percen*this.normalize2(this.lineDrugsVsSeizures[i].series[j].value, 0);
-          }else{
-            templineChartDrugs[i].series[j].value = this.normalize2(this.lineDrugsVsSeizures[i].series[j].value, 0);
-          }
-        }
-      }
-      this.lineDrugsVsSeizures = [];
-      this.lineDrugsVsSeizures = JSON.parse(JSON.stringify(templineChartDrugs));*/
-    }
-  }
-
-  normalizedChanged2(normalized){
-    this.normalized2 = normalized;
-    if(this.normalized2){
-      this.titleDrugsVsDrugs = this.titleDrugsVsNormalized;
-    }else{
-      this.titleDrugsVsDrugs = this.titleDrugsVsNoNormalized;
-    }
-     this.getDataNormalizedDrugsVsSeizures();
-    
-  }
-
-  transformDate(value) {
-    let newValue;
-    var format = 'yyyy-MM-dd';
-    if (this.lang == 'es') {
-      format = 'dd-MM-yyyy'
-    }
-    newValue = this.dateService.transformFormatDate(value, format);
-    return newValue;
   }
 
   searchTranslationDrugs() {
@@ -1069,98 +920,219 @@ getWeek(newdate, dowOffset?) {
     }
   }
 
-  tickFormatting(d: any) {
-    if (sessionStorage.getItem('lang') == 'es') {
-      this.formatDate = 'es-ES'
-    } else {
-      this.formatDate = 'en-EN'
-    }
-    var options = { year: 'numeric', month: 'short' };
-    //var options = { year: 'numeric', month: 'short', day: 'numeric' };
-    var res = d.toLocaleString(this.formatDate, options)
-    return res;
-  }
+  getStructure(res) {
+    console.log(res);
+    var lineChartDrugs = [];
+    for (var i = 0; i < res.length; i++) {
+      console.log(res[i].drugTranslate);
+      var foundElementDrugIndex = this.searchService.searchIndex(lineChartDrugs, 'name', res[i].drugTranslate);
+      var splitDate = new Date(res[i].startDate);
+      if (splitDate < this.minDateRange) {
+        splitDate = this.minDateRange
+      }
 
-  tickFormattingDay(d: any) {
-    if (sessionStorage.getItem('lang') == 'es') {
-      this.formatDate = 'es-ES'
-    } else {
-      this.formatDate = 'en-EN'
-    }
-    //var options = { year: 'numeric', month: 'short' };
-    var options = { year: 'numeric', month: 'short', day: 'numeric' };
-    var res = d.toLocaleString(this.formatDate, options)
-    return res;
-  }
+      var splitDateEnd = null;
 
-  onSelect(event) {
-    //your code here
-  }
 
-  loadDataRangeDate(rangeDate) {
-    this.rangeDate = rangeDate;
-    this.calculateMinDate();
-    this.normalized = true;
-    this.normalized2 = true;
-    this.loadData();
-  }
-
-  calculateMinDate(){
-    var period = 31;
-    if(this.rangeDate == 'quarter'){
-      period = 90;
-    }else if(this.rangeDate == 'year'){
-      period = 365;
-    }
-    var actualDate = new Date();
-    var pastDate=new Date(actualDate);
-    pastDate.setDate(pastDate.getDate() - period);
-    this.minDateRange = pastDate;
-  } 
-
-  getWeightAndAge() {
-    if(this.authService.getCurrentPatient().birthDate == null){
-      this.age = null;
-    }else{
-      this.ageFromDateOfBirthday(this.authService.getCurrentPatient().birthDate);
-    }
-    this.subscription.add(this.patientService.getPatientWeight()
-      .subscribe((res: any) => {
-        console.log(res);
-        if (res.message == 'There are no weight') {
-        }else if(res.message == 'old weight'){
-          console.log(res.weight)
-          this.weight = res.weight.value
-        }else{
-          this.weight = res.weight.value
+      if (foundElementDrugIndex != -1) {
+        if (this.maxValue < Number(res[i].dose)) {
+          this.maxValue = Number(res[i].dose);
         }
-      }, (err) => {
-        console.log(err);
-        this.toastr.error('', this.translate.instant("generics.error try again"));
-      }));
-  }
-  
+        lineChartDrugs[foundElementDrugIndex].series.push({ value: parseInt(res[i].dose), name: splitDate.toDateString() });
+        if (res[i].endDate == null) {
+          splitDateEnd = new Date();
+          lineChartDrugs[foundElementDrugIndex].series.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
+        } else {
+          splitDateEnd = new Date(res[i].endDate);
+          lineChartDrugs[foundElementDrugIndex].series.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
+        }
+      } else {
+        if (this.maxValue < Number(res[i].dose)) {
+          this.maxValue = Number(res[i].dose);
+        }
+        var seriesfirst = [{ value: parseInt(res[i].dose), name: splitDate.toDateString() }];
+        if (res[i].endDate == null) {
+          splitDateEnd = new Date();
+          seriesfirst.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
+        } else {
+          splitDateEnd = new Date(res[i].endDate);
+          seriesfirst.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
+        }
+        lineChartDrugs.push({ name: res[i].drugTranslate, series: seriesfirst });
 
-  getMaxValueRecommededDrug(name){
+      }
+
+    }
+
+    console.log(lineChartDrugs);
+
+    var copymeds = JSON.parse(JSON.stringify(lineChartDrugs));
+    for (var i = 0; i < lineChartDrugs.length; i++) {
+      for (var j = 0; j < lineChartDrugs[i].series.length; j = j + 2) {
+        var foundDate = false;
+        var actualDate = lineChartDrugs[i].series[j].name;
+        var nextDate = lineChartDrugs[i].series[j + 1].name;
+        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+          var theDate = new Date(actualDate);
+          theDate.setDate(theDate.getDate() + 1);
+          actualDate = theDate.toDateString();
+          if (actualDate != nextDate) {
+            copymeds[i].series.push({ value: lineChartDrugs[i].series[j].value, name: actualDate })
+          }
+
+        }
+        if (lineChartDrugs[i].series[j + 2] != undefined) {
+          var actualDate = lineChartDrugs[i].series[j + 1].name;
+          var nextDate = lineChartDrugs[i].series[j + 2].name;
+          for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+            var theDate = new Date(actualDate);
+            theDate.setDate(theDate.getDate() + 1);
+            actualDate = theDate.toDateString();
+            if (actualDate != nextDate) {
+              copymeds[i].series.push({ value: 0, name: actualDate })
+            }
+
+          }
+
+        }
+
+      }
+      copymeds[i].series.sort(this.sortService.DateSortInver("name"));
+    }
+    lineChartDrugs = JSON.parse(JSON.stringify(copymeds));
+    return lineChartDrugs;
+  }
+
+  normalize2(value, min) {
+    var max = 0;
+    if (this.maxValue > this.maxValueDrugsVsSeizu) {
+      max = this.maxValue;
+    } else {
+      max = this.maxValueDrugsVsSeizu;
+    }
+    var normalized = 0;
+    if (value != 0) {
+      normalized = (value - min) / (max - min);
+    }
+    return normalized;
+  }
+
+  add0Drugs(datagraphdrugs) {
+    //var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
+    var maxDateTemp = new Date();
+    var maxDate = maxDateTemp.toDateString();
+
+    var minDate = this.minDateRange.toDateString();
+    var copydatagraphseizures = [];
+    for (var i = 0; i < datagraphdrugs.length; i++) {
+      copydatagraphseizures.push({ name: datagraphdrugs[i].name, series: [] });
+      var splitLastDate = datagraphdrugs[i].series[datagraphdrugs[i].series.length - 1].name;
+      var splitFirstDate = datagraphdrugs[i].series[0].name;
+      if (splitLastDate < maxDate) {
+        datagraphdrugs[i].series.push({ value: 0, name: maxDate })
+      }
+      if (new Date(minDate) < new Date(splitFirstDate)) {
+        datagraphdrugs[i].series.push({ value: 0, name: minDate })
+      }
+      copydatagraphseizures[i].series = JSON.parse(JSON.stringify(datagraphdrugs[i].series));
+      datagraphdrugs[i].series.sort(this.sortService.DateSortInver("name"));
+      for (var j = 0; j < datagraphdrugs[i].series.length; j = j + 1) {
+        var foundDate = false;
+        var actualDate = datagraphdrugs[i].series[j].name;
+        if (datagraphdrugs[i].series[j + 1] != undefined) {
+          var nextDate = datagraphdrugs[i].series[j + 1].name;
+          //stringDate
+          for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+            var theDate = new Date(actualDate);
+            theDate.setDate(theDate.getDate() + 1);
+            actualDate = theDate.toDateString();
+            if (actualDate != nextDate) {
+              copydatagraphseizures[i].series.push({ value: 0, name: actualDate })
+            } else {
+              foundDate = true;
+            }
+
+          }
+          if (datagraphdrugs[i].series[j + 2] != undefined) {
+            var actualDate = datagraphdrugs[i].series[j + 1].name;
+            var nextDate = datagraphdrugs[i].series[j + 2].name;
+            for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+              var theDate = new Date(actualDate);
+              theDate.setDate(theDate.getDate() + 1);
+              actualDate = theDate.toDateString();
+              if (actualDate != nextDate) {
+                copydatagraphseizures[i].series.push({ value: 0, name: actualDate })
+              }
+
+            }
+
+          }
+        }
+      }
+      copydatagraphseizures[i].series.sort(this.sortService.DateSortInver("name"));
+      for (var j = 0; j < copydatagraphseizures[i].series.length; j++) {
+        copydatagraphseizures[i].series[j].name = copydatagraphseizures[i].series[j].name
+        var theDate = new Date(copydatagraphseizures[i].series[j].name);
+        copydatagraphseizures[i].series[j].name = this.tickFormattingDay(theDate)
+      }
+    }
+    return copydatagraphseizures;
+  }
+
+  normalizedChanged(normalized) {
+    this.normalized = normalized;
+    if (this.normalized) {
+      this.titleDose = this.titleDrugsVsNormalized;
+    } else {
+      this.titleDose = this.titleDrugsVsNoNormalized;
+    }
+    var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartDrugsCopy));
+    this.lineChartDrugs = [];
+    var maxValue = 0;
+    for (var i = 0; i < this.lineChartDrugsCopy.length; i++) {
+      var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartDrugsCopy[i].name);
+      if (maxValueRecommededDrug == 0) {
+        maxValueRecommededDrug = this.maxValue;
+      }
+      for (var j = 0; j < this.lineChartDrugsCopy[i].series.length; j++) {
+        if (this.normalized) {
+          templineChartDrugs[i].series[j].value = this.normalize(this.lineChartDrugsCopy[i].series[j].value, 0, maxValueRecommededDrug);
+        }
+        templineChartDrugs[i].series[j].name = this.lineChartDrugsCopy[i].series[j].name;
+        if (maxValue < this.lineChartDrugsCopy[i].series[j].value) {
+          maxValue = this.lineChartDrugsCopy[i].series[j].value;
+        }
+      }
+      templineChartDrugs[i].series.sort(this.sortService.DateSortInver("name"));
+    }
+    this.lineChartDrugs = JSON.parse(JSON.stringify(templineChartDrugs));
+    if (maxValue > 1 && !this.normalized) {
+      this.yAxisTicksDrugs = [0, Math.round(maxValue / 2), maxValue];
+    } else {
+      this.yAxisTicksDrugs = [0, 1];
+    }
+  }
+
+  getMaxValueRecommededDrug(name) {
     var maxDose = 0;
     var actualRecommendedDoses = this.recommendedDoses[name];
     console.log(this.weight);
-    if(actualRecommendedDoses==undefined || !this.weight){
+    if (actualRecommendedDoses == undefined || !this.weight) {
       return maxDose;
-    }else{
-      if(this.age<18){
-        if(actualRecommendedDoses.data != 'onlyadults'){
-          if(actualRecommendedDoses.kids.perkg=='no'){
+    } else {
+      if (this.age < 18) {
+        if (actualRecommendedDoses.data != 'onlyadults') {
+          if (actualRecommendedDoses.kids.perkg == 'no') {
             maxDose = actualRecommendedDoses.kids.maintenancedose.max
-          }else{
+          } else {
             maxDose = actualRecommendedDoses.kids.maintenancedose.max * Number(this.weight);
           }
         }
-      }else{
-        if(actualRecommendedDoses.data != 'onlykids'){
-          if(actualRecommendedDoses.adults.perkg=='no'){
+      } else {
+        if (actualRecommendedDoses.data != 'onlykids') {
+          if (actualRecommendedDoses.adults.perkg == 'no') {
             maxDose = actualRecommendedDoses.adults.maintenancedose.max
-          }else{
+          } else {
             maxDose = actualRecommendedDoses.adults.maintenancedose.max * Number(this.weight);
           }
         }
@@ -1178,91 +1150,224 @@ getWeek(newdate, dowOffset?) {
     }
   }
 
-  normalizedChanged(normalized){
-    this.normalized = normalized;
-    if(this.normalized){
-      this.titleDose = this.titleDrugsVsNormalized;
-    }else{
-      this.titleDose = this.titleDrugsVsNoNormalized;
+  normalize(value, min, max) {
+    var normalized = 0;
+    if (value != 0) {
+      normalized = (value - min) / (max - min);
     }
-      var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartDrugsCopy));
-      this.lineChartDrugs = [];
+    return normalized;
+  }
+
+  getDataNormalizedDrugsVsSeizures() {
+    var meds = this.getStructure(this.medications);
+    var seizu = this.getStructure2(this.events);
+    seizu = this.add0Seizures(seizu);
+    meds = this.add0Drugs(meds);
+    var copymeds = JSON.parse(JSON.stringify(meds));
+
+    if (this.rangeDate == 'quarter' || this.rangeDate == 'year') {
+      //meds = this.groupPerWeekDrugs(meds)
+
+    }
+    if (this.rangeDate == 'quarter' || this.rangeDate == 'year') {
+      seizu = this.groupPerWeek(seizu);
+      seizu = this.add0Seizures(seizu);
+    }
+
+    this.maxValueDrugsVsSeizu = 0;
+    for (var i = 0; i < this.lineChartSeizures[0].series.length; i++) {
+      if (this.maxValueDrugsVsSeizu < Number(this.lineChartSeizures[0].series[i].value)) {
+        this.maxValueDrugsVsSeizu = Number(this.lineChartSeizures[0].series[i].value);
+      }
+    }
+
+    var percen = 0;
+    if (this.maxValue > this.maxValueDrugsVsSeizu) {
+      percen = this.maxValue / this.maxValueDrugsVsSeizu
+    } else {
+      percen = this.maxValueDrugsVsSeizu / this.maxValue
+    }
+
+
+    this.barChart = seizu;
+    console.log(copymeds);
+    this.lineChartSeries = copymeds;
+    if (this.normalized2) {
+
+      var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartSeries));
+      console.log(this.lineChartSeries);
       var maxValue = 0;
-      for (var i = 0; i < this.lineChartDrugsCopy.length; i++) {
-        var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartDrugsCopy[i].name);
-        if(maxValueRecommededDrug==0){
+      for (var i = 0; i < this.lineChartSeries.length; i++) {
+        var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartSeries[i].name);
+        if (maxValueRecommededDrug == 0) {
           maxValueRecommededDrug = this.maxValue;
         }
-        for (var j = 0; j < this.lineChartDrugsCopy[i].series.length; j++) {
-          if(this.normalized){
-            templineChartDrugs[i].series[j].value = this.normalize(this.lineChartDrugsCopy[i].series[j].value, 0, maxValueRecommededDrug);
+        for (var j = 0; j < this.lineChartSeries[i].series.length; j++) {
+          if (this.normalized) {
+            templineChartDrugs[i].series[j].value = this.normalize(this.lineChartSeries[i].series[j].value, 0, maxValueRecommededDrug);
           }
-          templineChartDrugs[i].series[j].name = this.lineChartDrugsCopy[i].series[j].name;
-          if(maxValue<this.lineChartDrugsCopy[i].series[j].value){
-            maxValue= this.lineChartDrugsCopy[i].series[j].value;
+          templineChartDrugs[i].series[j].name = this.lineChartSeries[i].series[j].name;
+          if (maxValue < this.lineChartSeries[i].series[j].value) {
+            maxValue = this.lineChartSeries[i].series[j].value;
           }
         }
         templineChartDrugs[i].series.sort(this.sortService.DateSortInver("name"));
       }
-      this.lineChartDrugs = JSON.parse(JSON.stringify(templineChartDrugs));
-      if(maxValue>1 && !this.normalized){
-        this.yAxisTicksDrugs = [0,Math.round(maxValue/2),maxValue];
-      }else{
-        this.yAxisTicksDrugs = [0,1];
-      }
+      this.lineChartSeries = JSON.parse(JSON.stringify(templineChartDrugs));
+    }
   }
 
-  normalize(value, min, max) {
-    var normalized = 0;
-    if(value!=0){
-      normalized = (value - min) / (max - min);
-    }
-    return normalized;
+  loadDataRangeDate(rangeDate) {
+    this.rangeDate = rangeDate;
+    this.calculateMinDate();
+    this.normalized = true;
+    this.normalized2 = true;
+    this.loadPartData();
   }
 
-  normalize2(value, min) {
-    var max = 0;
-    if(this.maxValue>this.maxValueDrugsVsSeizu){
-      max = this.maxValue;
-    }else{
-      max = this.maxValueDrugsVsSeizu;
-    }
-    var normalized = 0;
-    if(value!=0){
-      normalized = (value - min) / (max - min);
-    }
-    return normalized;
-  }
-
-  groupPerWeekDrugs(meds){
-    var respDrugs= [];
-    for (var i=0; i < meds.length; i++)
-      {
-        for (var j = 0; j < meds[i].series.length; j++) {
-          var varweek = new Date(meds[i].series[j].name)
-          console.log(varweek)
-          meds[i].series[j].name = this.getWeek(varweek, 1);
-        }
-        respDrugs.push({name: meds[i].name, series:[]})
-      }
-      var copyDrugs = JSON.parse(JSON.stringify(meds));
-      console.log(copyDrugs);
-    for (var i=0; i < copyDrugs.length; i++){
-      for (var j = 0; j < copyDrugs[i].series.length; j++) {
-        var foundElementIndex = this.searchService.searchIndex(respDrugs[i].series, 'name', copyDrugs[i].series[j].name);
-      
-        if(foundElementIndex!=-1){
-          respDrugs[i].series[foundElementIndex].value = copyDrugs[i].series[j].value;
+  getDocs() {
+    this.docs = [];
+    this.loadedDocs = false;
+    this.subscription.add(this.http.get(environment.api + '/api/documents/' + this.authService.getCurrentPatient().sub)
+      .subscribe((resDocs: any) => {
+        if (resDocs.message) {
+          //no tiene historico de docs
+        } else {
+          resDocs.sort(this.sortService.DateSortInver("date"));
+          this.docs = resDocs;
+          for (var i = 0; i < this.docs.length; i++) {
+            var extension = this.docs[i].url.substr(this.docs[i].url.lastIndexOf('.'));
+            this.docs[i].extension=extension;
+          }
           
-        }else{
-          respDrugs[i].series.push(copyDrugs[i].series[j]);
+          this.getAzureBlobSasToken();
         }
-      }
-      
+
+        this.loadedDocs = true;
+      }, (err) => {
+        console.log(err);
+        this.loadedDocs = true;
+        this.toastr.error('', this.translate.instant("generics.error try again"));
+      }));
+  }
+
+  loadSymptoms() {
+    this.loadedSymptoms = false;
+    //cargar el fenotipo del usuario
+    this.subscription.add(this.apiDx29ServerService.getSymptoms(this.authService.getCurrentPatient().sub)
+      .subscribe((res: any) => {
+        if (res.message) {
+          //no tiene fenotipo
+          this.loadedSymptoms = true;
+        } else {
+          if (res.phenotype.data.length > 0) {
+            res.phenotype.data.sort(this.sortService.GetSortOrder("name"));
+            this.phenotype = res.phenotype;
+            this.phenotypeCopy = JSON.parse(JSON.stringify(res.phenotype));
+            var hposStrins = [];
+            this.phenotype.data.forEach(function (element) {
+              hposStrins.push(element.id);
+            });
+            //get symtoms
+            this.callGetInfoTempSymptomsJSON(hposStrins);
+
+            for (var j = 0; j < this.phenotype.data.length; j++) {
+              this.phenotype.data[j].checked = true;
+            }
+            this.phenotypeCopy = JSON.parse(JSON.stringify(res.phenotype));
+          } else {
+            //no tiene fenotipo
+            this.loadedSymptoms = true;
+            this.phenotype = res.phenotype;
+            this.phenotypeCopy = JSON.parse(JSON.stringify(res.phenotype));
+          }
+        }
+        this.loadedSymptoms = true;
+      }, (err) => {
+        console.log(err);
+        this.loadedSymptoms = true;
+      }));
+  }
+
+  callGetInfoTempSymptomsJSON(hposStrins) {
+    var lang = this.lang;
+    this.subscription.add(this.apif29BioService.getInfoOfSymptoms(lang, hposStrins)
+      .subscribe((res: any) => {
+
+        var tamano = Object.keys(res).length;
+        if (tamano > 0) {
+          for (var i in res) {
+            for (var j = 0; j < this.phenotype.data.length; j++) {
+              if (res[i].id == this.phenotype.data[j].id) {
+                this.phenotype.data[j].name = res[i].name;
+                this.phenotype.data[j].def = res[i].desc;
+                this.phenotype.data[j].synonyms = res[i].synonyms;
+                this.phenotype.data[j].comment = res[i].comment;
+                if (this.phenotype.data[j].importance == undefined) {
+                  this.phenotype.data[j].importance = 1;
+                }
+              }
+            }
+          }
+          console.log(this.phenotype.data);
+          this.phenotype.data.sort(this.sortService.GetSortOrder("name"));
+        }
+      }, (err) => {
+        console.log(err);
+      }));
+  }
+
+  showMoreInfoSymptomPopup(symptomIndex, contentInfoSymptomNcr) {
+    this.selectedInfoSymptomIndex = symptomIndex;
+    let ngbModalOptions: NgbModalOptions = {
+      keyboard: false,
+      windowClass: 'ModalClass-sm'// xl, lg, sm
+    };
+    this.modalReference = this.modalService.open(contentInfoSymptomNcr, ngbModalOptions);
+  }
+
+  closeModal() {
+    if (this.modalReference != undefined) {
+      this.modalReference.close();
+      this.modalReference = undefined;
     }
-    console.log(respDrugs);
-    return respDrugs;
-}
+  }
+
+  getAzureBlobSasToken() {
+    this.accessToken.containerName = this.authService.getCurrentPatient().sub.substr(1);
+    this.accessToken.patientId = this.authService.getCurrentPatient().sub;
+
+    this.subscription.add(this.apiDx29ServerService.getAzureBlobSasToken(this.accessToken.containerName)
+      .subscribe((res: any) => {
+        console.log(res);
+        this.accessToken.sasToken = '?' + res;
+      }, (err) => {
+        console.log(err);
+      }));
+  }
+
+  openResults(name, contentviewDoc, nameTitle) {
+    this.nameTitle = nameTitle;
+    var url = name.substr(0, name.lastIndexOf('/') + 1)
+    var fileNameNcr = url + 'textanaresult.json';
+    var url2 = this.accessToken.blobAccountUrl + this.accessToken.containerName + '/' + fileNameNcr + this.accessToken.sasToken;
+    this.subscription.add(this.http.get(this.accessToken.blobAccountUrl + this.accessToken.containerName + '/' + fileNameNcr + this.accessToken.sasToken)
+      .subscribe((res: any) => {
+        this.resultTextNcr = res.medicalText;
+        let ngbModalOptions: NgbModalOptions = {
+          keyboard: false,
+          windowClass: 'ModalClass-sm'// xl, lg, sm
+        };
+        this.modalReference = this.modalService.open(contentviewDoc, ngbModalOptions);
+      }, (err) => {
+        console.log(err);
+      }));
+
+  }
+
+  goTo(url){
+    document.getElementById(url).scrollIntoView(true);
+  }
 
 }
 
