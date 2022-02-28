@@ -109,4 +109,25 @@ export class PatientService {
          })
     }
 
+    requestIndividualShare(info){
+      //cargar las faqs del knowledgeBaseID
+      return this.http.post(environment.api+'/api/openraito/patient/individualshare/'+this.authService.getCurrentPatient().sub, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+    }
+
+    getIndividualShare(idUser){
+      //cargar las faqs del knowledgeBaseID
+      var info = {idUser: idUser}
+      return this.http.post(environment.api+'/api/openraito/patient/getindividualshare/'+this.authService.getCurrentPatient().sub, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+    }
+
 }

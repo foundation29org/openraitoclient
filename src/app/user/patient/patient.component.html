@@ -101,7 +101,7 @@
                         </div>
                     </div>
                     <div class="col-md-12" *ngIf="!patientPermissions.data.patientInfo">
-                        <p class="mb-0">No tienes permisos para ver los datos básicos!</p>
+                        <p class="mb-0">No tienes permisos para ver los datos básicos</p>
                     </div>
                 </div>
             </div>
@@ -682,7 +682,8 @@
                                 <div class="row p-2">
                                     <div class="col-12">
                                         <h4 class="text-bold-500 mb-0"></h4>
-                                        <p class="mb-0">No tienes permisos, logueate, y pide acceso!</p>
+                                        <p class="mb-0">No tienes permisos <a *ngIf="individualPermissions.status!='Pending'" (click)="requestPermission(shareCustom)">Request</a></p>
+                                        <p *ngIf="individualPermissions.status=='Pending'">Status: {{individualPermissions.status}} </p>
                                     </div>
                                 </div>
                             </div>
@@ -769,4 +770,49 @@
             </div>
         </div>
     </div>
+</ng-template>
+
+<ng-template #shareCustom let-c="close" let-d="dismiss" appendTo="body">
+    <div class="modal-header pb-0" id="idHeader">
+        <h4>{{'dashboardpatient.Share' | translate }}
+    <span class="font-small-2 d-block mt-1"></span>
+  </h4>
+
+        <button type="button" class="close" aria-label="Close" (click)="closeModalShare();">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+  <form #f="ngForm">
+    <div>
+      <div class="mt-2">
+        <div class="form-group col-md-12">
+                <p class="mb-1">Permissions</p>
+                <section class="example-section">
+                    <span class="d-block"><mat-checkbox name="newPermission.data.patientInfo" [(ngModel)]="newPermission.data.patientInfo">Data from the patient profile section</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.medicalInfo" [(ngModel)]="newPermission.data.medicalInfo">Medical information such as documents, seizures, drugs, symptoms, etc.</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.devicesInfo" [(ngModel)]="newPermission.data.devicesInfo">Devices information</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.genomicsInfo" [(ngModel)]="newPermission.data.genomicsInfo">Genetic information</mat-checkbox></span>
+                </section>
+                <label for="notes">Notes</label>
+                <textarea name="notes" id="textarea1" class="autoajustable form-control" [(ngModel)]="newPermission.notes"></textarea>
+        </div>
+    </div>
+    <div class="col-md-12">
+      <div class="center-elements" *ngIf="!sending">
+        <button class="btn btn-secondary mr-1" (click)="cancelCustom()"><span>Cancel</span></button>
+        <div *ngIf="f.valid;then formValid else formError"></div>
+        <ng-template #formValid>
+          <button class="btn btn-dark ml-1" (click)="sendShare()">Add</button>
+        </ng-template>
+        <ng-template #formError>
+          <button class="btn btn-dark ml-1" type="button" disabled="true" (click)="submitInvalidForm()"> <span *ngIf="newPermission._id==null">Add</span><span *ngIf="newPermission._id!=null">Update</span></button>
+        </ng-template>
+        
+      </div>
+      <div class="center-elements" *ngIf="sending">
+        <p class="centerSpinner"><i class="fa fa-spinner fa-spin fa-3x fa-fw pink"></i></p>
+      </div>
+    </div>
+    </div>
+  </form>
 </ng-template>

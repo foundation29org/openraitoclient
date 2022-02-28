@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { Router } from "@angular/router";
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
@@ -173,6 +174,11 @@ export class PatientComponent implements OnInit, OnDestroy {
     notes:''
   };
 
+  individualPermissions: any = {
+    data:{patientInfo:false, medicalInfo:false,devicesInfo:false, genomicsInfo:false},
+    notes:''
+  };
+
   loadedSymptoms: boolean = false;
   phenotype: any = {};
   phenotypeCopy: any = {};
@@ -191,6 +197,9 @@ export class PatientComponent implements OnInit, OnDestroy {
 
   infoOneDisease: any = {};
   
+  newPermission:any;
+  @ViewChild('f') sendForm: NgForm;
+  sending: boolean = false;
 
   constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform) {
     this.adapter.setLocale(this.authService.getLang());
@@ -443,6 +452,7 @@ export class PatientComponent implements OnInit, OnDestroy {
       if(this.patientPermissions.data.medicalInfo){
         this.loadTranslationsElements();
       }
+      this.getIndividualShare();
       this.loadedInfoPatient = true;
     }, (err) => {
       console.log(err);
@@ -1367,6 +1377,82 @@ cleanOrphas(xrefs) {
 
   goTo(url){
     document.getElementById(url).scrollIntoView(true);
+  }
+
+  requestPermission(shareCustom){
+    this.resetPermisions();
+    this.openModal(shareCustom);
+  }
+
+  openModal(modaltemplate){
+    let ngbModalOptions: NgbModalOptions = {
+          backdrop : 'static',
+          keyboard : false,
+          windowClass: 'ModalClass-xl'// xl, lg, sm
+    };
+    this.modalReference = this.modalService.open(modaltemplate, ngbModalOptions);
+  }
+
+  closeModalShare() {
+    if (this.modalReference != undefined) {
+      this.modalReference.close();
+      this.modalReference = undefined;
+    }
+  }
+
+  resetPermisions(){
+    var dateNow = new Date();
+    var stringDateNow = this.dateService.transformDate(dateNow);
+    this.newPermission={
+      data:{patientInfo:false, medicalInfo:false,devicesInfo:false, genomicsInfo:false},
+      notes:'',
+      date: stringDateNow,
+      token: '',
+      operations:[]
+    };
+  }
+
+  submitInvalidForm() {
+    if (!this.sendForm) { return; }
+    const base = this.sendForm;
+    for (const field in base.form.controls) {
+      if (!base.form.controls[field].valid) {
+          base.form.controls[field].markAsTouched()
+      }
+    }
+  }
+
+  sendShare(){
+    this.sending = true;
+    this.newPermission.idUser = this.authService.getIdUser();
+    this.subscription.add( this.patientService.requestIndividualShare(this.newPermission)
+    .subscribe( (res : any) => {
+      console.log(res);
+      this.resetPermisions();
+      this.closeModalShare();
+      this.sending = false;
+      this.getIndividualShare();
+     }, (err) => {
+       console.log(err);
+       this.sending = false;
+     }));
+  }
+
+  getIndividualShare(){
+    this.sending = true;
+    this.subscription.add( this.patientService.getIndividualShare(this.authService.getIdUser())
+    .subscribe( (res : any) => {
+      console.log(res);
+      if(!res.message){
+        this.individualPermissions = res.individualShare;
+      }
+      
+      //this.patientPermissions = res;
+      this.sending = false;
+     }, (err) => {
+       console.log(err);
+       this.sending = false;
+     }));
   }
 
 }
