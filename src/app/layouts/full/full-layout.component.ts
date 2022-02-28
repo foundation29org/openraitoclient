@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, Inject, Renderer2, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, Inject, Renderer2, AfterViewInit, ViewChild, HostListener } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfigService } from 'app/shared/services/config.service';
 import { AuthService } from 'app/shared/auth/auth.service';
@@ -9,6 +9,7 @@ import { Injectable, Injector } from '@angular/core';
 import { Data } from 'app/shared/services/data.service';
 import { LayoutService } from "app/shared/services/layout.service";
 import { Subscription } from "rxjs";
+import { WINDOW } from 'app/shared/services/window.service';
 
 var fireRefreshEventOnWindow = function() {
   var evt = document.createEvent("HTMLEvents");
@@ -48,8 +49,9 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     isApp: boolean = false;
     isHomePage: boolean = false;
     eventsService: any = null;
+    isScrollTopVisible = false;
 
-    constructor(private elementRef: ElementRef, private layoutService: LayoutService, private configService: ConfigService, @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private authService: AuthService,  private router: Router, private inj: Injector, private dataservice: Data) {
+    constructor(private elementRef: ElementRef, private layoutService: LayoutService, private configService: ConfigService, @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private authService: AuthService,  private router: Router, private inj: Injector, private dataservice: Data, @Inject(WINDOW) private window: Window) {
       this.eventsService = this.inj.get(EventsService);
           this.isApp = this.document.URL.indexOf( 'http://' ) === -1 && this.document.URL.indexOf( 'https://' ) === -1 && location.hostname != "localhost" && location.hostname != "127.0.0.1";
           this.role = this.authService.getRole();
@@ -281,5 +283,37 @@ export class FullLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     getOptions($event): void {
         this.options = $event;
     }
+
+    //scroll to top on click
+  scrollToTop() {
+    window.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+
+   //Add/remove classes on page scroll
+   @HostListener("window:scroll", [])
+   onWindowScroll() {
+     let number = this.window.pageYOffset || this.document.documentElement.scrollTop || this.document.body.scrollTop || 0;
+     if (number > 60) {
+       this.renderer.addClass(this.document.body, "navbar-scrolled");
+     } else {
+       this.renderer.removeClass(this.document.body, "navbar-scrolled");
+     }
+ 
+     if (number > 400) {
+       this.isScrollTopVisible = true;
+     } else {
+       this.isScrollTopVisible = false;
+     }
+ 
+     if (number > 20) {
+       this.renderer.addClass(this.document.body, "page-scrolled");
+     } else {
+       this.renderer.removeClass(this.document.body, "page-scrolled");
+     }
+   }
 
 }

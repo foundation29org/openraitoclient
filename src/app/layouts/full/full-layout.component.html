@@ -42,5 +42,6 @@
           <app-footer *ngIf="role != 'Clinical' && role!='Admin'"></app-footer>
           <app-footer2 *ngIf="role == 'Clinical' || role=='Admin'"></app-footer2>
         </div>-->
+        <button class="btn btn-primary scroll-top" type="button" *ngIf="isScrollTopVisible" (click)="scrollToTop()"><i class="ft-arrow-up"></i></button>
     </div>
 </div>

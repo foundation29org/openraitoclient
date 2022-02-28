@@ -131,7 +131,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           vendorData: 'lp2ko.com'
         }
       });*/
-    }, 2000);
+    }.bind(this), 2000);
   }
 
   getPatients() {

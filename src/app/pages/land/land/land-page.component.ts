@@ -1442,6 +1442,10 @@ cleanOrphas(xrefs) {
 
   }
 
+  goTo(url){
+    document.getElementById(url).scrollIntoView(true);
+  }
+
 }
 
 export let lineChartSeries = [
