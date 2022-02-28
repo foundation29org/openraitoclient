@@ -1,0 +1,10 @@
+<div *ngIf="!isVerified && loadVerifiedInfo" id='veriff-root'></div>
+<div *ngIf="loadedPatients && patients.length>0">
+    <ng2-smart-table [settings]="alertsettings" [source]="alertSource"  (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
+</div>
+<div *ngIf="loadedPatients && patients.length==0">
+    No patients
+</div>
+<div *ngIf="!loadedPatients">
+    <div><p class="centerSpinner"><i class="fa fa-spinner fa-spin fa-3x fa-fw pink"></i></p></div>
+</div>

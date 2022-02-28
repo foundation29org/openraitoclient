@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/53348303-e009-4241-9ac7-a8e4465ece27/resourceGroups/raito/providers/Microsoft.Web/sites/openhealth29",
+    "appService.deploySubpath": "dist"
+}
