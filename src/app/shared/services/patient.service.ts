@@ -75,7 +75,7 @@ export class PatientService {
 
     getPatientsRequest(){
       //cargar las faqs del knowledgeBaseID
-      return this.http.get(environment.api+'/api/openraito/patientsrequest/')
+      return this.http.get(environment.api+'/api/openraito/patientsrequest/'+this.authService.getIdUser())
         .map( (res : any) => {
           if(res.listpatients.length>0){
             return (res.listpatients);

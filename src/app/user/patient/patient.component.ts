@@ -391,10 +391,9 @@ export class PatientComponent implements OnInit, OnDestroy {
 
   loadRecommendedDose() {
     this.recommendedDoses = [];
-    //load countries file
     this.subscription.add(this.http.get('assets/jsons/recommendedDose.json')
       .subscribe((res: any) => {
-        console.log(res)
+        //console.log(res)
         this.recommendedDoses = res;
       }));
 
@@ -433,7 +432,6 @@ export class PatientComponent implements OnInit, OnDestroy {
     .subscribe( (res : any) => {
       console.log(res);
       if(!res.message){
-        console.log(res);
         this.patientDataInfo = res.patient;
         this.patientDataInfo.birthDate = this.dateService.transformDate(res.patient.birthDate);
         this.patientDataInfo = JSON.parse(JSON.stringify(res.patient));
@@ -566,7 +564,6 @@ cleanOrphas(xrefs) {
     }
     this.subscription.add(this.patientService.getPatientWeightOpen(this.authService.getCurrentPatient().sub)
       .subscribe((res: any) => {
-        console.log(res);
         if (res.message == 'There are no weight') {
         } else if (res.message == 'old weight') {
           console.log(res.weight)
@@ -873,7 +870,6 @@ cleanOrphas(xrefs) {
       .subscribe((res: any) => {
 
         this.medications = res;
-        console.log(res);
         if (this.medications.length > 0) {
           res.sort(this.sortService.DateSortInver("date"));
           this.searchTranslationDrugs();
@@ -931,10 +927,8 @@ cleanOrphas(xrefs) {
   }
 
   getStructure(res) {
-    console.log(res);
     var lineChartDrugs = [];
     for (var i = 0; i < res.length; i++) {
-      console.log(res[i].drugTranslate);
       var foundElementDrugIndex = this.searchService.searchIndex(lineChartDrugs, 'name', res[i].drugTranslate);
       var splitDate = new Date(res[i].startDate);
       if (splitDate < this.minDateRange) {
@@ -973,8 +967,6 @@ cleanOrphas(xrefs) {
       }
 
     }
-
-    console.log(lineChartDrugs);
 
     var copymeds = JSON.parse(JSON.stringify(lineChartDrugs));
     for (var i = 0; i < lineChartDrugs.length; i++) {
@@ -1126,7 +1118,6 @@ cleanOrphas(xrefs) {
   getMaxValueRecommededDrug(name) {
     var maxDose = 0;
     var actualRecommendedDoses = this.recommendedDoses[name];
-    console.log(this.weight);
     if (actualRecommendedDoses == undefined || !this.weight) {
       return maxDose;
     } else {
@@ -1200,12 +1191,10 @@ cleanOrphas(xrefs) {
 
 
     this.barChart = seizu;
-    console.log(copymeds);
     this.lineChartSeries = copymeds;
     if (this.normalized2) {
 
       var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartSeries));
-      console.log(this.lineChartSeries);
       var maxValue = 0;
       for (var i = 0; i < this.lineChartSeries.length; i++) {
         var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartSeries[i].name);
@@ -1319,7 +1308,6 @@ cleanOrphas(xrefs) {
               }
             }
           }
-          console.log(this.phenotype.data);
           this.phenotype.data.sort(this.sortService.GetSortOrder("name"));
         }
       }, (err) => {
@@ -1349,7 +1337,6 @@ cleanOrphas(xrefs) {
 
     this.subscription.add(this.apiDx29ServerService.getAzureBlobSasToken(this.accessToken.containerName)
       .subscribe((res: any) => {
-        console.log(res);
         this.accessToken.sasToken = '?' + res;
       }, (err) => {
         console.log(err);
@@ -1427,7 +1414,6 @@ cleanOrphas(xrefs) {
     this.newPermission.idUser = this.authService.getIdUser();
     this.subscription.add( this.patientService.requestIndividualShare(this.newPermission)
     .subscribe( (res : any) => {
-      console.log(res);
       this.resetPermisions();
       this.closeModalShare();
       this.sending = false;
