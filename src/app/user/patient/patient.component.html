@@ -609,57 +609,16 @@
                                         <td><strong>{{doc.name}}</strong></td>
                                         <td>{{doc.description}}</td>
                                         <td>{{doc.dateDoc | date}}</td>
-                                        <td><span><a class="btn btn-sm btn-outline-dark mb-0 mr-1"
+                                        <td><span><a class="btn btn-sm btn-outline-dark mb-0"
                                             href="{{accessToken.blobAccountUrl}}{{accessToken.containerName}}/{{doc.url}}{{accessToken.sasToken}}"
                                             target="_blank" download>
-                                            <i class="fa fa-download"></i></a></span>
-                                    <span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
-                                            (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span></td>
+                                            <i class="fa fa-eye"></i></a></span>
+                                    <!--<span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
+                                            (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span>--></td>
                                     </tr>
                                   </tbody>
                                 </table>
                               </div>
-
-                             <!--<div *ngFor="let doc of docs; let i = index" class="pb-2 col-lg-3 col-md-6">
-                                <div class="border center-elements">
-                                    <div class="card-header pb-2 row">
-                                        <span class="col-12">
-                                            <span class="">
-                                                <i *ngIf="doc.extension=='.pdf'" class="fas fa-file-pdf fa-3x danger"></i>
-                                                <i *ngIf="doc.extension=='.docx' || doc.extension=='.doc'"
-                                                    class="fas fas fa-file-word fa-3x info"></i>
-                                                <i *ngIf="doc.extension=='.txt'"
-                                                    class="fas fas fa-file-alt fa-3x warning"></i>
-                                                <i *ngIf="doc.extension=='.json'"
-                                                    class="fas fas fa-file-code fa-3x grey"></i>
-                                                <i *ngIf="doc.extension == '.jpg' || doc.extension == '.png' || doc.extension == '.gif' || doc.extension == '.tiff' || doc.extension == '.tif' || doc.extension == '.bmp' || doc.extension == '.dib' || doc.extension == '.bpg' || doc.extension == '.psd' || doc.extension == '.jpeg' || doc.extension == '.jpe' || doc.extension == '.jfif'"
-                                                    class="fas fas fa-file-image fa-3x yellow"></i>
-                                                <i *ngIf="doc.extension=='.html'"
-                                                    class="fas fas fa-file-code fa-3x grey"></i>
-                                                <i *ngIf="doc.extension=='.vcf' || doc.extension=='.vcf.gz' || doc.extension=='.gz'"
-                                                    class="fas fas fa-dna fa-3x info"></i>
-                                            </span>
-                                            <span class="d-block mt-2">
-                                                <span class="d-block" style="font-weight: bolder;">
-                                                    {{doc.name}}
-                                                </span>
-                                                <span>
-                                                    {{doc.description}}
-                                                </span>
-                                            </span>
-                                            <span class="text-muted">{{doc.dateDoc | date}}</span>
-                                        </span>
-                                    </div>
-                                    <div class="pb-2">
-                                        <span><a class="btn btn-sm btn-outline-dark mb-0 mr-1"
-                                                href="{{accessToken.blobAccountUrl}}{{accessToken.containerName}}/{{doc.url}}{{accessToken.sasToken}}"
-                                                target="_blank" download>
-                                                <i class="fa fa-download"></i></a></span>
-                                        <span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
-                                                (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span>
-                                    </div>
-                                </div>
-                            </div>-->
                         </div>
                         <div class="row col-md-12" *ngIf="docs.length == 0 && loadedDocs">
                             <p class="mb-0">No docs saved</p>
