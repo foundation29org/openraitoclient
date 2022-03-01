@@ -75,7 +75,7 @@ export class PatientService {
 
     getPatientsRequest(){
       //cargar las faqs del knowledgeBaseID
-      return this.http.get(environment.api+'/api/openraito/patientsrequest/')
+      return this.http.get(environment.api+'/api/openraito/patientsrequest/'+this.authService.getIdUser())
         .map( (res : any) => {
           if(res.listpatients.length>0){
             return (res.listpatients);
@@ -102,6 +102,27 @@ export class PatientService {
       //cargar las faqs del knowledgeBaseID
       var info = {token: token}
       return this.http.post(environment.api+'/api/openraito/patient/all/'+patientId, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+    }
+
+    requestIndividualShare(info){
+      //cargar las faqs del knowledgeBaseID
+      return this.http.post(environment.api+'/api/openraito/patient/individualshare/'+this.authService.getCurrentPatient().sub, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+    }
+
+    getIndividualShare(idUser){
+      //cargar las faqs del knowledgeBaseID
+      var info = {idUser: idUser}
+      return this.http.post(environment.api+'/api/openraito/patient/getindividualshare/'+this.authService.getCurrentPatient().sub, info)
         .map( (res : any) => {
           return res;
          }, (err) => {

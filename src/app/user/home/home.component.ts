@@ -15,6 +15,7 @@ import { Apif29BioService } from 'app/shared/services/api-f29bio.service';
 import { Apif29NcrService } from 'app/shared/services/api-f29ncr.service';
 import { DateService } from 'app/shared/services/date.service';
 import { SearchFilterPipe } from 'app/shared/services/search-filter.service';
+import { TextTransform } from 'app/shared/services/transform-text.service';
 import { Subscription } from 'rxjs/Subscription';
 import Swal from 'sweetalert2';
 import { LocalDataSource } from 'ng2-smart-table';
@@ -50,8 +51,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   loadedPatients: boolean = false;
   alertsettings: any = {};
   alertSource: LocalDataSource;
+  listDiagnosesAllPatients: any = [];
+  especialRequest: any = [];
 
-  constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router) {
+  constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private textTransform: TextTransform) {
     this.adapter.setLocale(this.authService.getLang());
     this.lang = this.authService.getLang();
     switch (this.authService.getLang()) {
@@ -137,6 +140,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   getPatients() {
     this.loadedPatients = false;
     this.patients = [];
+    this.listDiagnosesAllPatients = [];
+    this.especialRequest = [];
     this.subscription.add(this.patientService.getPatientsRequest()
       .subscribe((res: any) => {
         if (res != null) {
@@ -182,16 +187,35 @@ export class HomeComponent implements OnInit, OnDestroy {
             } else {
               this.patients[i].gender2 = '-';
             }
+            if(this.patients[i].previousDiagnosis!=null){
+              this.listDiagnosesAllPatients.push(this.patients[i].previousDiagnosis);
+            }
+
+            if(this.patients[i].hasIndividualShare){
+              this.patients[i].hasIndividualShare = '<span class="black">'+this.translate.instant("generics.Yes")+'</span>';
+              this.especialRequest.push(this.patients[i]);
+           }else{
+              this.patients[i].hasIndividualShare = '<span class="black">'+this.translate.instant("generics.No")+'</span>';
+           }
           }
-          this.alertSource = new LocalDataSource(this.patients);
-          console.log(this.alertSource);
-          this.loadSettingTable();
-          this.loadedPatients = true;
+          if(this.listDiagnosesAllPatients.length>0){
+            this.getInfoDiseases();
+          }else{
+            this.loadAllPatientsToTable();
+          }
+          
         }
       }, (err) => {
         console.log(err);
         this.loadedPatients = true;
       }));
+  }
+
+  loadAllPatientsToTable(){
+    this.alertSource = new LocalDataSource(this.patients);
+    console.log(this.alertSource);
+    this.loadSettingTable();
+    this.loadedPatients = true;
   }
 
   ageFromDateOfBirthday(dateOfBirth: any) {
@@ -232,6 +256,51 @@ export class HomeComponent implements OnInit, OnDestroy {
           title: this.translate.instant("diagnosis.Case"),
           placeholder: this.translate.instant("diagnosis.Case"),
           type: "html",
+        },
+        hasIndividualShare: {
+          title: 'Shared with me',
+          placeholder: this.translate.instant("generics.Yes")+'/'+this.translate.instant("generics.No"),
+          type: "html",
+          filter: {
+            type: 'list',
+            config: {
+              selectText: 'Select...',
+              list: [
+                { value: this.translate.instant("generics.Yes"), title: this.translate.instant("generics.Yes") },
+                { value: this.translate.instant("generics.No"), title: this.translate.instant("generics.No") },
+              ],
+            },
+          },
+          filterFunction(cell?: string, search?: string): boolean {
+            if (cell.indexOf(search) != -1) {
+              return true;
+            } else {
+              return false;
+            }
+          },
+        },
+        diagnosisInfo: {
+          title: this.translate.instant("clinicalinfo.Diagnosis"),
+          placeholder: this.translate.instant("clinicalinfo.Diagnosis"),
+          type: "html",
+          valuePrepareFunction: (diagnosis) => {
+            if (diagnosis) {
+              var dev = '<span class="">'+diagnosis.name+'</span><span class="d-block">'+diagnosis.xrefs[0].name+':'+diagnosis.xrefs[0].id +'</span>'
+              return dev;
+            }
+            else{
+                return null;
+            }
+        },
+        filterFunction(cell?: string, search?:string): boolean {
+          var infoDisease = JSON.stringify(cell).toLowerCase();
+          var searchLowercase = search.toLowerCase();
+          if(infoDisease.indexOf(searchLowercase)!=-1){
+            return true;
+          }else{
+            return false;
+          }
+        },
         },
         patientName: {
           title: this.translate.instant("generics.Name"),
@@ -282,6 +351,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
   }
 
+  selectPatient(data){
+    this.authService.setGroup(data.group)
+    var info = {
+      sub: data.id,
+      patientName: null,
+      surname: null,
+      permissions: null,
+      alias: null,
+      birthDate: data.birthDate,
+      gender: data.gender,
+      country: null,
+      showSwalIntro: false
+    };
+    this.authService.setCurrentPatient(info);
+    this.router.navigate(['/patient']);
+  }
+
   handleGridSelected(e) {
     this.authService.setGroup(e.data.group)
     var info = {
@@ -297,34 +383,61 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
     this.authService.setCurrentPatient(info);
     this.router.navigate(['/patient']);
-
-    //esta llamada creo que sobra
-    /*this.subscription.add( this.patientService.getPatientData(e.data.id)
-    .subscribe( (res : any) => {
-      console.log(res);
-      if(!res.message){
-
-        var info = {
-          sub: e.data.id,
-          patientName: null,
-          surname: null,
-          permissions: null,
-          alias: null,
-          birthDate: e.data.birthDate,
-          gender: e.data.gender,
-          country: null,
-          showSwalIntro: false
-      };
-      console.log(e.data.group);
-        this.authService.setGroup(e.data.group)
-        this.authService.setCurrentPatient(info);
-        console.log(this.authService.getCurrentPatient())
-        this.router.navigate(['/patient']);
-      }
-      
-    }, (err) => {
-      console.log(err);
-    }));*/
   }
+
+  getInfoDiseases(){
+    this.subscription.add(this.apif29BioService.getInfoOfDiseasesLang(this.listDiagnosesAllPatients, this.lang)
+      .subscribe((res1: any) => {
+        for (var i = 0; i < this.patients.length; i++) {
+          if(this.patients[i].previousDiagnosis!=null){
+            this.patients[i].diagnosisInfo = res1[this.patients[i].previousDiagnosis];
+            this.patients[i].diagnosisInfo = this.cleanxrefs(this.patients[i].diagnosisInfo);
+          }
+          else{
+            this.patients[i].diagnosisInfo = null;
+          }
+        }
+        this.loadAllPatientsToTable();
+        
+      }, (err) => {
+          this.loadAllPatientsToTable();
+          console.log(err);
+      }));
+  }
+
+  cleanxrefs(disease) {
+    if (disease.xrefs != undefined) {
+        if (disease.xrefs.length == 0) {
+            disease.xrefs.push(disease.id);
+        }
+        disease.xrefs.sort((one, two) => (one > two ? -1 : 1));
+        var xrefs = this.cleanOrphas(disease.xrefs)
+        disease.xrefs = xrefs;
+    }
+    disease.name = this.textTransform.transform(disease.name);
+    return disease;
+}
+
+cleanOrphas(xrefs) {
+  var res = [];
+  var count = 0;
+  for (var i = 0; i < xrefs.length; i++) {
+      if (xrefs[i].indexOf('ORPHA') != -1 || xrefs[i].indexOf('ORPHANET') != -1 || xrefs[i].indexOf('OMIM') != -1 || xrefs[i].indexOf('Orphanet') != -1) {
+          if (xrefs[i].indexOf('ORPHA') != -1 || xrefs[i].indexOf('ORPHANET') != -1 || xrefs[i].indexOf('Orphanet') != -1) {
+              count++;
+          }
+          if (count <= 1) {
+              var value = xrefs[i].split(':');
+              if (xrefs[i].indexOf('ORPHA') != -1 || xrefs[i].indexOf('ORPHANET') != -1 || xrefs[i].indexOf('Orphanet') != -1) {
+                  res.push({ name: 'Orphanet', id: value[1] });
+              } else if (xrefs[i].indexOf('OMIM') != -1) {
+                  res.push({ name: 'OMIM', id: value[1] });
+              }
+              count++;
+          }
+      }
+  }
+  return res;
+}
 
 }

@@ -1,6 +1,62 @@
 <div *ngIf="!isVerified && loadVerifiedInfo" id='veriff-root'></div>
 <div *ngIf="loadedPatients && patients.length>0">
-    <ng2-smart-table [settings]="alertsettings" [source]="alertSource"  (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-2">
+                    <h4 class="card-title mb-1"><span>All cases</span></h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body p-0">
+                        <ng2-smart-table [settings]="alertsettings" [source]="alertSource"  (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="especialRequest.length>0">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header pb-2">
+                        <h4 class="card-title mb-1"><span>My cases</span></h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body p-0">
+                          <div class="table-responsive">
+                            <table class="table text-center m-0">
+                              <thead>
+                                <tr>
+                                  <th>Case</th>
+                                  <th>Diagnosis</th>
+                                  <th>Name</th>
+                                  <th>Surname</th>
+                                  <th>Status</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let oneRequest of especialRequest ; let i = index">
+                                    <td>{{oneRequest.id}}</td>
+                                    <td>
+                                        <span *ngIf="oneRequest.diagnosisInfo!=null">{{oneRequest.diagnosisInfo.name}} ({{oneRequest.diagnosisInfo.xrefs[0].name}}:{{oneRequest.diagnosisInfo.xrefs[0].id}})</span>
+                                        <span *ngIf="oneRequest.diagnosisInfo==null">-</span>
+                                    </td>
+                                    <td>{{oneRequest.patientName}}</td>
+                                    <td>{{oneRequest.surname}}</td>
+                                    <td>{{oneRequest.status}}</td>
+                                    <td><button class="mb-0 btn btn-sm btn-dark round mr-1"
+                                        (click)="selectPatient(oneRequest);">View</button></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <div *ngIf="loadedPatients && patients.length==0">
     No patients
