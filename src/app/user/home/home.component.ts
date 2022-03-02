@@ -390,8 +390,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe((res1: any) => {
         for (var i = 0; i < this.patients.length; i++) {
           if(this.patients[i].previousDiagnosis!=null){
-            this.patients[i].diagnosisInfo = res1[this.patients[i].previousDiagnosis];
-            this.patients[i].diagnosisInfo = this.cleanxrefs(this.patients[i].diagnosisInfo);
+            var copy = JSON.parse(JSON.stringify(res1[this.patients[i].previousDiagnosis]));
+            this.patients[i].diagnosisInfo = this.cleanxrefs(copy);
           }
           else{
             this.patients[i].diagnosisInfo = null;
@@ -406,6 +406,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   cleanxrefs(disease) {
+    console.log(disease);
     if (disease.xrefs != undefined) {
         if (disease.xrefs.length == 0) {
             disease.xrefs.push(disease.id);
@@ -419,6 +420,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 }
 
 cleanOrphas(xrefs) {
+  console.log(xrefs);
   var res = [];
   var count = 0;
   for (var i = 0; i < xrefs.length; i++) {

@@ -108,7 +108,7 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.config = this.configService.templateConf;
 
-    this.loadPatientId();
+    //this.loadPatientId();
   }
 
   ngAfterViewInit() {

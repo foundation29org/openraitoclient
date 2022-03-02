@@ -17,12 +17,13 @@
                 <div class="card-content">
                     <div class="card-body">
                         <div class="d-flex justify-content-end mb-1">
-                            <button type="button" class="btn btn-sm btn-dark mb-0" (click)="goToTop()">Contact</button>
+                            <button type="button" class="btn btn-sm btn-dark mb-0" style="cursor: not-allowed;" [disabled]="true" (click)="goToTop()">Contact</button>
                         </div>
                         <div class="text-center mb-4">
                             <em class="ft-user avatar mb-2 fa-4x"></em>
                             <h4 class="mb-0 mt-2" *ngIf="patientPermissions.data.patientInfo">
-                                {{patientDataInfo.patientName}} {{patientDataInfo.surname}}
+                                <span *ngIf="patientDataInfo.patientName" class="mr-1">{{patientDataInfo.patientName}}</span> <span *ngIf="patientDataInfo.surname">{{patientDataInfo.surname}}</span>
+                                <span *ngIf="!patientDataInfo.patientName && !patientDataInfo.surname">Unknown name</span>                                 
                             </h4>
                             <h4 class="mb-0 mt-2" *ngIf="!patientPermissions.data.patientInfo">
                                 ********* **********
@@ -35,7 +36,9 @@
                                         </button>
                                         <div class="ml-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
-                                                {{patientDataInfo.gender}}
+                                                <span *ngIf="patientDataInfo.gender">{{patientDataInfo.gender}}</span>
+                                                <span *ngIf="!patientDataInfo.gender">{{'diagnosis.Unknown' | translate }}</span>
+                                                
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                                 *****
@@ -51,7 +54,8 @@
                                         </button>
                                         <div class="ml-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
-                                                {{patientDataInfo.birthDate | date }}
+                                                <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate}}</span>
+                                                <span *ngIf="!patientDataInfo.birthDate">{{'diagnosis.Unknown' | translate }}</span>
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                                 **/**/****
@@ -65,32 +69,36 @@
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="ml-2">
                                 <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
-                                    {{infoOneDisease.name}}
-                                    <span class="d-block">
-                                        <span class="content-sub-header text-muted"
-                                            *ngIf="infoOneDisease.xrefs!=undefined">
-                                            <span *ngIf="infoOneDisease.xrefs.length>0">{{
-                                                infoOneDisease.xrefs[0].name}}:{{
-                                                infoOneDisease.xrefs[0].id}}</span>
-                                            <span *ngIf="infoOneDisease.xrefs.length==0">{{ infoOneDisease.id }}</span>
-                                        </span>
-                                        <span *ngIf="infoOneDisease.xrefs!=undefined" class="ml-1">
-                                            <span *ngFor="let xref of infoOneDisease.xrefs ; let i = index">
-                                                <a *ngIf="xref.name=='Orphanet'" class="info"
-                                                    href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{xref.id}}&lng={{lang}}"
-                                                    target="_blank" title="{{'generics.More Info' | translate }}"><i
-                                                        class="ft-external-link"></i></a>
-                                                <a *ngIf="xref.name=='OMIM'" class="info"
-                                                    href="https://omim.org/entry/{{xref.id}}" target="_blank"
-                                                    title="{{'generics.More Info' | translate }}"><i
-                                                        class="ft-external-link"></i></a>
-                                                <span *ngIf="i<(infoOneDisease.xrefs.length-1)"> </span>
+                                    <span *ngIf="infoOneDisease.name">{{infoOneDisease.name}}</span>
+                                    <span *ngIf="!infoOneDisease.name">{{'diagnosis.Unknown' | translate }}</span>
+                                    <span *ngIf="infoOneDisease.name">
+                                        <span class="d-block">
+                                            <span class="content-sub-header text-muted"
+                                                *ngIf="infoOneDisease.xrefs!=undefined">
+                                                <span *ngIf="infoOneDisease.xrefs.length>0">{{
+                                                    infoOneDisease.xrefs[0].name}}:{{
+                                                    infoOneDisease.xrefs[0].id}}</span>
+                                                <span *ngIf="infoOneDisease.xrefs.length==0">{{ infoOneDisease.id }}</span>
+                                            </span>
+                                            <span *ngIf="infoOneDisease.xrefs!=undefined" class="ml-1">
+                                                <span *ngFor="let xref of infoOneDisease.xrefs ; let i = index">
+                                                    <a *ngIf="xref.name=='Orphanet'" class="info"
+                                                        href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{xref.id}}&lng={{lang}}"
+                                                        target="_blank" title="{{'generics.More Info' | translate }}"><i
+                                                            class="ft-external-link"></i></a>
+                                                    <a *ngIf="xref.name=='OMIM'" class="info"
+                                                        href="https://omim.org/entry/{{xref.id}}" target="_blank"
+                                                        title="{{'generics.More Info' | translate }}"><i
+                                                            class="ft-external-link"></i></a>
+                                                    <span *ngIf="i<(infoOneDisease.xrefs.length-1)"> </span>
+                                                </span>
                                             </span>
                                         </span>
+                                        <div class="">
+                                            <p class="mb-0">{{infoOneDisease.desc}}</p>
+                                        </div>
                                     </span>
-                                    <div class="">
-                                        <p class="mb-0">{{infoOneDisease.desc}}</p>
-                                    </div>
+                                    
                                 </h5>
                                 <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                     **************
@@ -498,7 +506,7 @@
                                         </label><span style="margin-left: 0.2rem !important;">{{titleDose}}</span>
                                     </span>
                                     <div id="line-chart2" #ContainerRef>
-                                        <div id="chartdoseAvgDrugs" style="max-height: 100px;" class="ct-chart"
+                                        <div id="chartdoseAvgDrugs" style="max-height: 100px;" class="ct-chart mt-2"
                                             height="200px">
                                         </div>
                                         <ngx-charts-line-chart [view]="[(ContainerRef.offsetWidth), 100]"
@@ -642,7 +650,7 @@
                                     <div class="col-12">
                                         <h4 class="text-bold-500 mb-0"></h4>
                                         <p class="mb-0">No tienes permisos <a *ngIf="individualPermissions.status!='Pending'" (click)="requestPermission(shareCustom)">Request</a></p>
-                                        <p *ngIf="individualPermissions.status=='Pending'">Status: {{individualPermissions.status}} </p>
+                                        <p *ngIf="individualPermissions.status!='Accepted'">Status: {{individualPermissions.status}} </p>
                                     </div>
                                 </div>
                             </div>
