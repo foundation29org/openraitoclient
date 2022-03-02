@@ -258,13 +258,13 @@ export class HomeComponent implements OnInit, OnDestroy {
           type: "html",
         },
         hasIndividualShare: {
-          title: 'Shared with me',
+          title: this.translate.instant("open.Shared with me"),
           placeholder: this.translate.instant("generics.Yes")+'/'+this.translate.instant("generics.No"),
           type: "html",
           filter: {
             type: 'list',
             config: {
-              selectText: 'Select...',
+              selectText: this.translate.instant("open.Select..."),
               list: [
                 { value: this.translate.instant("generics.Yes"), title: this.translate.instant("generics.Yes") },
                 { value: this.translate.instant("generics.No"), title: this.translate.instant("generics.No") },
@@ -324,7 +324,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           filter: {
             type: 'list',
             config: {
-              selectText: 'Select...',
+              selectText: this.translate.instant("open.Select..."),
               list: [
                 { value: this.translate.instant("personalinfo.Male"), title: this.translate.instant("personalinfo.Male") },
                 { value: this.translate.instant("personalinfo.Female"), title: this.translate.instant("personalinfo.Female") },

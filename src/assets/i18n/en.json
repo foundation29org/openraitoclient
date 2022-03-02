@@ -221,6 +221,7 @@
     "Resend": "Resend",
     "Shared": "Shared",
     "Pending": "Pending",
+    "Accepted":"Accepted",
     "Guest": "Guest",
     "Rejected": "Rejected",
     "Copy": "Copy",
@@ -1709,6 +1710,31 @@
     "grap2": "The following graph shows how the quality of life evolves.",
     "grap3": "The following graph shows the medication in through time. The dose is normalized to the recommended dose per drug.",
     "contentDemo": "The data below is not your data, but a template to show you what data the report contains."
+  },
+  "open":{
+    "All cases": "All cases",
+    "No patients": "No patients",
+    "Contact": "Contact",
+    "Unknown name": "Unknown name",
+    "Seizures in the last": "Seizures in the last",
+    "The patient weight is": "The patient weight is",
+    "It has not been indicated when the symptom appeared": "It has not been indicated when the symptom appeared",
+    "Appeared in": "Appeared in",
+    "There are no documents": "There are no documents",
+    "You dont have permissions, log in": "You don't have permissions, log in, and ask for access.",
+    "My cases": "My cases",
+    "Case": "Case",
+    "You are not allowed to view the basic data": "You are not allowed to view the basic data",
+    "You do not have permissions": "You do not have permissions",
+    "Request": "Request",
+    "perm1desc": "Data from the patient profile section",
+    "perm2desc": "Medical information such as documents, seizures, drugs, symptoms, etc.",
+    "perm3desc": "Devices information",
+    "perm4desc": "Genetic information",
+    "Permissions": "Permissions",
+    "Go top": "Go top",
+    "Shared with me": "Shared with me",
+    "Select...": "Select..."
   }
 }
 

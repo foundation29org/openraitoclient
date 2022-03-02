@@ -220,6 +220,7 @@
     "Resend": "Reenviar",
     "Shared": "Compartido",
     "Pending": "Pendiente",
+    "Accepted":"Aceptado",
     "Guest": "Invitado",
     "Rejected": "Rechazado",
     "Copy": "Copiar",
@@ -1710,5 +1711,30 @@
     "grap2": "El siguiente gráfico muestra cómo evoluciona la calidad de vida.",
     "grap3": "El siguiente gráfico muestra la medicación en el tiempo. La dosis está normalizada a la dosis recomendada por medicamento.",
     "contentDemo": "Los datos que aparecen a continuación no son los suyos, sino una plantilla para mostrar los datos que contiene el informe."
+  },
+  "open":{
+    "All cases": "Todos los casos",
+    "No patients": "No hay pacientes",
+    "Contact": "Contacto",
+    "Unknown name": "Nombre desconocido",
+    "Seizures in the last": "Convulsiones en el último",
+    "The patient weight is": "El peso del paciente es",
+    "It has not been indicated when the symptom appeared": "No se ha indicado cuando apareció el síntoma",
+    "Appeared in": "Apareció en",
+    "There are no documents": "No hay documentos",
+    "You dont have permissions, log in": "No tiene permisos, inicie sesión y pida acceso.",
+    "My cases": "Mis casos",
+    "Case": "Caso",
+    "You are not allowed to view the basic data": "No tienes permisos para ver los datos básicos",
+    "You do not have permissions": "No tienes permisos",
+    "Request": "Solicitar",
+    "perm1desc": "Datos de la sección de perfil del paciente",
+    "perm2desc": "Información médica como documentos, convulsiones, medicamentos, síntomas, etc.",
+    "perm3desc": "Información de dispositivos",
+    "perm4desc": "Información genética",
+    "Permissions": "Permisos",
+    "Go top": "Subir",
+    "Shared with me": "Compartido conmigo",
+    "Select...": "Seleccionar..."
   }
 }
