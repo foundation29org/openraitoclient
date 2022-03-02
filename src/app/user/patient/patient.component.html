@@ -17,13 +17,13 @@
                 <div class="card-content">
                     <div class="card-body">
                         <div class="d-flex justify-content-end mb-1">
-                            <button type="button" class="btn btn-sm btn-dark mb-0" style="cursor: not-allowed;" [disabled]="true" (click)="goToTop()">Contact</button>
+                            <button type="button" class="btn btn-sm btn-dark mb-0" style="cursor: not-allowed;" [disabled]="true" (click)="goToTop()">{{'open.Contact' | translate }}</button>
                         </div>
                         <div class="text-center mb-4">
                             <em class="ft-user avatar mb-2 fa-4x"></em>
                             <h4 class="mb-0 mt-2" *ngIf="patientPermissions.data.patientInfo">
                                 <span *ngIf="patientDataInfo.patientName" class="mr-1">{{patientDataInfo.patientName}}</span> <span *ngIf="patientDataInfo.surname">{{patientDataInfo.surname}}</span>
-                                <span *ngIf="!patientDataInfo.patientName && !patientDataInfo.surname">Unknown name</span>                                 
+                                <span *ngIf="!patientDataInfo.patientName && !patientDataInfo.surname">{{'open.Unknown name' | translate }}</span>                                 
                             </h4>
                             <h4 class="mb-0 mt-2" *ngIf="!patientPermissions.data.patientInfo">
                                 ********* **********
@@ -36,14 +36,17 @@
                                         </button>
                                         <div class="ml-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
-                                                <span *ngIf="patientDataInfo.gender">{{patientDataInfo.gender}}</span>
+                                                <span *ngIf="patientDataInfo.gender">
+                                                    <span *ngIf="patientDataInfo.gender=='male'">{{'personalinfo.Male' | translate }}</span>
+                                                    <span *ngIf="patientDataInfo.gender=='female'">{{'personalinfo.Female' | translate }}</span>
+                                                </span>
                                                 <span *ngIf="!patientDataInfo.gender">{{'diagnosis.Unknown' | translate }}</span>
                                                 
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                                 *****
                                             </h5>
-                                            <span class="grey">Gender</span>
+                                            <span class="grey">{{'personalinfo.Gender' | translate }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -54,13 +57,13 @@
                                         </button>
                                         <div class="ml-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
-                                                <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate}}</span>
+                                                <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate |date}}</span>
                                                 <span *ngIf="!patientDataInfo.birthDate">{{'diagnosis.Unknown' | translate }}</span>
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                                 **/**/****
                                             </h5>
-                                            <span class="grey">Birth date</span>
+                                            <span class="grey">{{'personalinfo.Birth Date' | translate }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -103,13 +106,13 @@
                                 <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                     **************
                                 </h5>
-                                <span class="grey">Diagnosis</span>
+                                <span class="grey">{{'clinicalinfo.Diagnosis' | translate }}</span>
                             </div>
 
                         </div>
                     </div>
                     <div class="col-md-12" *ngIf="!patientPermissions.data.patientInfo">
-                        <p class="mb-0">No tienes permisos para ver los datos básicos</p>
+                        <p class="mb-0">{{'open.You are not allowed to view the basic data' | translate }}</p>
                     </div>
                 </div>
             </div>
@@ -142,7 +145,7 @@
                                 <div class="media pb-1">
                                     <div class="media-body white text-left">
                                         <h3 class="font-large-1 white mb-0">{{docs.length}}</h3>
-                                        <span>Documents</span>
+                                        <span>{{'land.Documents' | translate }}</span>
                                     </div>
                                     <div class="media-right white text-right">
                                         <em class="fa-solid fa-book-medical font-large-1"></em>
@@ -159,7 +162,7 @@
                                 <div class="media pb-1">
                                     <div class="media-body white text-left">
                                         <h3 class="font-large-1 white mb-0">{{events.length}}</h3>
-                                        <span>Seizures in the last
+                                        <span>{{'open.Seizures in the last' | translate }}
                                             <span *ngIf="rangeDate=='month'">{{'charts.month' |
                                                 translate }}</span>
                                             <span *ngIf="rangeDate=='quarter'">{{'charts.quarter' |
@@ -230,7 +233,7 @@
                           </div>
                         <div class="card-footer">
                             <div class="d-block col-md-12 mt-1">
-                                <p>* The patient weight is {{weight |
+                                <p>* {{'open.The patient weight is' | translate }} {{weight |
                                     number : '1.0-2'}} kg</p>
                             </div>
                         </div>
@@ -272,10 +275,10 @@
 
                                                         <div class="ml-1" style="line-height: 0.5em !important;">
                                                             <span *ngIf="!hpo.onset">
-                                                                It has not been indicated when the symptom appeared
+                                                                {{'open.It has not been indicated when the symptom appeared' | translate }}
                                                             </span>
                                                             <span *ngIf="hpo.onset">
-                                                                Appeared in {{hpo.onset | date: 'y': '' :
+                                                                {{'open.Appeared in' | translate }} {{hpo.onset | date: 'y': '' :
                                                                 translate.currentLang}}
                                                             </span>
 
@@ -300,7 +303,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title d-inline">
-                        <span>Charts</span>
+                        <span>{{'menu.Charts' | translate }}</span>
                     </h4>
                     <span class="optionsCharts">
                         <span><button class="mb-0 btn btn-sm btn-dark round mr-1" [disabled]="rangeDate=='month'"
@@ -329,7 +332,7 @@
                                                 {{'charts.infoSeizures' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <div id="line-chart2" class="height-100">
@@ -376,7 +379,7 @@
                                                 {{'charts.infoSeizures' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <p class="mb-0">{{'charts.Noseizures' | translate }}
@@ -408,7 +411,7 @@
                                                 {{'charts.infoFeel' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <div id="line-chart2" class="height-100">
@@ -465,7 +468,7 @@
                                                 {{'charts.infoFeel' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <p class="mb-0">{{'charts.No data saved' | translate }}
@@ -495,7 +498,7 @@
                                                 {{'charts.infoDrugs' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <span class="text-muted">
@@ -537,7 +540,7 @@
                                                 {{'charts.infoDrugs' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <p class="mb-0">{{'charts.There is no drug data stored' | translate }}
@@ -599,7 +602,7 @@
                 <div class="card-content">
                     <div class="card-body">
                         <h4 class="card-title mb-2">
-                            <span>Documents</span>
+                            <span>{{'land.Documents' | translate }}</span>
                         </h4>
                         <div class="row col-md-12" *ngIf="docs.length > 0">
                             <div class="table-responsive">
@@ -607,9 +610,9 @@
                                   <thead>
                                     <tr>
                                       <th>{{'generics.Name' |translate }}</th>
-                                      <th>Description</th>
-                                      <th>Date</th>
-                                      <th>Options</th>
+                                      <th>{{'generics.Description' |translate }}</th>
+                                      <th>{{'generics.Date' |translate }}</th>
+                                      <th>{{'generics.Options' |translate }}</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -629,7 +632,7 @@
                               </div>
                         </div>
                         <div class="row col-md-12" *ngIf="docs.length == 0 && loadedDocs">
-                            <p class="mb-0">No docs saved</p>
+                            <p class="mb-0">{{'open.There are no documents' | translate }}</p>
                         </div>
                     </div>
                 </div>
@@ -649,8 +652,12 @@
                                 <div class="row p-2">
                                     <div class="col-12">
                                         <h4 class="text-bold-500 mb-0"></h4>
-                                        <p class="mb-0">No tienes permisos <a *ngIf="individualPermissions.status!='Pending'" (click)="requestPermission(shareCustom)">Request</a></p>
-                                        <p *ngIf="individualPermissions.status!='Accepted'">Status: {{individualPermissions.status}} </p>
+                                        <p class="mb-0">{{'open.You do not have permissions' | translate }} <a *ngIf="individualPermissions.status!='Pending'" class="btn btn-dark" (click)="requestPermission(shareCustom)">{{'open.Request' | translate }}</a></p>
+                                        <p *ngIf="individualPermissions.status!='Accepted'">{{'generics.Status' |translate }}: 
+                                            <span *ngIf="individualPermissions.status=='Pending'">{{'generics.Pending' |translate }}</span>
+                                            <span *ngIf="individualPermissions.status=='Accepted'">{{'generics.Accepted' |translate }}</span>
+                                            <span *ngIf="individualPermissions.status=='Rejected'">{{'generics.Rejected' |translate }}</span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -728,7 +735,7 @@
         <div class="p-2">
             <div>
                 <span class="animate-bottom" *ngIf="showButtonScroll" id="buttomScroll">
-                    <button type="button" class="btn btn-dark round mb-0" (click)="goToTop()">Go top</button>
+                    <button type="button" class="btn btn-dark round mb-0" (click)="goToTop()">{{'open.Go top' |translate }}</button>
                 </span>
                 <div class="mt-2 text-center">
                     <a id="initpos"></a>
@@ -753,26 +760,26 @@
     <div>
       <div class="mt-2">
         <div class="form-group col-md-12">
-                <p class="mb-1">Permissions</p>
+                <p class="mb-1">{{'open.Permissions' |translate }}</p>
                 <section class="example-section">
-                    <span class="d-block"><mat-checkbox name="newPermission.data.patientInfo" [(ngModel)]="newPermission.data.patientInfo">Data from the patient profile section</mat-checkbox></span>
-                    <span class="d-block"><mat-checkbox name="newPermission.data.medicalInfo" [(ngModel)]="newPermission.data.medicalInfo">Medical information such as documents, seizures, drugs, symptoms, etc.</mat-checkbox></span>
-                    <span class="d-block"><mat-checkbox name="newPermission.data.devicesInfo" [(ngModel)]="newPermission.data.devicesInfo">Devices information</mat-checkbox></span>
-                    <span class="d-block"><mat-checkbox name="newPermission.data.genomicsInfo" [(ngModel)]="newPermission.data.genomicsInfo">Genetic information</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.patientInfo" [(ngModel)]="newPermission.data.patientInfo">{{'open.perm1desc' |translate }}</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.medicalInfo" [(ngModel)]="newPermission.data.medicalInfo">{{'open.perm2desc' |translate }}</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.devicesInfo" [(ngModel)]="newPermission.data.devicesInfo">{{'open.perm3desc' |translate }}</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.genomicsInfo" [(ngModel)]="newPermission.data.genomicsInfo">{{'open.perm4desc' |translate }}</mat-checkbox></span>
                 </section>
-                <label for="notes">Notes</label>
+                <label for="notes">{{'generics.notes' |translate }}</label>
                 <textarea name="notes" id="textarea1" class="autoajustable form-control" [(ngModel)]="newPermission.notes"></textarea>
         </div>
     </div>
     <div class="col-md-12">
       <div class="center-elements" *ngIf="!sending">
-        <button class="btn btn-secondary mr-1" (click)="cancelCustom()"><span>Cancel</span></button>
+        <button class="btn btn-secondary mr-1" (click)="cancelCustom()"><span>{{'generics.Cancel' |translate }}</span></button>
         <div *ngIf="f.valid;then formValid else formError"></div>
         <ng-template #formValid>
-          <button class="btn btn-dark ml-1" (click)="sendShare()">Add</button>
+          <button class="btn btn-dark ml-1" (click)="sendShare()">{{'generics.Add' |translate }}</button>
         </ng-template>
         <ng-template #formError>
-          <button class="btn btn-dark ml-1" type="button" disabled="true" (click)="submitInvalidForm()"> <span *ngIf="newPermission._id==null">Add</span><span *ngIf="newPermission._id!=null">Update</span></button>
+          <button class="btn btn-dark ml-1" type="button" disabled="true" (click)="submitInvalidForm()"> <span *ngIf="newPermission._id==null">{{'generics.Add' |translate }}</span><span *ngIf="newPermission._id!=null">{{'generics.Update' |translate }}</span></button>
         </ng-template>
         
       </div>

@@ -404,7 +404,7 @@ cleanOrphas(xrefs) {
           filter: {
             type: 'list',
             config: {
-              selectText: 'Select...',
+              selectText: this.translate.instant("open.Select..."),
               list: [
                 { value: this.translate.instant("personalinfo.Male"), title: this.translate.instant("personalinfo.Male") },
                 { value: this.translate.instant("personalinfo.Female"), title: this.translate.instant("personalinfo.Female") },

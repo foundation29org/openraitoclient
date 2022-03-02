@@ -5,21 +5,21 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header pb-2">
-                            <h4 class="card-title mb-1"><span>All cases</span></h4>
+                            <h4 class="card-title mb-1"><span>{{'open.All cases' | translate }}</span></h4>
                         </div>
                         <div class="card-content">
                             <div class="card-body p-0">
                                 <ng2-smart-table [settings]="alertsettings" [source]="alertSource"
-                (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
+                                    (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
                             </div>
-                          </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
         </div>
         <div *ngIf="loadedPatients && patients.length==0">
-            No patients
+            {{'open.No patients' | translate }}
         </div>
         <div *ngIf="!loadedPatients">
             <div>
@@ -39,15 +39,18 @@
                 <div class="card-content">
                     <div class="card-body">
                         <div class="d-flex justify-content-end mb-1">
-                            <button type="button" class="btn btn-sm btn-dark mb-0" style="cursor: not-allowed;" [disabled]="true" (click)="goToTop()">Contact</button>
+                            <button type="button" class="btn btn-sm btn-dark mb-0" style="cursor: not-allowed;"
+                                [disabled]="true" (click)="goToTop()">{{'open.Contact' | translate }}</button>
                         </div>
                         <div class="text-center mb-4">
                             <em class="ft-user avatar mb-2 fa-4x"></em>
                             <h4 class="mb-0 mt-2" *ngIf="patientPermissions.data.patientInfo">
-                                <span *ngIf="patientDataInfo.patientName" class="mr-1">{{patientDataInfo.patientName}}</span> 
-                                <span *ngIf="!patientDataInfo.patientName && !patientDataInfo.surname">Unknown name</span> 
+                                <span *ngIf="patientDataInfo.patientName"
+                                    class="mr-1">{{patientDataInfo.patientName}}</span>
+                                <span *ngIf="!patientDataInfo.patientName && !patientDataInfo.surname">{{'open.Unknown
+                                    name' | translate }}</span>
                                 <span *ngIf="patientDataInfo.surname">{{patientDataInfo.surname}}</span>
-                                 
+
                             </h4>
                             <h4 class="mb-0 mt-2" *ngIf="!patientPermissions.data.patientInfo">
                                 ********* **********
@@ -60,14 +63,21 @@
                                         </button>
                                         <div class="ml-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
-                                                <span *ngIf="patientDataInfo.gender">{{patientDataInfo.gender}}</span>
-                                                <span *ngIf="!patientDataInfo.gender">{{'diagnosis.Unknown' | translate }}</span>
-                                                
+                                                <span *ngIf="patientDataInfo.gender">
+                                                    <span *ngIf="patientDataInfo.gender=='male'">{{'personalinfo.Male' |
+                                                        translate }}</span>
+                                                    <span
+                                                        *ngIf="patientDataInfo.gender=='female'">{{'personalinfo.Female'
+                                                        | translate }}</span>
+                                                </span>
+                                                <span *ngIf="!patientDataInfo.gender">{{'diagnosis.Unknown' | translate
+                                                    }}</span>
+
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                                 *****
                                             </h5>
-                                            <span class="grey">Gender</span>
+                                            <span class="grey">{{'personalinfo.Gender' | translate }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -78,13 +88,15 @@
                                         </button>
                                         <div class="ml-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
-                                                <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate}}</span>
-                                                <span *ngIf="!patientDataInfo.birthDate">{{'diagnosis.Unknown' | translate }}</span>
+                                                <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate |
+                                                    date}}</span>
+                                                <span *ngIf="!patientDataInfo.birthDate">{{'diagnosis.Unknown' |
+                                                    translate }}</span>
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                                 **/**/****
                                             </h5>
-                                            <span class="grey">Birth date</span>
+                                            <span class="grey">{{'personalinfo.Birth Date' | translate }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -102,7 +114,8 @@
                                                 <span *ngIf="infoOneDisease.xrefs.length>0">{{
                                                     infoOneDisease.xrefs[0].name}}:{{
                                                     infoOneDisease.xrefs[0].id}}</span>
-                                                <span *ngIf="infoOneDisease.xrefs.length==0">{{ infoOneDisease.id }}</span>
+                                                <span *ngIf="infoOneDisease.xrefs.length==0">{{ infoOneDisease.id
+                                                    }}</span>
                                             </span>
                                             <span *ngIf="infoOneDisease.xrefs!=undefined" class="ml-1">
                                                 <span *ngFor="let xref of infoOneDisease.xrefs ; let i = index">
@@ -122,12 +135,12 @@
                                             <p class="mb-0">{{infoOneDisease.desc}}</p>
                                         </div>
                                     </span>
-                                    
+
                                 </h5>
                                 <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                     **************
                                 </h5>
-                                <span class="grey">Diagnosis</span>
+                                <span class="grey">{{'clinicalinfo.Diagnosis' | translate }}</span>
                             </div>
 
                         </div>
@@ -166,7 +179,7 @@
                                 <div class="media pb-1">
                                     <div class="media-body white text-left">
                                         <h3 class="font-large-1 white mb-0">{{docs.length}}</h3>
-                                        <span>Documents</span>
+                                        <span>{{'land.Documents' | translate }}</span>
                                     </div>
                                     <div class="media-right white text-right">
                                         <em class="fa-solid fa-book-medical font-large-1"></em>
@@ -183,7 +196,7 @@
                                 <div class="media pb-1">
                                     <div class="media-body white text-left">
                                         <h3 class="font-large-1 white mb-0">{{events.length}}</h3>
-                                        <span>Seizures in the last
+                                        <span>{{'open.Seizures in the last' | translate }}
                                             <span *ngIf="rangeDate=='month'">{{'charts.month' |
                                                 translate }}</span>
                                             <span *ngIf="rangeDate=='quarter'">{{'charts.quarter' |
@@ -227,34 +240,34 @@
                         </div>
                         <div class="card-content">
                             <div class="card-body p-0">
-                              <div class="table-responsive">
-                                <table class="table text-center m-0">
-                                  <thead>
-                                    <tr>
-                                      <th>{{'generics.Name' |translate }}</th>
-                                      <th>{{'medication.mg/day' | translate }} *</th>
-                                      <th>{{'generics.Start Date' | translate}}</th>
-                                      <th>{{'generics.End Date' | translate }}</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <tr *ngFor="let drug of medications ; let i = index">
-                                        <td><strong>{{drug.drugTranslate}}</strong></td>
-                                        <td>{{drug.dose}}</td>
-                                        <td>{{drug.startDate | date}}</td>
-                                        <td><span
-                                            *ngIf="drug.endDate">{{drug.endDate | date}}</span><span
-                                            *ngIf="!drug.endDate">{{'medication.Currently taking' | translate
-                                            }}</span></td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
+                                <div class="table-responsive">
+                                    <table class="table text-center m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>{{'generics.Name' |translate }}</th>
+                                                <th>{{'medication.mg/day' | translate }} *</th>
+                                                <th>{{'generics.Start Date' | translate}}</th>
+                                                <th>{{'generics.End Date' | translate }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let drug of medications ; let i = index">
+                                                <td><strong>{{drug.drugTranslate}}</strong></td>
+                                                <td>{{drug.dose}}</td>
+                                                <td>{{drug.startDate | date}}</td>
+                                                <td><span *ngIf="drug.endDate">{{drug.endDate | date}}</span><span
+                                                        *ngIf="!drug.endDate">{{'medication.Currently taking' |
+                                                        translate
+                                                        }}</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                          </div>
+                        </div>
                         <div class="card-footer">
                             <div class="d-block col-md-12 mt-1">
-                                <p>* The patient weight is {{weight |
+                                <p>* {{'open.The patient weight is' | translate }} {{weight |
                                     number : '1.0-2'}} kg</p>
                             </div>
                         </div>
@@ -265,7 +278,7 @@
     </div>
     <a id="linksympt" style="position: absolute;margin-top: -4em;"></a>
     <div class="row match-height">
-        
+
         <div class="col-xl-4 col-md-6" *ngIf="phenotype.data">
             <div class="card">
                 <div class="card-content">
@@ -296,10 +309,12 @@
 
                                                         <div class="ml-1" style="line-height: 0.5em !important;">
                                                             <span *ngIf="!hpo.onset">
-                                                                It has not been indicated when the symptom appeared
+                                                                {{'open.It has not been indicated when the symptom
+                                                                appeared' | translate }}
                                                             </span>
                                                             <span *ngIf="hpo.onset">
-                                                                Appeared in {{hpo.onset | date: 'y': '' :
+                                                                {{'open.Appeared in' | translate }} {{hpo.onset | date:
+                                                                'y': '' :
                                                                 translate.currentLang}}
                                                             </span>
 
@@ -324,7 +339,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title d-inline">
-                        <span>Charts</span>
+                        <span>{{'menu.Charts' | translate }}</span>
                     </h4>
                     <span class="optionsCharts">
                         <span><button class="mb-0 btn btn-sm btn-dark round mr-1" [disabled]="rangeDate=='month'"
@@ -353,7 +368,7 @@
                                                 {{'charts.infoSeizures' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <div id="line-chart2" class="height-100">
@@ -400,7 +415,7 @@
                                                 {{'charts.infoSeizures' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <p class="mb-0">{{'charts.Noseizures' | translate }}
@@ -432,7 +447,7 @@
                                                 {{'charts.infoFeel' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <div id="line-chart2" class="height-100">
@@ -489,7 +504,7 @@
                                                 {{'charts.infoFeel' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <p class="mb-0">{{'charts.No data saved' | translate }}
@@ -519,7 +534,7 @@
                                                 {{'charts.infoDrugs' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <span class="text-muted">
@@ -561,7 +576,7 @@
                                                 {{'charts.infoDrugs' | translate }}
                                             </span>
                                             <button class="pull-right mt-2" style="margin-top: 1em;margin-bottom: 1em;"
-                                                (click)="p1.close()">Close</button>
+                                                (click)="p1.close()">{{'generics.Close' |translate }}</button>
                                         </ng-template>
                                     </h4>
                                     <p class="mb-0">{{'charts.There is no drug data stored' | translate }}
@@ -623,37 +638,38 @@
                 <div class="card-content">
                     <div class="card-body">
                         <h4 class="card-title mb-2">
-                            <span>Documents</span>
+                            <span>{{'land.Documents' | translate }}</span>
                         </h4>
                         <div class="row col-md-12" *ngIf="docs.length > 0">
                             <div class="table-responsive">
                                 <table class="table text-center m-0">
-                                  <thead>
-                                    <tr>
-                                      <th>{{'generics.Name' |translate }}</th>
-                                      <th>Description</th>
-                                      <th>Date</th>
-                                      <th>Options</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <tr *ngFor="let doc of docs ; let i = index">
-                                        <td><strong>{{doc.name}}</strong></td>
-                                        <td>{{doc.description}}</td>
-                                        <td>{{doc.dateDoc | date}}</td>
-                                        <td><span><a class="btn btn-sm btn-outline-dark mb-0"
-                                            href="{{accessToken.blobAccountUrl}}{{accessToken.containerName}}/{{doc.url}}{{accessToken.sasToken}}"
-                                            target="_blank" download>
-                                            <i class="fa fa-eye"></i></a></span>
-                                   <!--<span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
-                                            (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span>--></td>
-                                    </tr>
-                                  </tbody>
+                                    <thead>
+                                        <tr>
+                                            <th>{{'generics.Name' |translate }}</th>
+                                            <th>{{'generics.Description' |translate }}</th>
+                                            <th>{{'generics.Date' |translate }}</th>
+                                            <th>{{'generics.Options' |translate }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let doc of docs ; let i = index">
+                                            <td><strong>{{doc.name}}</strong></td>
+                                            <td>{{doc.description}}</td>
+                                            <td>{{doc.dateDoc | date}}</td>
+                                            <td><span><a class="btn btn-sm btn-outline-dark mb-0"
+                                                        href="{{accessToken.blobAccountUrl}}{{accessToken.containerName}}/{{doc.url}}{{accessToken.sasToken}}"
+                                                        target="_blank" download>
+                                                        <i class="fa fa-eye"></i></a></span>
+                                                <!--<span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
+                                            (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span>-->
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
-                              </div>
+                            </div>
                         </div>
                         <div class="row col-md-12" *ngIf="docs.length == 0 && loadedDocs">
-                            <p class="mb-0">No docs saved</p>
+                            <p class="mb-0">{{'open.There are no documents' | translate }}</p>
                         </div>
                     </div>
                 </div>
@@ -673,7 +689,7 @@
                                 <div class="row p-2">
                                     <div class="col-12">
                                         <h4 class="text-bold-500 mb-0"></h4>
-                                        <p class="mb-0">No tienes permisos, logueate, y pide acceso!</p>
+                                        <p class="mb-0">{{'open.You dont have permissions, log in' | translate }}</p>
                                     </div>
                                 </div>
                             </div>

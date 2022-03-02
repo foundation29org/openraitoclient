@@ -4,7 +4,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header pb-2">
-                    <h4 class="card-title mb-1"><span>All cases</span></h4>
+                    <h4 class="card-title mb-1"><span>{{'open.All cases' | translate }}</span></h4>
                 </div>
                 <div class="card-content">
                     <div class="card-body p-0">
@@ -19,7 +19,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header pb-2">
-                        <h4 class="card-title mb-1"><span>My cases</span></h4>
+                        <h4 class="card-title mb-1"><span>{{'open.My cases' | translate }}</span></h4>
                     </div>
                     <div class="card-content">
                         <div class="card-body p-0">
@@ -27,11 +27,11 @@
                             <table class="table text-center m-0">
                               <thead>
                                 <tr>
-                                  <th>Case</th>
-                                  <th>Diagnosis</th>
-                                  <th>Name</th>
-                                  <th>Surname</th>
-                                  <th>Status</th>
+                                  <th>{{'open.Case' | translate }}</th>
+                                  <th>{{'clinicalinfo.Diagnosis' | translate }}</th>
+                                  <th>{{'generics.Name' |translate }}</th>
+                                  <th>{{'personalinfo.Last Name' |translate }}</th>
+                                  <th>{{'generics.Status' |translate }}</th>
                                   <th></th>
                                 </tr>
                               </thead>
@@ -44,9 +44,13 @@
                                     </td>
                                     <td>{{oneRequest.patientName}}</td>
                                     <td>{{oneRequest.surname}}</td>
-                                    <td>{{oneRequest.status}}</td>
+                                    <td>
+                                        <span *ngIf="oneRequest.status=='Pending'">{{'generics.Pending' |translate }}</span>
+                                        <span *ngIf="oneRequest.status=='Accepted'">{{'generics.Accepted' |translate }}</span>
+                                        <span *ngIf="oneRequest.status=='Rejected'">{{'generics.Rejected' |translate }}</span>
+                                    </td>
                                     <td><button class="mb-0 btn btn-sm btn-dark round mr-1"
-                                        (click)="selectPatient(oneRequest);">View</button></td>
+                                        (click)="selectPatient(oneRequest);">{{'generics.View' |translate }}</button></td>
                                 </tr>
                               </tbody>
                             </table>
@@ -59,7 +63,7 @@
     </div>
 </div>
 <div *ngIf="loadedPatients && patients.length==0">
-    No patients
+    {{'open.No patients' | translate }}
 </div>
 <div *ngIf="!loadedPatients">
     <div><p class="centerSpinner"><i class="fa fa-spinner fa-spin fa-3x fa-fw pink"></i></p></div>
