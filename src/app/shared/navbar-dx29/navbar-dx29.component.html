@@ -9,11 +9,15 @@
           <span class="icon-bar"></span>
       </button>-->
           <span class="navbar-header-logos">
-            <img *ngIf="isHomePage" class="logo-img" src='assets/img/logo-raito.png' (click)="lauchEvent('Logo');"/>
-            <img *ngIf="!isHomePage" class="logo-img" src='assets/img/logo-raito.png' routerLink="/." (click)="lauchEvent('Logo');" style="cursor: pointer;"/>
-            <span class="font-large-2 text-bold-600" style="position: absolute;top: 20%;font-size: 2rem !important;">Raito</span>
+            <span *ngIf="isHomePage">
+              <img  class="logo-img" src='assets/img/logo-raito.png' (click)="lauchEvent('Logo');"/>
+              <span class="font-large-2 text-bold-600" style="position: absolute;top: 20%;font-size: 2rem !important;">Raito</span>
+            </span>
+            <span *ngIf="!isHomePage" routerLink="/." style="cursor: pointer;">
+              <img class="logo-img" src='assets/img/logo-raito.png' (click)="lauchEvent('Logo');"/>
+              <span class="font-large-2 text-bold-600" style="position: absolute;top: 20%;font-size: 2rem !important;">Raito</span>
+            </span>
           </span>
-
       </div>
       <!--<div class="d-none d-lg-block">
         <div class="navbar-collapse" id="navbarSupportedContent">

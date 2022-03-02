@@ -2,6 +2,29 @@
   cursor:pointer;
 }
 
+.avatar{
+  border-radius: 50%;
+  border: 2px solid #009da0;
+  padding: 0.3rem;
+  width: 6.5rem;
+    background-color: transparent;
+    padding: 0.4rem;
+    color:#009da0;
+}
+
+.card-footer {
+  border-top: none;
+}
+
+.table td {
+  border-top: none;
+}
+
+
+span{
+  line-height: 1rem !important;
+}
+
 ::ng-deep .chart-legend .horizontal-legend li {
   display: block !important;
 }

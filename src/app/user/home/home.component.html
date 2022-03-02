@@ -36,7 +36,7 @@
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr *ngFor="let oneRequest of especialRequest ; let i = index">
+                                <tr *ngFor="let oneRequest of especialRequest ; let i = index" (click)="selectPatient(oneRequest);">
                                     <td>{{oneRequest.id}}</td>
                                     <td>
                                         <span *ngIf="oneRequest.diagnosisInfo!=null">{{oneRequest.diagnosisInfo.name}} ({{oneRequest.diagnosisInfo.xrefs[0].name}}:{{oneRequest.diagnosisInfo.xrefs[0].id}})</span>

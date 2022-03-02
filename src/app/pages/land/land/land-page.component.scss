@@ -2,6 +2,15 @@
   cursor:pointer;
 }
 
+:host /deep/ tbody tr:hover {
+  background: #B3E2E3 !important;
+  cursor: pointer;
+}
+
+:host /deep/ tbody > tr {
+  background: inherit !important;
+}
+    
 .avatar{
   border-radius: 50%;
   border: 2px solid #009da0;

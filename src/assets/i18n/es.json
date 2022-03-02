@@ -251,7 +251,8 @@
     "There is no patient data to export": "No hay datos de pacientes para exportar.",
     "OPTIONAL": "Opcional",
     "Reference Genome": "Genoma de referencia",
-    "Save changes": "Guardar cambios"
+    "Save changes": "Guardar cambios",
+    "Unknown": "Desconocido"
   },
   "lang":{
     "Question deleted successfully": "Pregunta eliminada con éxito",
