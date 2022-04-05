@@ -175,14 +175,6 @@ export class UserProfilePageComponent implements OnInit, OnDestroy {
       this.translate.use(newValue);
       var eventsLang = this.inj.get(EventsService);
       eventsLang.broadcast('changelang', newValue);
-      if(newValue=='es'){
-        Swal.fire({
-            title: this.translate.instant("Los textos en este idioma pueden contener errores"),
-            html: '<p>Este idioma está en desarrollo. Los nombres de los síntomas y las enfermedades, así como sus descripciones y sinónimos pueden contener errores.</p> <p>Para mejorar las traducciones, por favor, envíanos cualquier error a <a href="mailto:support@foundation29.org">support@foundation29.org</a></p>',
-            confirmButtonText: this.translate.instant("generics.Accept"),
-            icon:"warning"
-        })
-      }
     }
 
     resetForm() {

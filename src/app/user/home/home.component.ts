@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from "@angular/router";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from 'app/shared/auth/auth.service';
@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   lang = 'en';
   formatDate: any = [];
   today = new Date();
-  isVerified: boolean = false;
+  infoVerified: any = {};
   loadVerifiedInfo: boolean = false;
   patients: any = [];
   loadedPatients: boolean = false;
@@ -53,6 +53,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   alertSource: LocalDataSource;
   listDiagnosesAllPatients: any = [];
   especialRequest: any = [];
+  userInfo: any = {};
 
   constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private textTransform: TextTransform) {
     this.adapter.setLocale(this.authService.getLang());
@@ -82,8 +83,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.callIsVerified();
-    this.getPatients();
+    this.getUserInfo();
+  }
+
+  getUserInfo() {
+    this.subscription.add(this.http.get(environment.api + '/api/users/name/' + this.authService.getIdUser())
+      .subscribe((res: any) => {
+        this.userInfo = res;
+        this.callIsVerified();
+      }, (err) => {
+        console.log(err);
+      }));
+
   }
 
   callIsVerified() {
@@ -91,12 +102,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subscription.add(this.http.get(environment.api + '/api/verified/' + this.authService.getIdUser())
       .subscribe((res: any) => {
         this.loadVerifiedInfo = true;
-        this.isVerified = res.verified;
-        /*if(!this.isVerified){
+        this.infoVerified = res.infoVerified;
+        if(!this.infoVerified.isVerified){
           this.getVerified();
         }else{
-          
-        }*/
+          this.getPatients();
+        }
       }, (err) => {
         console.log(err);
       }));
@@ -104,37 +115,118 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   getVerified() {
-    console.log(this.isVerified);
+    console.log(this.infoVerified);
     console.log(this.loadVerifiedInfo);
-    setTimeout(function () {
-      const veriff = Veriff({
-        host: 'https://stationapi.veriff.com',
-        apiKey: 'afde96eb-05e6-4f38-82ab-2d59fdcdf2a5',
-        parentId: 'veriff-root',
-        onSession: function (err, response) {
-          console.log(response);
-          window.veriffSDK.createVeriffFrame({ url: response.verification.url });
-          //window.location.replace(response.verification.url);
-        }
-      });
+    if(this.infoVerified.status=='Not started'){
+      var date = new Date();
+      date.toISOString();
+      var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.isUser,"timestamp":date}};
+      this.subscription.add(this.http.post('https://api.veriff.me/v1/sessions', params)
+        .subscribe((res: any) => {
+          console.log(res);
+          this.infoVerified.url = res.verification.url;
+          this.infoVerified.status = res.verification.status;
+          this.saveDataVerfified();
+          if(res.verification.status=='created'){
+            window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
+              onEvent: function(msg) {
+              console.log(msg);
+            } });
+          }
+          
 
-      veriff.setParams({
-        person: {
-          givenName: 'Foo',
-          lastName: 'Bar'
-        },
-        vendorData: 'example@mail.com'
-      });
-      veriff.mount({
-        submitBtnText: 'Get verified'
-      });
-
-      /*veriff.mount({
-        formLabel: {
-          vendorData: 'lp2ko.com'
+        }, (err) => {
+          console.log(err);
+        }));
+    }else if(this.infoVerified.status=='created'){
+      window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
+        onEvent: function(msg) {
+        console.log(msg);
+        if(msg=='FINISHED'){
+          this.infoVerified.status = 'submitted';
+          this.saveDataVerfified();
         }
-      });*/
-    }.bind(this), 2000);
+      }.bind(this) });
+    }else if(this.infoVerified.status=='submitted'){
+      this.verifyStatus();
+    }else{
+      this.verifyStatus();
+    }
+  }
+
+  verifyStatus(){
+    var token = this.infoVerified.url.split('https://magic.veriff.me/v/');
+    console.log(token);
+    const headers= new HttpHeaders()
+    .set('Authorization', 'Bearer '+token[1]);
+    this.subscription.add(this.http.get('https://alchemy.veriff.com/api/v2/sessions', { 'headers': headers })
+        .subscribe((res: any) => {
+          console.log(res);
+          this.infoVerified.status = res.status;
+          if(this.infoVerified.status=='completed'){
+            if(res.activeVerificationSession.status=='declined'){
+              this.infoVerified.status='declined';
+              this.infoVerified.info = res.activeVerificationSession.verificationRejectionCategory;
+              console.log(res.activeVerificationSession.verificationRejectionCategory.value);
+              this.infoVerified.isVerified = false;
+            }else{
+              this.infoVerified.isVerified = true;
+            }
+            
+          }
+          if(this.infoVerified.status=='submitted' && res.previousVerificationSessions.length>0){
+            this.infoVerified.status = 'resubmission_requested';
+            this.infoVerified.info = res.previousVerificationSessions[0].verificationRejectionCategory;
+            if(res.previousVerificationSessions[0].status=='resubmission_requested'){
+              Swal.fire({
+                title: 'There was an error in the verification process.',
+                html: 'Please try again',
+                icon: 'warning',
+                showCancelButton: false,
+                confirmButtonColor: '#33658a',
+                cancelButtonColor: '#B0B6BB',
+                confirmButtonText: 'Ok',
+                showLoaderOnConfirm: true,
+                allowOutsideClick: false
+            }).then((result) => {
+              if (result.value) {
+                console.log(res.previousVerificationSessions[0].verificationRejectionCategory.details);
+              window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
+                onEvent: function(msg) {
+                console.log(msg);
+                if(msg=='FINISHED'){
+                  this.infoVerified.status = 'submitted';
+                  this.saveDataVerfified();
+                }
+              }.bind(this) });
+              }
+            });
+
+              
+            }
+
+          }
+          this.saveDataVerfified();
+          
+          //Resubmission
+          //Declined
+          //Approved
+          //Expired
+          //Abandoned
+
+        }, (err) => {
+          console.log(err);
+        }));
+  }
+
+  saveDataVerfified(){
+      var paramssend = { infoVerified: this.infoVerified };
+      this.subscription.add( this.http.post(environment.api+'/api/verified/'+this.authService.getIdUser(), paramssend)
+      .subscribe( (res : any) => {
+        console.log(res);
+       }, (err) => {
+         console.log(err.error);
+       }));
   }
 
   getPatients() {

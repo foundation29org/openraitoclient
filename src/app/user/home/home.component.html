@@ -1,70 +1,104 @@
-<div *ngIf="!isVerified && loadVerifiedInfo" id='veriff-root'></div>
-<div *ngIf="loadedPatients && patients.length>0">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header pb-2">
-                    <h4 class="card-title mb-1"><span>{{'open.All cases' | translate }}</span></h4>
-                </div>
-                <div class="card-content">
-                    <div class="card-body p-0">
-                        <ng2-smart-table [settings]="alertsettings" [source]="alertSource"  (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
-                    </div>
-                  </div>
+<div *ngIf="!infoVerified.isVerified && loadVerifiedInfo" id='veriff-root'></div>
+<div class="row">
+    <div class="col-12">
+        <div class="mt-2 mb-2 card card-block mx-auto" *ngIf="infoVerified.status =='created' || infoVerified.status =='submitted'" style="max-width: 30rem !important;">
+            <div class="card-header">
+                <h4>Thank you!</h4>
+            </div>
+            <div class="card-content p-2">
+                <p>Your verification data has been successfully submitted. You'll get the results shortly.</p>
+                <p>Please wait two minutes and reload the page. o recargarla nosotros cada x tiempo...</p>
+                <p>If you have closed the Veriff window by mistake, please reload the page to continue the verification process.</p>
+            </div>
+        </div>
+        <div class="mt-2 mb-2 card card-block mx-auto" *ngIf="infoVerified.status =='resubmission_requested'" style="max-width: 30rem !important;">
+            <div class="card-header">
+                <h4>There was an error in the verification process.</h4>
+            </div>
+            <div class="card-content p-2">
+                <p>If you have closed the Veriff window by mistake, please reload the page to continue the verification process.</p>
+            </div>
+        </div>
+        <div class="mt-2 mb-2 card card-block mx-auto" *ngIf="infoVerified.status =='declined'" style="max-width: 30rem !important;">
+            <div class="card-header">
+                <h4>Your verification could not be accepted, you have been rejected.</h4>
+            </div>
+            <div class="card-content p-2">
+                <p>Reason: {{infoVerified.info.value}}</p>
+                <p>If you think this is an error, please write to support@foundation29.org.</p>
             </div>
         </div>
     </div>
-    <div *ngIf="especialRequest.length>0">
+</div>
+<div *ngIf="infoVerified.isVerified">
+    <div *ngIf="loadedPatients && patients.length>0">
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header pb-2">
-                        <h4 class="card-title mb-1"><span>{{'open.My cases' | translate }}</span></h4>
+                        <h4 class="card-title mb-1"><span>{{'open.All cases' | translate }}</span></h4>
                     </div>
                     <div class="card-content">
                         <div class="card-body p-0">
-                          <div class="table-responsive">
-                            <table class="table text-center m-0">
-                              <thead>
-                                <tr>
-                                  <th>{{'open.Case' | translate }}</th>
-                                  <th>{{'clinicalinfo.Diagnosis' | translate }}</th>
-                                  <th>{{'generics.Name' |translate }}</th>
-                                  <th>{{'personalinfo.Last Name' |translate }}</th>
-                                  <th>{{'generics.Status' |translate }}</th>
-                                  <th></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr *ngFor="let oneRequest of especialRequest ; let i = index" (click)="selectPatient(oneRequest);">
-                                    <td>{{oneRequest.id}}</td>
-                                    <td>
-                                        <span *ngIf="oneRequest.diagnosisInfo!=null">{{oneRequest.diagnosisInfo.name}} ({{oneRequest.diagnosisInfo.xrefs[0].name}}:{{oneRequest.diagnosisInfo.xrefs[0].id}})</span>
-                                        <span *ngIf="oneRequest.diagnosisInfo==null">-</span>
-                                    </td>
-                                    <td>{{oneRequest.patientName}}</td>
-                                    <td>{{oneRequest.surname}}</td>
-                                    <td>
-                                        <span *ngIf="oneRequest.status=='Pending'">{{'generics.Pending' |translate }}</span>
-                                        <span *ngIf="oneRequest.status=='Accepted'">{{'generics.Accepted' |translate }}</span>
-                                        <span *ngIf="oneRequest.status=='Rejected'">{{'generics.Rejected' |translate }}</span>
-                                    </td>
-                                    <td><button class="mb-0 btn btn-sm btn-dark round mr-1"
-                                        (click)="selectPatient(oneRequest);">{{'generics.View' |translate }}</button></td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
+                            <ng2-smart-table [settings]="alertsettings" [source]="alertSource"  (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
                         </div>
                       </div>
                 </div>
             </div>
         </div>
+        <div *ngIf="especialRequest.length>0">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header pb-2">
+                            <h4 class="card-title mb-1"><span>{{'open.My cases' | translate }}</span></h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body p-0">
+                              <div class="table-responsive">
+                                <table class="table text-center m-0">
+                                  <thead>
+                                    <tr>
+                                      <th>{{'open.Case' | translate }}</th>
+                                      <th>{{'clinicalinfo.Diagnosis' | translate }}</th>
+                                      <th>{{'generics.Name' |translate }}</th>
+                                      <th>{{'personalinfo.Last Name' |translate }}</th>
+                                      <th>{{'generics.Status' |translate }}</th>
+                                      <th></th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr *ngFor="let oneRequest of especialRequest ; let i = index" (click)="selectPatient(oneRequest);">
+                                        <td>{{oneRequest.id}}</td>
+                                        <td>
+                                            <span *ngIf="oneRequest.diagnosisInfo!=null">{{oneRequest.diagnosisInfo.name}} ({{oneRequest.diagnosisInfo.xrefs[0].name}}:{{oneRequest.diagnosisInfo.xrefs[0].id}})</span>
+                                            <span *ngIf="oneRequest.diagnosisInfo==null">-</span>
+                                        </td>
+                                        <td>{{oneRequest.patientName}}</td>
+                                        <td>{{oneRequest.surname}}</td>
+                                        <td>
+                                            <span *ngIf="oneRequest.status=='Pending'">{{'generics.Pending' |translate }}</span>
+                                            <span *ngIf="oneRequest.status=='Accepted'">{{'generics.Accepted' |translate }}</span>
+                                            <span *ngIf="oneRequest.status=='Rejected'">{{'generics.Rejected' |translate }}</span>
+                                        </td>
+                                        <td><button class="mb-0 btn btn-sm btn-dark round mr-1"
+                                            (click)="selectPatient(oneRequest);">{{'generics.View' |translate }}</button></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="loadedPatients && patients.length==0">
+        {{'open.No patients' | translate }}
+    </div>
+    <div *ngIf="!loadedPatients">
+        <div><p class="centerSpinner"><i class="fa fa-spinner fa-spin fa-3x fa-fw pink"></i></p></div>
     </div>
 </div>
-<div *ngIf="loadedPatients && patients.length==0">
-    {{'open.No patients' | translate }}
-</div>
-<div *ngIf="!loadedPatients">
-    <div><p class="centerSpinner"><i class="fa fa-spinner fa-spin fa-3x fa-fw pink"></i></p></div>
-</div>
+
