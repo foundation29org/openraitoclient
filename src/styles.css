@@ -178,10 +178,10 @@ a:hover, a:focus {
   background-color: #b0b6bb !important;
 }
 
-.swal2-icon.swal2-warning {
+/*.swal2-icon.swal2-warning {
   border-color: #F9423A !important;
   color: #F9423A !important;
-}
+}*/
 
 .tab-content {
   min-height: 430px !important;

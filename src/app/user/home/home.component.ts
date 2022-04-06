@@ -118,41 +118,77 @@ export class HomeComponent implements OnInit, OnDestroy {
     console.log(this.infoVerified);
     console.log(this.loadVerifiedInfo);
     if(this.infoVerified.status=='Not started'){
-      var date = new Date();
-      date.toISOString();
-      var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.isUser,"timestamp":date}};
-      this.subscription.add(this.http.post('https://api.veriff.me/v1/sessions', params)
-        .subscribe((res: any) => {
-          console.log(res);
-          this.infoVerified.url = res.verification.url;
-          this.infoVerified.status = res.verification.status;
-          this.saveDataVerfified();
-          if(res.verification.status=='created'){
-            window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
-              onEvent: function(msg) {
-              console.log(msg);
-            } });
-          }
-          
-
-        }, (err) => {
-          console.log(err);
-        }));
+      Swal.fire({
+        title: this.translate.instant("identity.t1"),
+        html: this.translate.instant("identity.t2"),
+        icon: 'warning',
+        showCancelButton: false,
+        confirmButtonColor: '#33658a',
+        cancelButtonColor: '#B0B6BB',
+        confirmButtonText: 'Ok',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: false
+    }).then((result) => {
+      if (result.value) {
+        var date = new Date();
+        date.toISOString();
+        var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.isUser,"timestamp":date}};
+        this.subscription.add(this.http.post('https://api.veriff.me/v1/sessions', params)
+          .subscribe((res: any) => {
+            console.log(res);
+            this.infoVerified.url = res.verification.url;
+            this.infoVerified.status = res.verification.status;
+            this.saveDataVerfified();
+            if(res.verification.status=='created'){
+              window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
+                onEvent: function(msg) {
+                console.log(msg);
+              } });
+            }
+          }, (err) => {
+            console.log(err);
+          }));
+      }
+    });
+    
+      
     }else if(this.infoVerified.status=='created'){
-      window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
-        onEvent: function(msg) {
-        console.log(msg);
-        if(msg=='FINISHED'){
-          this.infoVerified.status = 'submitted';
-          this.saveDataVerfified();
-        }
-      }.bind(this) });
+      Swal.fire({
+        title: this.translate.instant("identity.t1"),
+        html: this.translate.instant("identity.t2"),
+        icon: 'warning',
+        showCancelButton: false,
+        confirmButtonColor: '#33658a',
+        cancelButtonColor: '#B0B6BB',
+        confirmButtonText: 'Ok',
+        showLoaderOnConfirm: true,
+        allowOutsideClick: false
+    }).then((result) => {
+      if (result.value) {
+        window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
+          onEvent: async function(msg) {
+          console.log(msg);
+          if(msg=='FINISHED'){
+            this.infoVerified.status = 'submitted';
+            this.saveDataVerfified();
+            await this.delay(60000);
+            this.reloadPage();
+          }
+        }.bind(this) });
+      }
+    });
+
+      
     }else if(this.infoVerified.status=='submitted'){
       this.verifyStatus();
     }else{
       this.verifyStatus();
     }
   }
+
+  delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
 
   verifyStatus(){
     var token = this.infoVerified.url.split('https://magic.veriff.me/v/');
@@ -171,16 +207,17 @@ export class HomeComponent implements OnInit, OnDestroy {
               this.infoVerified.isVerified = false;
             }else{
               this.infoVerified.isVerified = true;
+              Swal.fire(this.translate.instant("identity.t3"), this.translate.instant("identity.t4"), "success");
+              this.getPatients();
             }
             
-          }
-          if(this.infoVerified.status=='submitted' && res.previousVerificationSessions.length>0){
+          }else if(this.infoVerified.status=='submitted' && res.previousVerificationSessions.length>0){
             this.infoVerified.status = 'resubmission_requested';
             this.infoVerified.info = res.previousVerificationSessions[0].verificationRejectionCategory;
             if(res.previousVerificationSessions[0].status=='resubmission_requested'){
               Swal.fire({
-                title: 'There was an error in the verification process.',
-                html: 'Please try again',
+                title: this.translate.instant("identity.t5"),
+                html: this.translate.instant("identity.t6"),
                 icon: 'warning',
                 showCancelButton: false,
                 confirmButtonColor: '#33658a',
@@ -192,11 +229,13 @@ export class HomeComponent implements OnInit, OnDestroy {
               if (result.value) {
                 console.log(res.previousVerificationSessions[0].verificationRejectionCategory.details);
               window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
-                onEvent: function(msg) {
+                onEvent: async function(msg) {
                 console.log(msg);
                 if(msg=='FINISHED'){
                   this.infoVerified.status = 'submitted';
                   this.saveDataVerfified();
+                  await this.delay(60000);
+                  this.reloadPage();
                 }
               }.bind(this) });
               }
@@ -205,6 +244,11 @@ export class HomeComponent implements OnInit, OnDestroy {
               
             }
 
+          }else if(this.infoVerified.status=='submitted'){
+            (async () => { 
+              await this.delay(60000);
+               this.reloadPage();
+             })();
           }
           this.saveDataVerfified();
           
@@ -532,6 +576,10 @@ cleanOrphas(xrefs) {
       }
   }
   return res;
+}
+
+reloadPage(){
+  window.location.reload();
 }
 
 }

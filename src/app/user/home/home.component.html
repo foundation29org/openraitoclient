@@ -3,29 +3,29 @@
     <div class="col-12">
         <div class="mt-2 mb-2 card card-block mx-auto" *ngIf="infoVerified.status =='created' || infoVerified.status =='submitted'" style="max-width: 30rem !important;">
             <div class="card-header">
-                <h4>Thank you!</h4>
+                <h4>{{'identity.t4' | translate }}</h4>
             </div>
             <div class="card-content p-2">
-                <p>Your verification data has been successfully submitted. You'll get the results shortly.</p>
-                <p>Please wait two minutes and reload the page. o recargarla nosotros cada x tiempo...</p>
-                <p>If you have closed the Veriff window by mistake, please reload the page to continue the verification process.</p>
+                <p>{{'identity.t7' | translate }}</p>
+                <p>{{'identity.t8' | translate }}</p>
+                <p>{{'identity.t9' | translate }} <a class="info" (click)="reloadPage()">{{'open.click here' | translate }}</a> {{'identity.t10' | translate }}</p>
             </div>
         </div>
         <div class="mt-2 mb-2 card card-block mx-auto" *ngIf="infoVerified.status =='resubmission_requested'" style="max-width: 30rem !important;">
             <div class="card-header">
-                <h4>There was an error in the verification process.</h4>
+                <h4>{{'identity.t5' | translate }}</h4>
             </div>
             <div class="card-content p-2">
-                <p>If you have closed the Veriff window by mistake, please reload the page to continue the verification process.</p>
+                <p>{{'identity.t9' | translate }} <a class="info" (click)="reloadPage()">{{'open.click here' | translate }}</a> {{'identity.t10' | translate }}</p>
             </div>
         </div>
         <div class="mt-2 mb-2 card card-block mx-auto" *ngIf="infoVerified.status =='declined'" style="max-width: 30rem !important;">
             <div class="card-header">
-                <h4>Your verification could not be accepted, you have been rejected.</h4>
+                <h4>{{'identity.t11' | translate }}</h4>
             </div>
             <div class="card-content p-2">
-                <p>Reason: {{infoVerified.info.value}}</p>
-                <p>If you think this is an error, please write to support@foundation29.org.</p>
+                <p>{{'identity.t12' | translate }}: {{infoVerified.info.value}}</p>
+                <p>{{'identity.t13' | translate }}</p>
             </div>
         </div>
     </div>
