@@ -111,7 +111,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   userId: string = '';
   loadedPatientId: boolean = false;
   selectedPatient: any = {};
-  userName: string = '';
+  userInfo: any = {};
   loadedInfoPatient: boolean = false;
   patientDataInfo: any = {};
   basicInfoPatient: any;
@@ -419,7 +419,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   getUserName() {
     this.subscription.add(this.http.get(environment.api + '/api/users/name/' + this.authService.getIdUser())
       .subscribe((res: any) => {
-        this.userName = res.userName;
+        this.userInfo = res;
       }, (err) => {
         console.log(err);
       }));

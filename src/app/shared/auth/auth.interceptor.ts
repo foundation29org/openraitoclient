@@ -65,6 +65,22 @@ export class AuthInterceptor implements HttpInterceptor {
       authReq = req.clone({ headers });
     }
 
+    if (req.url.indexOf('api.veriff.me/v1/sessions') !== -1) {
+      isExternalReq = true;
+      const headers = new HttpHeaders({
+        'x-auth-client': 'afde96eb-05e6-4f38-82ab-2d59fdcdf2a5'
+      });
+      authReq = req.clone({ headers });
+    }
+
+    if (req.url.indexOf('https://alchemy.veriff.com/api/v2/sessions') !== -1) {
+      isExternalReq = true;
+      /*const headers = new HttpHeaders({
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2lkIjoiMzZiYjllMTUtYTQ0NS00MGE5LWJlYWMtYmFlNDliNGVlNzI1IiwiaWF0IjoxNjQ3NTk3MDI1fQ.AplkUalQkKoPzvscBrZrWbDWjshmPToVyjs06C-MZV0'
+      });
+      authReq = req.clone({ headers });*/
+    }
+
     /*if(req.url.indexOf('https://blobraito.blob.core.windows.net')!==-1){
       isExternalReq = true;
       const headers = new HttpHeaders({
