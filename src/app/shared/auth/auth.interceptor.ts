@@ -68,7 +68,7 @@ export class AuthInterceptor implements HttpInterceptor {
     if (req.url.indexOf('api.veriff.me/v1/sessions') !== -1) {
       isExternalReq = true;
       const headers = new HttpHeaders({
-        'x-auth-client': 'afde96eb-05e6-4f38-82ab-2d59fdcdf2a5'
+        'x-auth-client': environment.tokenVeriff
       });
       authReq = req.clone({ headers });
     }

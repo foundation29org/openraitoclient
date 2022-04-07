@@ -7,5 +7,6 @@
     f29bio:undefined, // f29Bio sevice URL 
     f29api: undefined, // f29api service URL
     hotjarSiteId:undefined, // Horjar ID
+    tokenVeriff:undefined, // veriff.com token
     urlDxv2:undefined // url dx29 v2 
     };
