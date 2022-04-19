@@ -11,6 +11,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "downlevelIteration": true,
+    "skipLibCheck": true,
     "target": "ES5",
     "typeRoots": [
       "node_modules/@types"

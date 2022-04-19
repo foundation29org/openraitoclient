@@ -8,6 +8,7 @@
         f29api: undefined, // f29api service URL
         hotjarSiteId:undefined, // Horjar ID
         tokenVeriff:undefined, // veriff.com token
+        privateVeriff:undefined, // veriff.com Private key
         urlDxv2:undefined // url dx29 v2 
         };
     

@@ -21,6 +21,8 @@ import Swal from 'sweetalert2';
 import { LocalDataSource } from 'ng2-smart-table';
 import { DateAdapter } from '@angular/material/core';
 import { createVeriffFrame } from '@veriff/incontext-sdk';
+import CryptoES from 'crypto-es';
+import * as decode from 'jwt-decode';
 //const Veriff = require('@veriff/js-sdk');
 //import * as Veriff from '@veriff/js-sdk';
 declare var Veriff: any;
@@ -104,14 +106,88 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.loadVerifiedInfo = true;
         this.infoVerified = res.infoVerified;
         if(!this.infoVerified.isVerified){
-          this.getVerified();
+          this.checkStatusVerified();
+          //this.getVerified();
         }else{
+          //this.checkStatusVerified();
           this.getPatients();
         }
       }, (err) => {
         console.log(err);
       }));
 
+  }
+
+  checkStatusVerified(){
+    console.log(this.infoVerified.url);
+    if(this.infoVerified.url){
+      var token = this.infoVerified.url.split('https://magic.veriff.me/v/');
+      console.log(token);
+      var tokenPayload = decode(token[1]);
+      console.log(tokenPayload);
+      var date1 = tokenPayload.iat;
+      var date2 = (new Date().getTime())/1000;
+      console.log(date1);
+      console.log(date2);
+      var timeDiff = date2 - date1;
+      var Difference_In_Days = timeDiff / (1000 * 3600 * 24);
+      console.log(Difference_In_Days);
+      if(Difference_In_Days>=6){
+        //this.createSesion();
+        this.verifyStatus();
+      }else{
+        this.getVerified();
+      }
+      //this.saveDataVeriff(tokenPayload.session_id);
+    }else{
+      this.getVerified();
+    }
+        
+  }
+
+  saveDataVeriff(){
+    var token = this.infoVerified.url.split('https://magic.veriff.me/v/');
+    console.log(token);
+    var tokenPayload = decode(token[1]);
+    var session_id= tokenPayload.session_id
+    var hashva = CryptoES.HmacSHA256(session_id, environment.privateVeriff);
+    const headers= new HttpHeaders()
+    .set('X-HMAC-SIGNATURE', hashva.toString().toLowerCase())
+    .set('x-auth-client', environment.tokenVeriff);
+
+    this.subscription.add(this.http.get('https://api.veriff.me/v1/sessions/'+session_id+'/person', { 'headers': headers })
+      .subscribe((res: any) => {
+        console.log(res);
+        if(res.status=='success'){
+          this.infoVerified.info = res.person;
+        }
+        this.saveDataVerfified();
+        
+      }, (err) => {
+        console.log(err);
+      }));
+  }
+  
+
+  createSesion(){
+    var date = new Date();
+    date.toISOString();
+    var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.isUser,"timestamp":date}};
+    this.subscription.add(this.http.post('https://api.veriff.me/v1/sessions', params)
+      .subscribe((res: any) => {
+        console.log(res);
+        this.infoVerified.url = res.verification.url;
+        this.infoVerified.status = res.verification.status;
+        this.saveDataVerfified();
+        if(res.verification.status=='created'){
+          window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
+            onEvent: function(msg) {
+            console.log(msg);
+          } });
+        }
+      }, (err) => {
+        console.log(err);
+      }));
   }
 
   getVerified() {
@@ -130,24 +206,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         allowOutsideClick: false
     }).then((result) => {
       if (result.value) {
-        var date = new Date();
-        date.toISOString();
-        var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.isUser,"timestamp":date}};
-        this.subscription.add(this.http.post('https://api.veriff.me/v1/sessions', params)
-          .subscribe((res: any) => {
-            console.log(res);
-            this.infoVerified.url = res.verification.url;
-            this.infoVerified.status = res.verification.status;
-            this.saveDataVerfified();
-            if(res.verification.status=='created'){
-              window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
-                onEvent: function(msg) {
-                console.log(msg);
-              } });
-            }
-          }, (err) => {
-            console.log(err);
-          }));
+        this.createSesion();
       }
     });
     
@@ -165,16 +224,18 @@ export class HomeComponent implements OnInit, OnDestroy {
         allowOutsideClick: false
     }).then((result) => {
       if (result.value) {
-        window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
-          onEvent: async function(msg) {
-          console.log(msg);
-          if(msg=='FINISHED'){
-            this.infoVerified.status = 'submitted';
-            this.saveDataVerfified();
-            await this.delay(60000);
-            this.reloadPage();
-          }
-        }.bind(this) });
+          console.log(this.infoVerified);
+          window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
+            onEvent: async function(msg) {
+            console.log(msg);
+            if(msg=='FINISHED'){
+              this.infoVerified.status = 'submitted';
+              this.saveDataVerfified();
+              await this.delay(60000);
+              this.reloadPage();
+            }
+          }.bind(this) });
+        
       }
     });
 
@@ -207,6 +268,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               this.infoVerified.isVerified = false;
             }else{
               this.infoVerified.isVerified = true;
+              this.saveDataVeriff();
               Swal.fire(this.translate.instant("identity.t3"), this.translate.instant("identity.t4"), "success");
               this.getPatients();
             }
@@ -249,6 +311,9 @@ export class HomeComponent implements OnInit, OnDestroy {
               await this.delay(60000);
                this.reloadPage();
              })();
+          }else if(this.infoVerified.status=='expired' || this.infoVerified.status=='abandoned'){
+            //this.infoVerified.status=='Not started';
+            this.createSesion();
           }
           this.saveDataVerfified();
           
