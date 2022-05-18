@@ -40,7 +40,7 @@
                                                     <span *ngIf="patientDataInfo.gender=='male'">{{'personalinfo.Male' | translate }}</span>
                                                     <span *ngIf="patientDataInfo.gender=='female'">{{'personalinfo.Female' | translate }}</span>
                                                 </span>
-                                                <span *ngIf="!patientDataInfo.gender">{{'diagnosis.Unknown' | translate }}</span>
+                                                <span *ngIf="!patientDataInfo.gender">{{'generics.Unknown' | translate }}</span>
                                                 
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
@@ -58,7 +58,7 @@
                                         <div class="ml-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
                                                 <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate |date}}</span>
-                                                <span *ngIf="!patientDataInfo.birthDate">{{'diagnosis.Unknown' | translate }}</span>
+                                                <span *ngIf="!patientDataInfo.birthDate">{{'generics.Unknown' | translate }}</span>
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
                                                 **/**/****
@@ -73,7 +73,7 @@
                             <div class="ml-2">
                                 <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
                                     <span *ngIf="infoOneDisease.name">{{infoOneDisease.name}}</span>
-                                    <span *ngIf="!infoOneDisease.name">{{'diagnosis.Unknown' | translate }}</span>
+                                    <span *ngIf="!infoOneDisease.name">{{'generics.Unknown' | translate }}</span>
                                     <span *ngIf="infoOneDisease.name">
                                         <span class="d-block">
                                             <span class="content-sub-header text-muted"
@@ -652,7 +652,7 @@
                                 <div class="row p-2">
                                     <div class="col-12">
                                         <h4 class="text-bold-500 mb-0"></h4>
-                                        <p class="mb-0">{{'open.You do not have permissions' | translate }} <a *ngIf="individualPermissions.status!='Pending'" class="btn btn-dark" (click)="requestPermission(shareCustom)">{{'open.Request' | translate }}</a></p>
+                                        <p class="mb-0">{{'open.You do not have permissions' | translate }} <button *ngIf="individualPermissions.status!='Pending'" class="d-block btn btn-dark" (click)="requestPermission(shareCustom)">{{'open.Request' | translate }}</button></p>
                                         <p *ngIf="individualPermissions.status!='Accepted'">{{'generics.Status' |translate }}: 
                                             <span *ngIf="individualPermissions.status=='Pending'">{{'generics.Pending' |translate }}</span>
                                             <span *ngIf="individualPermissions.status=='Accepted'">{{'generics.Accepted' |translate }}</span>
@@ -764,8 +764,8 @@
                 <section class="example-section">
                     <span class="d-block"><mat-checkbox name="newPermission.data.patientInfo" [(ngModel)]="newPermission.data.patientInfo">{{'open.perm1desc' |translate }}</mat-checkbox></span>
                     <span class="d-block"><mat-checkbox name="newPermission.data.medicalInfo" [(ngModel)]="newPermission.data.medicalInfo">{{'open.perm2desc' |translate }}</mat-checkbox></span>
-                    <span class="d-block"><mat-checkbox name="newPermission.data.devicesInfo" [(ngModel)]="newPermission.data.devicesInfo">{{'open.perm3desc' |translate }}</mat-checkbox></span>
-                    <span class="d-block"><mat-checkbox name="newPermission.data.genomicsInfo" [(ngModel)]="newPermission.data.genomicsInfo">{{'open.perm4desc' |translate }}</mat-checkbox></span>
+                    <!--<span class="d-block"><mat-checkbox name="newPermission.data.devicesInfo" [(ngModel)]="newPermission.data.devicesInfo">{{'open.perm3desc' |translate }}</mat-checkbox></span>
+                    <span class="d-block"><mat-checkbox name="newPermission.data.genomicsInfo" [(ngModel)]="newPermission.data.genomicsInfo">{{'open.perm4desc' |translate }}</mat-checkbox></span>-->
                 </section>
                 <label for="notes">{{'generics.notes' |translate }}</label>
                 <textarea name="notes" id="textarea1" class="autoajustable form-control" [(ngModel)]="newPermission.notes"></textarea>

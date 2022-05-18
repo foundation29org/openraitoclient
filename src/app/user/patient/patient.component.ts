@@ -1441,6 +1441,13 @@ cleanOrphas(xrefs) {
      }));
   }
 
+  cancelCustom(){
+    if (this.modalReference != undefined) {
+      this.modalReference.close();
+      this.modalReference = undefined;
+    }
+  }
+
 }
 
 export let lineChartSeries = [
