@@ -776,7 +776,7 @@
         <button class="btn btn-secondary mr-1" (click)="cancelCustom()"><span>{{'generics.Cancel' |translate }}</span></button>
         <div *ngIf="f.valid;then formValid else formError"></div>
         <ng-template #formValid>
-          <button class="btn btn-dark ml-1" (click)="sendShare()">{{'generics.Add' |translate }}</button>
+          <button class="btn btn-dark ml-1" [disabled]="!newPermission.data.patientInfo && !newPermission.data.medicalInfo" (click)="sendShare()">{{'generics.Add' |translate }}</button>
         </ng-template>
         <ng-template #formError>
           <button class="btn btn-dark ml-1" type="button" disabled="true" (click)="submitInvalidForm()"> <span *ngIf="newPermission._id==null">{{'generics.Add' |translate }}</span><span *ngIf="newPermission._id!=null">{{'generics.Update' |translate }}</span></button>
