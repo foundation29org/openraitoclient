@@ -172,7 +172,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   createSesion(){
     var date = new Date();
     date.toISOString();
-    var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.isUser,"timestamp":date}};
+    var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.idUser,"timestamp":date}};
     this.subscription.add(this.http.post('https://api.veriff.me/v1/sessions', params)
       .subscribe((res: any) => {
         console.log(res);
