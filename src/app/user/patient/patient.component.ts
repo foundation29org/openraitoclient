@@ -868,8 +868,13 @@ cleanOrphas(xrefs) {
 
     this.subscription.add(this.http.post(environment.api + '/api/medications/dates/' + this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
-
-        this.medications = res;
+        //add oldy current drugs
+        for (var i = 0; i < res.length; i++) {
+          if(res[i].endDate==null){
+            this.medications.push(res[i])
+          }
+        }
+        //this.medications = res;
         if (this.medications.length > 0) {
           res.sort(this.sortService.DateSortInver("date"));
           this.searchTranslationDrugs();
