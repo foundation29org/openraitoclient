@@ -168,6 +168,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
 
   showRightYAxisLabel: boolean = true;
   yAxisLabelRight: string;
+  xAxisTicks = [];
 
   private subscription: Subscription = new Subscription();
   constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform) {
@@ -602,6 +603,12 @@ cleanOrphas(xrefs) {
     var pastDate = new Date(actualDate);
     pastDate.setDate(pastDate.getDate() - period);
     this.minDateRange = pastDate;
+
+    var actualDate1=new Date();
+    var pastDate1=new Date(actualDate1);
+    pastDate1.setDate(pastDate1.getDate() - Math.round((period+1)/2));
+    var mediumDate = pastDate1;
+    this.xAxisTicks = [this.minDateRange.toISOString(),mediumDate.toISOString(),actualDate.toISOString()];
   }
 
   loadData() {
@@ -652,45 +659,67 @@ cleanOrphas(xrefs) {
     var info = { rangeDate: this.rangeDate }
     this.subscription.add(this.http.post(environment.api + '/api/feels/dates/' + this.patientDataInfo.id, info)
       .subscribe((resFeels: any) => {
+        console.log(resFeels);
         if (resFeels.message) {
           //no tiene historico de peso
         } else {
-          resFeels.sort(this.sortService.DateSortInver("date"));
-          this.feels = resFeels;
-
-          var datagraphheight = [];
-          for (var i = 0; i < resFeels.length; i++) {
-            var splitDate = new Date(resFeels[i].date);
+          resFeels.feels.sort(this.sortService.DateSortInver("date"));
+        this.feels = resFeels.feels;
+        
+        var datagraphheight = [];
+          for (var i = 0; i < this.feels.length; i++) {
+            var splitDate = new Date(this.feels[i].date);
             var numAnswers = 0;
             var value = 0;
-            if (resFeels[i].a1 != "") {
+            if(this.feels[i].a1!=""){
               numAnswers++;
-              value = value + parseInt(resFeels[i].a1);
+              value = value+parseInt(this.feels[i].a1);
             }
-            if (resFeels[i].a2 != "") {
+            if(this.feels[i].a2!=""){
               numAnswers++;
-              value = value + parseInt(resFeels[i].a2);
+              value = value+parseInt(this.feels[i].a2);
             }
-            if (resFeels[i].a3 != "") {
+            if(this.feels[i].a3!=""){
               numAnswers++;
-              value = value + parseInt(resFeels[i].a3);
+              value = value+parseInt(this.feels[i].a3);
             }
-            var value = value / numAnswers;
+            var value = value/numAnswers;
+            var splitDate = new Date(this.feels[i].date);
+            var stringDate = splitDate.toDateString();
             var foundDateIndex = this.searchService.searchIndex(datagraphheight, 'name', splitDate.toDateString());
-            if (foundDateIndex != -1) {
+            if(foundDateIndex != -1){
               //There cannot be two on the same day
               datagraphheight[foundDateIndex].name = splitDate.toDateString();
               datagraphheight[foundDateIndex].value = value;
-            } else {
-              datagraphheight.push({ value: value, name: splitDate.toDateString() });
+              datagraphheight[foundDateIndex].splitDate = splitDate;
+            }else{
+              datagraphheight.push({ value: value, name: splitDate.toDateString(), stringDate: stringDate });
             }
-
           }
-
+          var result = this.add0Feels(datagraphheight);
+          var prevValue = 0;
+          for (var i = 0; i < result.length; i++) {
+            if(resFeels.old.date){
+              if(result[i].value==0 && resFeels.old.date<result[i].stringDate && prevValue==0){
+                result[i].value = (parseInt(resFeels.old.a1)+parseInt(resFeels.old.a2)+parseInt(resFeels.old.a3))/3;
+              }else if(result[i].value==0 && prevValue!=0){
+                result[i].value = prevValue;
+              }
+              else if(result[i].value!=0){
+                prevValue = result[i].value;
+              }
+            }else{
+              if(result[i].value==0 && prevValue!=0){
+                result[i].value =prevValue;
+              }else if(result[i].value!=0){
+                prevValue = result[i].value;
+              }
+            }
+          }
           this.lineChartHeight = [
             {
               "name": 'Feel',
-              "series": datagraphheight
+              "series": result
             }
           ];
 
@@ -702,6 +731,64 @@ cleanOrphas(xrefs) {
         this.loadedFeels = true;
         this.toastr.error('', this.translate.instant("generics.error try again"));
       }));
+  }
+
+  add0Feels(datagraphheight){
+    var maxDateTemp = new Date();
+    var maxDate = maxDateTemp.toDateString();
+    
+    var minDate = this.minDateRange.toDateString();
+    
+    var splitLastDate = datagraphheight[datagraphheight.length-1].stringDate;
+    var splitFirstDate = datagraphheight[0].stringDate;
+      if(new Date(splitLastDate)<new Date(maxDate)){
+        datagraphheight.push({value: 0,name:maxDate,stringDate:maxDate, types: []})
+      }
+      if(new Date(minDate)<new Date(splitFirstDate)){
+        datagraphheight.push({value: 0,name:minDate,stringDate:minDate, types: []})
+      }
+      var copydatagraphheight = JSON.parse(JSON.stringify(datagraphheight));
+      datagraphheight.sort(this.sortService.DateSortInver("stringDate"));
+    for (var j = 0; j < datagraphheight.length; j=j+1) {
+      var foundDate = false;
+      var actualDate = datagraphheight[j].stringDate;
+      if(datagraphheight[j+1]!=undefined){
+        var nextDate = datagraphheight[j+1].stringDate;
+        //stringDate
+        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+          var theDate = new Date(actualDate);
+          theDate.setDate(theDate.getDate()+1);
+          actualDate = theDate.toDateString();
+          if(actualDate != nextDate){
+            copydatagraphheight.push({value: 0,name:actualDate,stringDate:actualDate, types: []})
+          }else{
+            foundDate = true;
+          }
+          
+        }
+        if(datagraphheight[j+2]!=undefined){
+        var actualDate = datagraphheight[j+1].stringDate;
+        var nextDate = datagraphheight[j+2].stringDate;
+        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+          var theDate = new Date(actualDate);
+          theDate.setDate(theDate.getDate()+1);
+          actualDate = theDate.toDateString();
+          if(actualDate != nextDate){
+            copydatagraphheight.push({value: 0,name:actualDate,stringDate:actualDate, types: []})
+          }
+          
+        }
+  
+        }
+      }
+    }
+    copydatagraphheight.sort(this.sortService.DateSortInver("stringDate"));
+    for (var j = 0; j < copydatagraphheight.length; j++) {
+      copydatagraphheight[j].name = copydatagraphheight[j].stringDate
+      var theDate = new Date(copydatagraphheight[j].name);
+      copydatagraphheight[j].name = this.tickFormattingDay(theDate)
+    }
+    return copydatagraphheight;
   }
 
   getSeizures() {
