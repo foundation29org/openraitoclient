@@ -399,6 +399,16 @@
                                     </div>
                                 </div>
                             </div>
+                            <div *ngIf="rangeDate=='month'" class="center-elements col-12" style="position: absolute;top: 90%;">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                            </div>
+                            <div *ngIf="rangeDate!='month'" class="center-elements col-12">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-xl-6 col-md-12 col-sm-6" *ngIf="events.length == 0 && loadedEvents">
@@ -459,7 +469,7 @@
                                             (select)="onSelect($event)" [yAxisTicks]=[0,5] [yScaleMax]="5"
                                             [yAxisTickFormatting]="axisFormat">
                                             <ng-template #tooltipTemplate let-model="model">
-                                                <span class="d-block">{{ model.name |date }}</span>
+                                                <span class="d-block">{{ model.name }}</span>
                                                 <span *ngIf="model.value==5">{{'charts.Very happy' | translate
                                                     }}</span>
                                                 <span *ngIf="model.value==4">{{'charts.Happy' | translate
@@ -472,7 +482,7 @@
                                             </ng-template>
                                             <ng-template #seriesTooltipTemplate let-model="model">
                                                 <div *ngFor="let mod of model; let i = index">
-                                                    <span class="d-block">{{ mod.name |date }}</span>
+                                                    <span class="d-block">{{ mod.name }}</span>
                                                     <span *ngIf="mod.value==5">{{'charts.Very happy' | translate
                                                         }}</span>
                                                     <span *ngIf="mod.value==4">{{'charts.Happy' | translate
@@ -485,18 +495,18 @@
                                                 </div>
                                             </ng-template>
                                         </ngx-charts-line-chart>
-                                        <div *ngIf="rangeDate=='month'" class="center-elements col-12">
-                                            <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
-                                            <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
-                                            <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
-                                        </div>
-                                        <div *ngIf="rangeDate!='month'" class="center-elements col-12">
-                                            <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
-                                            <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
-                                            <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
-                                        </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div *ngIf="rangeDate=='month'" class="center-elements col-12" style="position: absolute;top: 90%;">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                            </div>
+                            <div *ngIf="rangeDate!='month'" class="center-elements col-12">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
                             </div>
                         </div>
                     </div>
@@ -532,7 +542,7 @@
                     </div>
                     <div class="col-xl-6 col-md-12 col-sm-6" *ngIf="medications.length > 0 && loadedDrugs">
                         <div class="card">
-                            <div class="card-content">
+                            <div class="card-content mb-3">
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'clinicalinfo.Medication' |translate }}</span>
@@ -570,6 +580,16 @@
                                     </div>
                                 </div>
                             </div>
+                            <div *ngIf="rangeDate=='month'" class="center-elements col-12" style="position: absolute;top: 90%;">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                            </div>
+                            <div *ngIf="rangeDate!='month'" class="center-elements col-12">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="col-xl-6 col-md-12 col-sm-6" *ngIf="medications.length == 0 && loadedDrugs">
@@ -605,7 +625,7 @@
                     <div class="col-xl-6 col-md-12 col-sm-6"
                         *ngIf="medications.length > 0 && loadedDrugs && events.length > 0 && loadedEvents">
                         <div class="card">
-                            <div class="card-content">
+                            <div class="card-content mb-4">
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'charts.Drugs vs Seizures' | translate}}</span>
@@ -638,6 +658,16 @@
                                         </combo-chart-component>
                                     </div>
                                 </div>
+                            </div>
+                            <div *ngIf="rangeDate=='month'" class="center-elements col-12" style="position: absolute;top: 90%;">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                            </div>
+                            <div *ngIf="rangeDate!='month'" class="center-elements col-12">
+                                <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
                             </div>
                         </div>
                     </div>
