@@ -738,15 +738,17 @@ cleanOrphas(xrefs) {
     var maxDate = maxDateTemp.toDateString();
     
     var minDate = this.minDateRange.toDateString();
-    
-    var splitLastDate = datagraphheight[datagraphheight.length-1].stringDate;
-    var splitFirstDate = datagraphheight[0].stringDate;
+    if(datagraphheight[datagraphheight.length-1]!=undefined){
+      var splitLastDate = datagraphheight[datagraphheight.length-1].stringDate;
+      var splitFirstDate = datagraphheight[0].stringDate;
       if(new Date(splitLastDate)<new Date(maxDate)){
         datagraphheight.push({value: 0,name:maxDate,stringDate:maxDate, types: []})
       }
       if(new Date(minDate)<new Date(splitFirstDate)){
         datagraphheight.push({value: 0,name:minDate,stringDate:minDate, types: []})
       }
+    }
+    
       var copydatagraphheight = JSON.parse(JSON.stringify(datagraphheight));
       datagraphheight.sort(this.sortService.DateSortInver("stringDate"));
     for (var j = 0; j < datagraphheight.length; j=j+1) {
@@ -789,7 +791,7 @@ cleanOrphas(xrefs) {
       copydatagraphheight[j].name = this.tickFormattingDay(theDate)
     }
     return copydatagraphheight;
-  }
+}
 
   getSeizures() {
     this.events = [];
