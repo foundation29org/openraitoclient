@@ -9,6 +9,7 @@
         hotjarSiteId:undefined, // Horjar ID
         tokenVeriff:undefined, // veriff.com token
         privateVeriff:undefined, // veriff.com Private key
-        urlDxv2:undefined // url dx29 v2 
+        urlDxv2:undefined, // url dx29 v2 
+        urlRaito:undefined // url raito
         };
     
