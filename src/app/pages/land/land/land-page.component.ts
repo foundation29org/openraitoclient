@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { TranslateService } from '@ngx-translate/core';
+import { RaitoService } from 'app/shared/services/raito.service';
 import { Subscription } from 'rxjs/Subscription';
 import { PatientService } from 'app/shared/services/patient.service';
 import { ApiDx29ServerService } from 'app/shared/services/api-dx29-server.service';
@@ -22,7 +23,7 @@ import * as chartsData from 'app/shared/configs/general-charts.config';
   selector: 'app-land-page',
   templateUrl: './land-page.component.html',
   styleUrls: ['./land-page.component.scss'],
-  providers: [PatientService, ApiDx29ServerService, Apif29BioService]
+  providers: [PatientService, ApiDx29ServerService, Apif29BioService, RaitoService]
 })
 
 export class LandPageComponent implements OnInit, OnDestroy {
@@ -171,7 +172,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
   xAxisTicks = [];
 
   private subscription: Subscription = new Subscription();
-  constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform) {
+  constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService) {
     this.lang = sessionStorage.getItem('lang');
     var param = router.parseUrl(router.url).queryParams;
     if (param.key && param.token) {
@@ -511,7 +512,7 @@ cleanOrphas(xrefs) {
   loadRecommendedDose() {
     this.recommendedDoses = [];
     //load countries file
-    this.subscription.add(this.http.get('assets/jsons/recommendedDose.json')
+    this.subscription.add( this.raitoService.loadRecommendedDose()
       .subscribe((res: any) => {
         console.log(res)
         this.recommendedDoses = res;
@@ -556,7 +557,7 @@ cleanOrphas(xrefs) {
 
   loadTranslationsElements() {
     this.loadingDataGroup = true;
-    this.subscription.add(this.http.get(environment.api + '/api/group/medications/' + this.patientDataInfo.group)
+    this.subscription.add( this.raitoService.loadDrugsGroup(this.patientDataInfo.group)
       .subscribe((res: any) => {
         if (res.medications.data.length == 0) {
           //no tiene datos sobre el grupo
@@ -638,7 +639,7 @@ cleanOrphas(xrefs) {
     } else {
       this.ageFromDateOfBirthday(this.patientDataInfo.birthDate);
     }
-    this.subscription.add(this.patientService.getPatientWeightOpen(this.patientDataInfo.id)
+    this.subscription.add(this.raitoService.getPatientWeight(this.patientDataInfo.id)
       .subscribe((res: any) => {
         console.log(res);
         if (res.message == 'There are no weight') {
@@ -657,7 +658,7 @@ cleanOrphas(xrefs) {
   getFeels() {
     this.feels = [];
     var info = { rangeDate: this.rangeDate }
-    this.subscription.add(this.http.post(environment.api + '/api/feels/dates/' + this.patientDataInfo.id, info)
+    this.subscription.add( this.raitoService.getFeelsPatient(this.patientDataInfo.id, info)
       .subscribe((resFeels: any) => {
         console.log(resFeels);
         if (resFeels.message) {
@@ -798,7 +799,7 @@ cleanOrphas(xrefs) {
     this.lineChartSeizures = [];
     this.drugsBefore = false;
     var info = { rangeDate: this.rangeDate }
-    this.subscription.add(this.http.post(environment.api + '/api/seizures/dates/' + this.patientDataInfo.id, info)
+    this.subscription.add( this.raitoService.getSeizuresPatient(this.patientDataInfo.id, info)
       .subscribe((res: any) => {
         if (res.message) {
           //no tiene información
@@ -1024,8 +1025,7 @@ cleanOrphas(xrefs) {
     this.maxValue = 0;
     this.medications = [];
     var info = { rangeDate: this.rangeDate }
-
-    this.subscription.add(this.http.post(environment.api + '/api/medications/dates/' + this.patientDataInfo.id, info)
+    this.subscription.add( this.raitoService.getMedicationsPatient(this.patientDataInfo.id, info)
       .subscribe((res: any) => {
         //add oldy current drugs
         for (var i = 0; i < res.length; i++) {
@@ -1425,7 +1425,7 @@ cleanOrphas(xrefs) {
   loadSymptoms() {
     this.loadedSymptoms = false;
     //cargar el fenotipo del usuario
-    this.subscription.add(this.apiDx29ServerService.getSymptoms(this.patientDataInfo.id)
+    this.subscription.add(this.raitoService.getPatientPhenotypes(this.patientDataInfo.id)
       .subscribe((res: any) => {
         if (res.message) {
           //no tiene fenotipo

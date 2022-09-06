@@ -43,12 +43,9 @@ export class UserProfilePageComponent implements OnInit, OnDestroy {
     item: number = 0;
     tittleGeneral: string = '';
     tittlePassword: string = '';
-    tittlePermissions: string = '';
     credentials: any = {};
     role: string = '';
     subrole: string = '';
-    symptomsPermissions:any = {shareWithCommunity:false};
-    phenotype_id: string = '';
     private subscription: Subscription = new Subscription();
 
     constructor(private http: HttpClient, private authService: AuthService, public toastr: ToastrService, public translate: TranslateService, private authGuard: AuthGuard, private langService:LangService, private elRef: ElementRef, private router: Router, private dateService: DateService, private inj: Injector, private patientService: PatientService) {
@@ -78,10 +75,6 @@ export class UserProfilePageComponent implements OnInit, OnDestroy {
         this.role = res.user.role;
         this.subrole = res.user.subrole;
         this.loading = false;
-        if(this.role == 'User'){
-          //load the patient to get the shareWithCommunity value
-          this.loadPatientId();
-        }
        }, (err) => {
          console.log(err);
          this.loading = false;
@@ -98,54 +91,6 @@ export class UserProfilePageComponent implements OnInit, OnDestroy {
          password2: '',
          actualpassword: ''
        };
-    }
-
-    loadPatientId(){
-      this.subscription.add( this.patientService.getPatientId()
-      .subscribe( (res : any) => {
-        //get data of permissions
-        var para= this.authService.getCurrentPatient().sub;
-        //cargar el fenotipo del usuario
-        this.subscription.add( this.http.get(environment.api+'/api/symptoms/permissions/'+para)
-        .subscribe( (res : any) => {
-          if(res.message){
-
-          }else{
-            if(res.permissions!=undefined){
-              if(res.permissions.length==0){
-                this.symptomsPermissions = {shareWithCommunity:false};
-              }else{
-                this.symptomsPermissions = res.permissions[0];
-              }
-            }else{
-              this.symptomsPermissions = {shareWithCommunity:false};
-            }
-            this.phenotype_id = res._id;
-          }
-
-        }, (err) => {
-          console.log(err);
-        }));
-       }, (err) => {
-         console.log(err);
-       }));
-    }
-
-    changeStatePermissions(param){
-      if(param == 'shareWithCommunity'){
-        this.symptomsPermissions.shareWithCommunity = !this.symptomsPermissions.shareWithCommunity;
-      }
-      console.log(this.symptomsPermissions);
-      this.setPermissions();
-    }
-
-    setPermissions(){
-      this.subscription.add( this.http.put(environment.api+'/api/symptoms/changesharewithcommunity/'+this.phenotype_id, this.symptomsPermissions)
-      .subscribe( (res : any) => {
-        console.log(res);
-       }, (err) => {
-         console.log(err.error);
-       }));
     }
 
     //traducir cosas
@@ -165,9 +110,6 @@ export class UserProfilePageComponent implements OnInit, OnDestroy {
       });
       this.translate.get('generics.Download').subscribe((res: string) => {
         this.msgDownload=res;
-      });
-      this.translate.get('permissions.Permissions').subscribe((res: string) => {
-        this.tittlePermissions=res;
       });
     }
 
@@ -238,9 +180,6 @@ export class UserProfilePageComponent implements OnInit, OnDestroy {
       }else if (panelId === 'panelPassword') {
         this.activeTittleMenu = "Password";
         this.msgActiveTittleMenu = this.tittlePassword;
-      }else if (panelId === 'PanelPermissions') {
-        this.activeTittleMenu = "Permissions";
-        this.msgActiveTittleMenu = this.tittlePermissions;
       }
 
 
