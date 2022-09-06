@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { TranslateService } from '@ngx-translate/core';
+import { RaitoService } from 'app/shared/services/raito.service';
 import { AuthService } from 'app/shared/auth/auth.service';
 import { PatientService } from 'app/shared/services/patient.service';
 import { ApiDx29ServerService } from 'app/shared/services/api-dx29-server.service';
@@ -13,7 +14,6 @@ import { SortService } from 'app/shared/services/sort.service';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/toPromise';
 import { Apif29BioService } from 'app/shared/services/api-f29bio.service';
-import { Apif29NcrService } from 'app/shared/services/api-f29ncr.service';
 import { DateService } from 'app/shared/services/date.service';
 import { SearchFilterPipe } from 'app/shared/services/search-filter.service';
 import { NgbModal, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
@@ -28,7 +28,7 @@ import { IBlobAccessToken } from 'app/shared/services/blob-storage.service';
   selector: 'app-patient',
   templateUrl: './patient.component.html',
   styleUrls: ['./patient.component.scss'],
-  providers: [PatientService, Apif29BioService, ApiDx29ServerService, Apif29NcrService]
+  providers: [PatientService, Apif29BioService, ApiDx29ServerService, RaitoService]
 })
 
 export class PatientComponent implements OnInit, OnDestroy {
@@ -202,7 +202,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   sending: boolean = false;
   xAxisTicks = [];
 
-  constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform) {
+  constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService) {
     this.adapter.setLocale(this.authService.getLang());
     this.lang = this.authService.getLang();
     switch (this.authService.getLang()) {
@@ -224,7 +224,7 @@ export class PatientComponent implements OnInit, OnDestroy {
 
   
   loadGroups() {
-    this.subscription.add(this.apiDx29ServerService.loadGroups()
+    this.subscription.add(this.raitoService.loadGroups()
       .subscribe((res: any) => {
         this.groups = res;
         this.groups.sort(this.sortService.GetSortOrder("name"));
@@ -342,7 +342,7 @@ export class PatientComponent implements OnInit, OnDestroy {
 
   loadTranslationsElements() {
     this.loadingDataGroup = true;
-    this.subscription.add(this.http.get(environment.api + '/api/group/medications/' + this.authService.getGroup())
+    this.subscription.add( this.raitoService.loadDrugsGroup(this.authService.getGroup())
       .subscribe((res: any) => {
         if (res.medications.data.length == 0) {
           //no tiene datos sobre el grupo
@@ -392,7 +392,7 @@ export class PatientComponent implements OnInit, OnDestroy {
 
   loadRecommendedDose() {
     this.recommendedDoses = [];
-    this.subscription.add(this.http.get('assets/jsons/recommendedDose.json')
+    this.subscription.add( this.raitoService.loadRecommendedDose()
       .subscribe((res: any) => {
         //console.log(res)
         this.recommendedDoses = res;
@@ -415,16 +415,6 @@ export class PatientComponent implements OnInit, OnDestroy {
      }, (err) => {
        console.log(err);
      }));
-  }
-
-  getUserName() {
-    this.subscription.add(this.http.get(environment.api + '/api/users/name/' + this.authService.getIdUser())
-      .subscribe((res: any) => {
-        this.userInfo = res;
-      }, (err) => {
-        console.log(err);
-      }));
-
   }
 
   getInfoPatient(){
@@ -569,7 +559,7 @@ cleanOrphas(xrefs) {
     } else {
       this.ageFromDateOfBirthday(this.patientDataInfo.birthDate);
     }
-    this.subscription.add(this.patientService.getPatientWeightOpen(this.authService.getCurrentPatient().sub)
+    this.subscription.add(this.raitoService.getPatientWeight(this.authService.getCurrentPatient().sub)
       .subscribe((res: any) => {
         if (res.message == 'There are no weight') {
         } else if (res.message == 'old weight') {
@@ -587,7 +577,7 @@ cleanOrphas(xrefs) {
   getFeels() {
     this.feels = [];
     var info = { rangeDate: this.rangeDate }
-    this.subscription.add(this.http.post(environment.api + '/api/feels/dates/' + this.authService.getCurrentPatient().sub, info)
+    this.subscription.add( this.raitoService.getFeelsPatient(this.authService.getCurrentPatient().sub, info)
       .subscribe((resFeels: any) => {
         if (resFeels.message) {
           //no tiene historico de peso
@@ -727,7 +717,7 @@ cleanOrphas(xrefs) {
     this.lineChartSeizures = [];
     this.drugsBefore = false;
     var info = { rangeDate: this.rangeDate }
-    this.subscription.add(this.http.post(environment.api + '/api/seizures/dates/' + this.authService.getCurrentPatient().sub, info)
+    this.subscription.add( this.raitoService.getSeizuresPatient(this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
         if (res.message) {
           //no tiene información
@@ -953,8 +943,7 @@ cleanOrphas(xrefs) {
     this.maxValue = 0;
     this.medications = [];
     var info = { rangeDate: this.rangeDate }
-
-    this.subscription.add(this.http.post(environment.api + '/api/medications/dates/' + this.authService.getCurrentPatient().sub, info)
+    this.subscription.add( this.raitoService.getMedicationsPatient(this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
         //add oldy current drugs
         for (var i = 0; i < res.length; i++) {
@@ -1346,7 +1335,7 @@ cleanOrphas(xrefs) {
   loadSymptoms() {
     this.loadedSymptoms = false;
     //cargar el fenotipo del usuario
-    this.subscription.add(this.apiDx29ServerService.getSymptoms(this.authService.getCurrentPatient().sub)
+    this.subscription.add(this.raitoService.getPatientPhenotypes(this.authService.getCurrentPatient().sub)
       .subscribe((res: any) => {
         if (res.message) {
           //no tiene fenotipo

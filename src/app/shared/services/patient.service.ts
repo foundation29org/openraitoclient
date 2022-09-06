@@ -29,36 +29,6 @@ export class PatientService {
          })
     }
 
-    getPatientWeight(){
-      //cargar las faqs del knowledgeBaseID
-      return this.http.get(environment.api+'/api/weight/'+this.authService.getCurrentPatient().sub)
-        .map( (res : any) => {
-          return res;
-         }, (err) => {
-           console.log(err);
-         })
-    }
-
-    getPatientWeightOpen(idpatient){
-      //cargar las faqs del knowledgeBaseID
-      return this.http.get(environment.api+'/api/weight/'+idpatient)
-        .map( (res : any) => {
-          return res;
-         }, (err) => {
-           console.log(err);
-         })
-    }
-
-    getPatientHeight(){
-      //cargar las faqs del knowledgeBaseID
-      return this.http.get(environment.api+'/api/height/'+this.authService.getCurrentPatient().sub)
-        .map( (res : any) => {
-          return res;
-         }, (err) => {
-           console.log(err);
-         })
-    }
-
     getPatients(){
       //cargar las faqs del knowledgeBaseID
       return this.http.get(environment.api+'/api/openraito/patients/'+this.authService.getIdUser())

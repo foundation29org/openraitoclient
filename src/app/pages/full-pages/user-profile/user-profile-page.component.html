@@ -20,9 +20,6 @@
 				<a class="list-group-item no-border" (click)="SetActive($event, 'panelPassword')">
 						{{tittlePassword}}
 				</a>
-				<a *ngIf="phenotype_id!=''" class="list-group-item no-border" (click)="SetActive($event, 'PanelPermissions')">
-						{{tittlePermissions}}
-				</a>
 			</div>
 		</div>
 		<div class="col-md-9">
@@ -31,7 +28,6 @@
 					<h4 class="form-section">
 						<i [ngClass]="{'ft-user success': activeTittleMenu=='General'}"></i>
 						<i [ngClass]="{'ft-lock danger': activeTittleMenu=='Password'}"></i>
-						<i [ngClass]="{'ft-share-2 danger': activeTittleMenu=='Permissions'}"></i>
 						{{ msgActiveTittleMenu }}
 					</h4>
 				</div>
@@ -165,32 +161,6 @@
 													</span>
 												</div>
 										</form>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div *ngIf="activeTittleMenu == 'Permissions'">
-					<div class="row" *ngIf="!loading">
-						<div class="col-md-12">
-							<div class="card" style="margin-top:0px;">
-								<div class="card-header">
-								</div>
-								<div class="card-body">
-									<div>
-										<div class="form-body">
-											<div class="row">
-												<div class="col-md-12">
-													<div class="form-group">
-														<label for="userName">{{'permissions.Share the symptoms with the community' | translate }}</label>
-														<button (click)="changeStatePermissions('shareWithCommunity')" style="min-width: 20px;min-height: 20px;float:left;" [ngClass]="(symptomsPermissions.shareWithCommunity==true)?'p-0 btn btn-success btn-sm mr-1 mb-0 btn-fab':'p-0 btn btn-secondary btn-sm mr-1 mb-0 btn-fab'" href="javascript:void(0)">
-															<i *ngIf="symptomsPermissions.shareWithCommunity" class="fa fa-check"></i>
-														</button>
-													</div>
-												</div>
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>
