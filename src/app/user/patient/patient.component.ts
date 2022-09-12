@@ -394,34 +394,15 @@ export class PatientComponent implements OnInit, OnDestroy {
     this.recommendedDoses = [];
     this.subscription.add( this.raitoService.loadRecommendedDose()
       .subscribe((res: any) => {
-        //console.log(res)
         this.recommendedDoses = res;
       }));
 
-  }
-
-  loadPatientId(){
-    this.loadedPatientId = false;
-    this.subscription.add( this.patientService.getPatientId()
-    .subscribe( (res : any) => {
-      if(res==null){
-        this.authService.logout();
-      }else{
-        this.loadedPatientId = true;
-        this.authService.setCurrentPatient(res);
-        this.selectedPatient = res;
-        this.loadEnvironment();
-      }
-     }, (err) => {
-       console.log(err);
-     }));
   }
 
   getInfoPatient(){
     this.loadedInfoPatient = false;
     this.subscription.add( this.patientService.getPatientData(this.authService.getCurrentPatient().sub)
     .subscribe( (res : any) => {
-      console.log(res);
       if(!res.message){
         this.patientDataInfo = res.patient;
         this.patientDataInfo.birthDate = this.dateService.transformDate(res.patient.birthDate);
@@ -563,7 +544,6 @@ cleanOrphas(xrefs) {
       .subscribe((res: any) => {
         if (res.message == 'There are no weight') {
         } else if (res.message == 'old weight') {
-          console.log(res.weight)
           this.weight = res.weight.value
         } else {
           this.weight = res.weight.value
@@ -1510,7 +1490,6 @@ cleanOrphas(xrefs) {
     this.sending = true;
     this.subscription.add( this.patientService.getIndividualShare(this.authService.getIdUser())
     .subscribe( (res : any) => {
-      console.log(res);
       if(!res.message){
         this.individualPermissions = res.individualShare;
       }

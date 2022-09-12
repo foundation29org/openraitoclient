@@ -107,8 +107,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     this.config = this.configService.templateConf;
-
-    //this.loadPatientId();
   }
 
   ngAfterViewInit() {
@@ -157,17 +155,6 @@ export class NavbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   exit() {
     navigator.app.exitApp();
-  }
-
-
-  loadPatientId() {
-    this.subscription.add(this.patientService.getPatientId()
-      .subscribe((res: any) => {
-        this.authService.setCurrentPatient(res);
-        //.sub
-      }, (err) => {
-        console.log(err);
-      }));
   }
 
 }

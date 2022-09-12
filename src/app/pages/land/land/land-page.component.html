@@ -70,7 +70,7 @@
                                                         *ngIf="patientDataInfo.gender=='female'">{{'personalinfo.Female'
                                                         | translate }}</span>
                                                 </span>
-                                                <span *ngIf="!patientDataInfo.gender">{{'diagnosis.Unknown' | translate
+                                                <span *ngIf="!patientDataInfo.gender">{{'generics.Unknown' | translate
                                                     }}</span>
 
                                             </h5>
@@ -90,7 +90,7 @@
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
                                                 <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate |
                                                     date}}</span>
-                                                <span *ngIf="!patientDataInfo.birthDate">{{'diagnosis.Unknown' |
+                                                <span *ngIf="!patientDataInfo.birthDate">{{'generics.Unknown' |
                                                     translate }}</span>
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!patientPermissions.data.patientInfo">
@@ -106,7 +106,7 @@
                             <div class="ml-2">
                                 <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
                                     <span *ngIf="infoOneDisease.name">{{infoOneDisease.name}}</span>
-                                    <span *ngIf="!infoOneDisease.name">{{'diagnosis.Unknown' | translate }}</span>
+                                    <span *ngIf="!infoOneDisease.name">{{'generics.Unknown' | translate }}</span>
                                     <span *ngIf="infoOneDisease.name">
                                         <span class="d-block">
                                             <span class="content-sub-header text-muted"

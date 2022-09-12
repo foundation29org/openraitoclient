@@ -12,23 +12,6 @@ import { catchError, debounceTime, distinctUntilChanged, map, tap, switchMap, me
 export class PatientService {
     constructor(private authService: AuthService, private http: HttpClient) {}
 
-    getPatientId(){
-      //cargar las faqs del knowledgeBaseID
-      return this.http.get(environment.api+'/api/patients-all/'+this.authService.getIdUser())
-        .map( (res : any) => {
-          if(res.listpatients.length>0){
-            this.authService.setPatientList(res.listpatients);
-            this.authService.setCurrentPatient(res.listpatients[0]);
-            this.authService.setGroup(res.listpatients[0].group);
-            return this.authService.getCurrentPatient();
-          }else{
-            return null;
-          }
-         }, (err) => {
-           console.log(err);
-         })
-    }
-
     getPatients(){
       //cargar las faqs del knowledgeBaseID
       return this.http.get(environment.api+'/api/openraito/patients/'+this.authService.getIdUser())
