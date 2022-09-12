@@ -118,19 +118,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   checkStatusVerified(){
-    console.log(this.infoVerified.url);
     if(this.infoVerified.url){
       var token = this.infoVerified.url.split('https://magic.veriff.me/v/');
-      console.log(token);
       var tokenPayload = decode(token[1]);
-      console.log(tokenPayload);
       var date1 = tokenPayload.iat;
       var date2 = (new Date().getTime())/1000;
-      console.log(date1);
-      console.log(date2);
       var timeDiff = date2 - date1;
       var Difference_In_Days = timeDiff / (1000 * 3600 * 24);
-      console.log(Difference_In_Days);
       if(Difference_In_Days>=6){
         //this.createSesion();
         this.verifyStatus();
@@ -146,7 +140,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   saveDataVeriff(){
     var token = this.infoVerified.url.split('https://magic.veriff.me/v/');
-    console.log(token);
     var tokenPayload = decode(token[1]);
     var session_id= tokenPayload.session_id
     var hashva = CryptoES.HmacSHA256(session_id, environment.privateVeriff);
@@ -156,7 +149,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.subscription.add(this.http.get('https://api.veriff.me/v1/sessions/'+session_id+'/person', { 'headers': headers })
       .subscribe((res: any) => {
-        console.log(res);
         if(res.status=='success'){
           this.infoVerified.info = res.person;
         }
@@ -174,14 +166,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     var params = {"verification":{"person":{"firstName":this.userInfo.userName,"lastName":this.userInfo.lastName},"vendorData":this.userInfo.idUser,"timestamp":date}};
     this.subscription.add(this.http.post('https://api.veriff.me/v1/sessions', params)
       .subscribe((res: any) => {
-        console.log(res);
         this.infoVerified.url = res.verification.url;
         this.infoVerified.status = res.verification.status;
         this.saveDataVerfified();
         if(res.verification.status=='created'){
           window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
             onEvent: function(msg) {
-            console.log(msg);
           } });
         }
       }, (err) => {
@@ -190,8 +180,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   getVerified() {
-    console.log(this.infoVerified);
-    console.log(this.loadVerifiedInfo);
     if(this.infoVerified.status=='Not started'){
       Swal.fire({
         title: this.translate.instant("identity.t1"),
@@ -223,10 +211,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         allowOutsideClick: false
     }).then((result) => {
       if (result.value) {
-          console.log(this.infoVerified);
           window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
             onEvent: async function(msg) {
-            console.log(msg);
             if(msg=='FINISHED'){
               this.infoVerified.status = 'submitted';
               this.saveDataVerfified();
@@ -252,18 +238,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   verifyStatus(){
     var token = this.infoVerified.url.split('https://magic.veriff.me/v/');
-    console.log(token);
     const headers= new HttpHeaders()
     .set('Authorization', 'Bearer '+token[1]);
     this.subscription.add(this.http.get('https://alchemy.veriff.com/api/v2/sessions', { 'headers': headers })
         .subscribe((res: any) => {
-          console.log(res);
           this.infoVerified.status = res.status;
           if(this.infoVerified.status=='completed'){
             if(res.activeVerificationSession.status=='declined'){
               this.infoVerified.status='declined';
               this.infoVerified.info = res.activeVerificationSession.verificationRejectionCategory;
-              console.log(res.activeVerificationSession.verificationRejectionCategory.value);
               this.infoVerified.isVerified = false;
             }else{
               this.infoVerified.isVerified = true;
@@ -288,10 +271,8 @@ export class HomeComponent implements OnInit, OnDestroy {
                 allowOutsideClick: false
             }).then((result) => {
               if (result.value) {
-                console.log(res.previousVerificationSessions[0].verificationRejectionCategory.details);
               window.veriffSDK.createVeriffFrame({ url: this.infoVerified.url, 
                 onEvent: async function(msg) {
-                console.log(msg);
                 if(msg=='FINISHED'){
                   this.infoVerified.status = 'submitted';
                   this.saveDataVerfified();
@@ -331,7 +312,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       var paramssend = { infoVerified: this.infoVerified };
       this.subscription.add( this.http.post(environment.api+'/api/verified/'+this.authService.getIdUser(), paramssend)
       .subscribe( (res : any) => {
-        console.log(res);
+        
        }, (err) => {
          console.log(err.error);
        }));
@@ -345,7 +326,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.subscription.add(this.patientService.getPatientsRequest()
       .subscribe((res: any) => {
         if (res != null) {
-          console.log(res);
           this.patients = res;
           for (var i = 0; i < this.patients.length; i++) {
             if (this.patients[i].birthDate) {
@@ -413,7 +393,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   loadAllPatientsToTable(){
     this.alertSource = new LocalDataSource(this.patients);
-    console.log(this.alertSource);
     this.loadSettingTable();
     this.loadedPatients = true;
   }
@@ -606,7 +585,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   cleanxrefs(disease) {
-    console.log(disease);
     if (disease.xrefs != undefined) {
         if (disease.xrefs.length == 0) {
             disease.xrefs.push(disease.id);
@@ -620,7 +598,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 }
 
 cleanOrphas(xrefs) {
-  console.log(xrefs);
   var res = [];
   var count = 0;
   for (var i = 0; i < xrefs.length; i++) {

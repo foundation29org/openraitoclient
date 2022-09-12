@@ -216,8 +216,6 @@ export class LandPageComponent implements OnInit, OnDestroy {
     this.loadedInfoPatient = false;
     this.subscription.add(this.patientService.getOpenData(key, token)
       .subscribe((res: any) => {
-        console.log(res);
-
         if (!res.message) {
           this.patientDataInfo = res.data;
           if(this.patientDataInfo.previousDiagnosis!=null){
@@ -292,7 +290,6 @@ cleanOrphas(xrefs) {
     this.subscription.add(this.patientService.getPatientsRequest()
       .subscribe((res: any) => {
         if (res != null) {
-          console.log(res);
           this.patients = res;
           for (var i = 0; i < this.patients.length; i++) {
             if (this.patients[i].birthDate) {
@@ -336,7 +333,6 @@ cleanOrphas(xrefs) {
             }
           }
           this.alertSource = new LocalDataSource(this.patients);
-          console.log(this.alertSource);
           this.loadSettingTable();
           this.loadedPatients = true;
         }
@@ -514,7 +510,6 @@ cleanOrphas(xrefs) {
     //load countries file
     this.subscription.add( this.raitoService.loadRecommendedDose()
       .subscribe((res: any) => {
-        console.log(res)
         this.recommendedDoses = res;
       }));
 
@@ -641,10 +636,8 @@ cleanOrphas(xrefs) {
     }
     this.subscription.add(this.raitoService.getPatientWeight(this.patientDataInfo.id)
       .subscribe((res: any) => {
-        console.log(res);
         if (res.message == 'There are no weight') {
         } else if (res.message == 'old weight') {
-          console.log(res.weight)
           this.weight = res.weight.value
         } else {
           this.weight = res.weight.value
@@ -660,7 +653,6 @@ cleanOrphas(xrefs) {
     var info = { rangeDate: this.rangeDate }
     this.subscription.add( this.raitoService.getFeelsPatient(this.patientDataInfo.id, info)
       .subscribe((resFeels: any) => {
-        console.log(resFeels);
         if (resFeels.message) {
           //no tiene historico de peso
         } else {
@@ -1034,7 +1026,6 @@ cleanOrphas(xrefs) {
           }
         }
         //this.medications = res;
-        console.log(res);
         if (this.medications.length > 0) {
           res.sort(this.sortService.DateSortInver("date"));
           this.searchTranslationDrugs();
@@ -1092,10 +1083,8 @@ cleanOrphas(xrefs) {
   }
 
   getStructure(res) {
-    console.log(res);
     var lineChartDrugs = [];
     for (var i = 0; i < res.length; i++) {
-      console.log(res[i].drugTranslate);
       var foundElementDrugIndex = this.searchService.searchIndex(lineChartDrugs, 'name', res[i].drugTranslate);
       var splitDate = new Date(res[i].startDate);
       if (splitDate < this.minDateRange) {
@@ -1134,8 +1123,6 @@ cleanOrphas(xrefs) {
       }
 
     }
-
-    console.log(lineChartDrugs);
 
     var copymeds = JSON.parse(JSON.stringify(lineChartDrugs));
     for (var i = 0; i < lineChartDrugs.length; i++) {
@@ -1287,7 +1274,6 @@ cleanOrphas(xrefs) {
   getMaxValueRecommededDrug(name) {
     var maxDose = 0;
     var actualRecommendedDoses = this.recommendedDoses[name];
-    console.log(this.weight);
     if (actualRecommendedDoses == undefined || !this.weight) {
       return maxDose;
     } else {
@@ -1361,12 +1347,10 @@ cleanOrphas(xrefs) {
 
 
     this.barChart = seizu;
-    console.log(copymeds);
     this.lineChartSeries = copymeds;
     if (this.normalized2) {
 
       var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartSeries));
-      console.log(this.lineChartSeries);
       var maxValue = 0;
       for (var i = 0; i < this.lineChartSeries.length; i++) {
         var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartSeries[i].name);
@@ -1480,7 +1464,6 @@ cleanOrphas(xrefs) {
               }
             }
           }
-          console.log(this.phenotype.data);
           this.phenotype.data.sort(this.sortService.GetSortOrder("name"));
         }
       }, (err) => {
@@ -1510,7 +1493,6 @@ cleanOrphas(xrefs) {
 
     this.subscription.add(this.apiDx29ServerService.getAzureBlobSasToken(this.accessToken.containerName)
       .subscribe((res: any) => {
-        console.log(res);
         this.accessToken.sasToken = '?' + res;
       }, (err) => {
         console.log(err);

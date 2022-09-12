@@ -122,28 +122,8 @@ export class LoginPageComponent implements OnDestroy, OnInit {
           sessionStorage.setItem('lang', this.authService.getLang());
           this.testHotjarTrigger(this.authService.getLang());
           let url = this.authService.getRedirectUrl();
-          if (this.authService.getRole() == 'User') {
-            this.subscription.add(this.patientService.getPatientId()
-              .subscribe((res: any) => {
-                this.authService.setCurrentPatient(res);
-                this.router.navigate([url]);
-                this.sending = false;
-              }, (err) => {
-                console.log(err);
-                this.sending = false;
-              }));
-          } else if (this.authService.getRole() == 'Clinical') {
-            this.sending = false;
-            this.router.navigate([url]);
-          }
-          else if (this.authService.getRole() == 'Admin') {
-            this.sending = false;
-            this.router.navigate([url]);
-          }
-          else {
-            this.sending = false;
-            this.router.navigate([url]);
-          }
+          this.sending = false;
+          this.router.navigate([url]);
 
         } else {
           this.sending = false;
