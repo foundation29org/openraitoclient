@@ -650,7 +650,7 @@ cleanOrphas(xrefs) {
 
   getFeels() {
     this.feels = [];
-    var info = { rangeDate: this.rangeDate }
+    var info = { rangeDate: this.rangeDate, token: this.token }
     this.subscription.add( this.raitoService.getFeelsPatient(this.patientDataInfo.id, info)
       .subscribe((resFeels: any) => {
         if (resFeels.message) {
@@ -790,7 +790,7 @@ cleanOrphas(xrefs) {
     this.events = [];
     this.lineChartSeizures = [];
     this.drugsBefore = false;
-    var info = { rangeDate: this.rangeDate }
+    var info = { rangeDate: this.rangeDate, token: this.token }
     this.subscription.add( this.raitoService.getSeizuresPatient(this.patientDataInfo.id, info)
       .subscribe((res: any) => {
         if (res.message) {
@@ -1016,7 +1016,7 @@ cleanOrphas(xrefs) {
     this.lineChartDrugsCopy = [];
     this.maxValue = 0;
     this.medications = [];
-    var info = { rangeDate: this.rangeDate }
+    var info = { rangeDate: this.rangeDate, token: this.token }
     this.subscription.add( this.raitoService.getMedicationsPatient(this.patientDataInfo.id, info)
       .subscribe((res: any) => {
         //add oldy current drugs
@@ -1409,7 +1409,8 @@ cleanOrphas(xrefs) {
   loadSymptoms() {
     this.loadedSymptoms = false;
     //cargar el fenotipo del usuario
-    this.subscription.add(this.raitoService.getPatientPhenotypes(this.patientDataInfo.id)
+    var info = { token: this.token }
+    this.subscription.add(this.raitoService.getPatientPhenotypes(this.patientDataInfo.id, info)
       .subscribe((res: any) => {
         if (res.message) {
           //no tiene fenotipo

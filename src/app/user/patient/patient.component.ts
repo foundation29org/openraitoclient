@@ -556,8 +556,8 @@ cleanOrphas(xrefs) {
 
   getFeels() {
     this.feels = [];
-    var info = { rangeDate: this.rangeDate }
-    this.subscription.add( this.raitoService.getFeelsPatient(this.authService.getCurrentPatient().sub, info)
+    var info = { rangeDate: this.rangeDate,  userId: this.authService.getIdUser() }
+    this.subscription.add( this.raitoService.getFeelsPatientV2(this.authService.getCurrentPatient().sub, info)
       .subscribe((resFeels: any) => {
         if (resFeels.message) {
           //no tiene historico de peso
@@ -696,8 +696,8 @@ cleanOrphas(xrefs) {
     this.events = [];
     this.lineChartSeizures = [];
     this.drugsBefore = false;
-    var info = { rangeDate: this.rangeDate }
-    this.subscription.add( this.raitoService.getSeizuresPatient(this.authService.getCurrentPatient().sub, info)
+    var info = { rangeDate: this.rangeDate,  userId: this.authService.getIdUser()}
+    this.subscription.add( this.raitoService.getSeizuresPatientV2(this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
         if (res.message) {
           //no tiene información
@@ -922,8 +922,8 @@ cleanOrphas(xrefs) {
     this.lineChartDrugsCopy = [];
     this.maxValue = 0;
     this.medications = [];
-    var info = { rangeDate: this.rangeDate }
-    this.subscription.add( this.raitoService.getMedicationsPatient(this.authService.getCurrentPatient().sub, info)
+    var info = { rangeDate: this.rangeDate,  userId: this.authService.getIdUser() }
+    this.subscription.add( this.raitoService.getMedicationsPatientV2(this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
         //add oldy current drugs
         for (var i = 0; i < res.length; i++) {
@@ -1315,7 +1315,8 @@ cleanOrphas(xrefs) {
   loadSymptoms() {
     this.loadedSymptoms = false;
     //cargar el fenotipo del usuario
-    this.subscription.add(this.raitoService.getPatientPhenotypes(this.authService.getCurrentPatient().sub)
+    var info = { userId: this.authService.getIdUser() }
+    this.subscription.add(this.raitoService.getPatientPhenotypesV2(this.authService.getCurrentPatient().sub, info)
       .subscribe((res: any) => {
         if (res.message) {
           //no tiene fenotipo

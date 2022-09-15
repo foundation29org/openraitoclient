@@ -158,9 +158,68 @@ export class RaitoService {
          })
     }
 
-    getFeelsPatient(idPatient, rangeDate){
-      var info = {rangeDate: rangeDate}
-      return this.http.post(environment.urlRaito+'/api/feels/dates/'+idPatient, info)
+    getFeelsPatient(idPatient, infoall){
+      var info = {rangeDate: infoall.rangeDate}
+      if(infoall.token!=''){
+        return this.http.post(environment.urlRaito+'/api/openraito/invitation/feels/dates/'+idPatient, infoall)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }else{
+        return this.http.post(environment.urlRaito+'/api/openraito/feels/dates/'+idPatient, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }
+      
+    }
+
+    getSeizuresPatient(idPatient, infoall){
+      var info = {rangeDate: infoall.rangeDate}
+      if(infoall.token!=''){
+        return this.http.post(environment.urlRaito+'/api/openraito/invitation/seizures/dates/'+idPatient, infoall)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }else{
+        return this.http.post(environment.urlRaito+'/api/openraito/seizures/dates/'+idPatient, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }
+      
+    }
+
+    getMedicationsPatient(idPatient, infoall){
+      var info = {rangeDate: infoall.rangeDate}
+      if(infoall.token!=''){
+        return this.http.post(environment.urlRaito+'/api/openraito/invitation/medications/dates/'+idPatient, infoall)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }else{
+        return this.http.post(environment.urlRaito+'/api/openraito/medications/dates/'+idPatient, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }
+      
+    }
+
+    getFeelsPatientV2(idPatient, info){
+      return this.http.post(environment.urlRaito+'/api/openraito/v2/feels/dates/'+idPatient, info)
         .map( (res : any) => {
           return res;
          }, (err) => {
@@ -168,9 +227,8 @@ export class RaitoService {
          })
     }
 
-    getSeizuresPatient(idPatient, rangeDate){
-      var info = {rangeDate: rangeDate}
-      return this.http.post(environment.urlRaito+'/api/seizures/dates/'+idPatient, info)
+    getSeizuresPatientV2(idPatient, info){
+      return this.http.post(environment.urlRaito+'/api/openraito/v2/seizures/dates/'+idPatient, info)
         .map( (res : any) => {
           return res;
          }, (err) => {
@@ -178,9 +236,8 @@ export class RaitoService {
          })
     }
 
-    getMedicationsPatient(idPatient, rangeDate){
-      var info = {rangeDate: rangeDate}
-      return this.http.post(environment.urlRaito+'/api/medications/dates/'+idPatient, info)
+    getMedicationsPatientV2(idPatient, info){
+      return this.http.post(environment.urlRaito+'/api/openraito/v2/medications/dates/'+idPatient, info)
         .map( (res : any) => {
           return res;
          }, (err) => {
@@ -197,8 +254,27 @@ export class RaitoService {
          })
     }
 
-    getPatientPhenotypes(idPatient){
-      return this.http.get(environment.urlRaito+'/api/phenotypes/'+idPatient)
+    getPatientPhenotypes(idPatient, info){
+      if(info.token!=''){
+        return this.http.post(environment.urlRaito+'/api/openraito/invitation/phenotypes/'+idPatient, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }else{
+        return this.http.post(environment.urlRaito+'/api/openraito/phenotypes/'+idPatient, info)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+      }
+      
+    }
+
+    getPatientPhenotypesV2(idPatient, info){
+      return this.http.post(environment.urlRaito+'/api/openraito/v2/phenotypes/'+idPatient, info)
         .map( (res : any) => {
           return res;
          }, (err) => {
