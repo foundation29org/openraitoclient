@@ -1118,14 +1118,17 @@ cleanOrphas(xrefs) {
           splitDateEnd = new Date(res[i].endDate);
           seriesfirst.push({ value: parseInt(res[i].dose), name: splitDateEnd.toDateString() });
         }
-        lineChartDrugs.push({ name: res[i].drugTranslate, series: seriesfirst });
-
+        if (res[i].drugTranslate == undefined) {
+          lineChartDrugs.push({ name: res[i].drug, series: seriesfirst });
+        } else {
+          lineChartDrugs.push({ name: res[i].drugTranslate, series: seriesfirst });
+        }
       }
-
     }
 
     var copymeds = JSON.parse(JSON.stringify(lineChartDrugs));
     for (var i = 0; i < lineChartDrugs.length; i++) {
+      lineChartDrugs[i].series.sort(this.sortService.DateSortInver("name"));
       for (var j = 0; j < lineChartDrugs[i].series.length; j = j + 2) {
         var foundDate = false;
         var actualDate = lineChartDrugs[i].series[j].name;
@@ -1142,16 +1145,27 @@ cleanOrphas(xrefs) {
         if (lineChartDrugs[i].series[j + 2] != undefined) {
           var actualDate = lineChartDrugs[i].series[j + 1].name;
           var nextDate = lineChartDrugs[i].series[j + 2].name;
-          for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+          for (var k = 0; actualDate != nextDate && actualDate < nextDate && !foundDate; k++) {
             var theDate = new Date(actualDate);
             theDate.setDate(theDate.getDate() + 1);
             actualDate = theDate.toDateString();
             if (actualDate != nextDate) {
               copymeds[i].series.push({ value: 0, name: actualDate })
             }
-
           }
 
+        } else {
+          actualDate = new Date(lineChartDrugs[i].series[j + 1].name);
+          nextDate = new Date();
+          for (var k = 0; actualDate != nextDate && actualDate < nextDate; k++) {
+            var theDate2 = actualDate;
+            theDate2.setDate(theDate2.getDate() + 1);
+            actualDate = theDate2.toDateString();
+            if (actualDate != nextDate) {
+              copymeds[i].series.push({ value: 0, name: actualDate })
+            }
+
+          }
         }
 
       }
