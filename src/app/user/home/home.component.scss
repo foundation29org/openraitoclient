@@ -1,8 +1,8 @@
-:host /deep/ tbody tr:hover {
+::ng-deep tbody tr:hover {
     background: #B3E2E3 !important;
     cursor: pointer;
   }
   
-  :host /deep/ tbody > tr {
+  ::ng-deep tbody > tr {
     background: inherit !important;
   }

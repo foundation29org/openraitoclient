@@ -1542,6 +1542,7 @@
     "quarter": "quarter",
     "year": "year",
     "Drugs vs Seizures": "Drugs vs Seizures",
+    "Vertical bars": "Vertical bars",
     "infoTitle": "Help",
     "infoSeizures": "Seizures are represented in total number indepentendtly of the type. If last quarter or last year is selected, then the data is the average number of seizures of the previous 7 days.",
     "infoDrugs": "Drugs can be represented in percentage of the recommended drug dose or in absolute dose.",

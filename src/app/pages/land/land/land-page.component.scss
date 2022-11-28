@@ -2,12 +2,12 @@
   cursor:pointer;
 }
 
-:host /deep/ tbody tr:hover {
+::ng-deep tbody tr:hover {
   background: #B3E2E3 !important;
   cursor: pointer;
 }
 
-:host /deep/ tbody > tr {
+::ng-deep tbody > tr {
   background: inherit !important;
 }
     
@@ -34,13 +34,22 @@ span{
   line-height: 1rem !important;
 }
 
+::ng-deep .chart-legend .legend-label-text {
+  margin-top: 0.4em !important;
+}
+
+::ng-deep .chart-legend .legend-labels {
+  border-top: 1px solid #dee2e6 !important;
+}
+
 ::ng-deep .chart-legend .horizontal-legend li {
   display: block !important;
 }
 
-/*::ng-deep .chart-legend {
-  display: contents !important;
-}*/
+::ng-deep .chart-legend {
+  display: block !important;
+}
+
 .optionsCharts{
   float: right !important;
 }
@@ -53,8 +62,9 @@ span{
   display: none !important;
 }
 
-::ng-deep .chart-legend{
-  margin-top: 0.75rem !important;
+::ng-deep .chart-legend .legend-wrap {
+  width: 100% !important;
+  padding: 1em !important;
 }
 
 .container {
