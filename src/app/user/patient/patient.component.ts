@@ -23,6 +23,7 @@ import Swal from 'sweetalert2';
 import * as chartsData from 'app/shared/configs/general-charts.config';
 import { DateAdapter } from '@angular/material/core';
 import { IBlobAccessToken } from 'app/shared/services/blob-storage.service';
+import { ColorHelper } from '@swimlane/ngx-charts';
 
 @Component({
   selector: 'app-patient',
@@ -32,52 +33,53 @@ import { IBlobAccessToken } from 'app/shared/services/blob-storage.service';
 })
 
 export class PatientComponent implements OnInit, OnDestroy {
-   //Variable Declaration
-   patient: any;
-   selectedHeight: any;
-   actualHeight: any;
-   settingHeight: boolean = false;
-   footHeight: any;
- 
-   //Chart Data
-   lineChartSeizures = [];
-   lineChartHeight = [];
-   lineChartDrugs = [];
-   lineChartDrugsCopy = [];
-   lineDrugsVsSeizures = [];
-   //Line Charts
- 
-   lineChartView: any[] = chartsData.lineChartView;
- 
-   // options
-   lineChartShowXAxis = chartsData.lineChartShowXAxis;
-   lineChartShowYAxis = chartsData.lineChartShowYAxis;
-   lineChartGradient = chartsData.lineChartGradient;
-   lineChartShowLegend = chartsData.lineChartShowLegend;
-   lineChartShowXAxisLabel = chartsData.lineChartShowXAxisLabel;
-   lineChartShowYAxisLabel = chartsData.lineChartShowYAxisLabel;
- 
-   lineChartColorScheme = chartsData.lineChartColorScheme;
-   lineChartOneColorScheme = chartsData.lineChartOneColorScheme;
- 
-   // line, area
-   lineChartAutoScale = chartsData.lineChartAutoScale;
-   lineChartLineInterpolation = chartsData.lineChartLineInterpolation;
+ //Variable Declaration
+ patient: any;
+ selectedHeight: any;
+ actualHeight: any;
+ settingHeight: boolean = false;
+ footHeight: any;
+
+ //Chart Data
+ lineChartSeizures = [];
+ lineChartHeight = [];
+ lineChartDrugs = [];
+ lineChartDrugsCopy = [];
+ lineDrugsVsSeizures = [];
+ //Line Charts
+
+ lineChartView: any[] = chartsData.lineChartView;
+
+ // options
+ lineChartShowXAxis = chartsData.lineChartShowXAxis;
+ lineChartShowYAxis = chartsData.lineChartShowYAxis;
+ lineChartGradient = chartsData.lineChartGradient;
+ lineChartShowLegend = chartsData.lineChartShowLegend;
+ lineChartShowXAxisLabel = chartsData.lineChartShowXAxisLabel;
+ lineChartShowYAxisLabel = chartsData.lineChartShowYAxisLabel;
+
+ lineChartColorScheme = chartsData.lineChartColorScheme;
+ lineChartOneColorScheme = chartsData.lineChartOneColorScheme;
+ lineChartOneColorScheme2 = chartsData.lineChartOneColorScheme2;
+
+ // line, area
+ lineChartAutoScale = chartsData.lineChartAutoScale;
+ lineChartLineInterpolation = chartsData.lineChartLineInterpolation;
 
 
-   //Bar Charts
-    barChartView: any[] = chartsData.barChartView;
+ //Bar Charts
+  barChartView: any[] = chartsData.barChartView;
 
-    // options
-    barChartShowYAxis = chartsData.barChartShowYAxis;
-    barChartShowXAxis = chartsData.barChartShowXAxis;
-    barChartGradient = chartsData.barChartGradient;
-    barChartShowLegend = chartsData.barChartShowLegend;
-    barChartShowXAxisLabel = chartsData.barChartShowXAxisLabel;
-    barChartXAxisLabel = chartsData.barChartXAxisLabel;
-    barChartShowYAxisLabel = chartsData.barChartShowYAxisLabel;
-    barChartYAxisLabel = chartsData.barChartYAxisLabel;
-    barChartColorScheme = chartsData.barChartColorScheme;
+  // options
+  barChartShowYAxis = chartsData.barChartShowYAxis;
+  barChartShowXAxis = chartsData.barChartShowXAxis;
+  barChartGradient = chartsData.barChartGradient;
+  barChartShowLegend = chartsData.barChartShowLegend;
+  barChartShowXAxisLabel = chartsData.barChartShowXAxisLabel;
+  barChartXAxisLabel = chartsData.barChartXAxisLabel;
+  barChartShowYAxisLabel = chartsData.barChartShowYAxisLabel;
+  barChartYAxisLabel = chartsData.barChartYAxisLabel;
+  barChartColorScheme = chartsData.barChartColorScheme;
 
    private msgDataSavedOk: string;
    private msgDataSavedFail: string;
@@ -151,14 +153,14 @@ export class PatientComponent implements OnInit, OnDestroy {
     name: 'coolthree',
     selectable: true,
     group: 'Ordinal',
-    domain: ['#01579b', '#7aa3e5', '#a8385d', '#00bfa5']
+    domain: this.lineChartColorScheme.domain // ['#01579b', '#7aa3e5', '#a8385d', '#00bfa5']
   };
 
   comboBarScheme = {
     name: 'singleLightBlue',
     selectable: true,
     group: 'Ordinal',
-    domain: ['#01579b']
+    domain: this.lineChartOneColorScheme2.domain
   };
 
   showRightYAxisLabel: boolean = true;
@@ -169,6 +171,13 @@ export class PatientComponent implements OnInit, OnDestroy {
   showNotiSeizu: boolean = false;
   showNotiFeel: boolean = false;
   showNotiDrugs: boolean = false;
+
+  public chartNames: string[];
+  public colors: ColorHelper;
+  public colors2: ColorHelper;
+  public colorsLineToll: ColorHelper;
+  titleSeizuresLegend = [];
+
   patientPermissions: any = {
     data:{patientInfo:false, medicalInfo:false,devicesInfo:false, genomicsInfo:false},
     notes:''
@@ -326,6 +335,8 @@ export class PatientComponent implements OnInit, OnDestroy {
 
     this.translate.get('menu.Seizures').subscribe((res: string) => {
       this.titleSeizures = res;
+      var tempTitle = this.titleSeizures+' ('+this.translate.instant("charts.Vertical bars")+')';
+      this.titleSeizuresLegend = [tempTitle]
     });
     this.translate.get('medication.Dose mg').subscribe((res: string) => {
       this.yAxisLabelRight = res;
@@ -741,7 +752,7 @@ cleanOrphas(xrefs) {
       }));
   }
 
-  getStructure2(res) {
+  getStructure2(res){
     var datagraphseizures = [];
     for (var i = 0; i < res.length; i++) {
       var splitDate = new Date(res[i].start);
@@ -764,53 +775,53 @@ cleanOrphas(xrefs) {
     return datagraphseizures;
   }
 
-  add0Seizures(datagraphseizures) {
+  add0Seizures(datagraphseizures){
     //var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
     var maxDateTemp = new Date();
     var maxDate = maxDateTemp.toDateString();
-
+    
     var minDate = this.minDateRange.toDateString();
-
-    var splitLastDate = datagraphseizures[datagraphseizures.length - 1].stringDate;
+    
+    var splitLastDate = datagraphseizures[datagraphseizures.length-1].stringDate;
     var splitFirstDate = datagraphseizures[0].stringDate;
-    if (splitLastDate < maxDate) {
-      datagraphseizures.push({ value: 0, name: maxDate, stringDate: maxDate, types: [] })
-    }
-    if (new Date(minDate) < new Date(splitFirstDate)) {
-      datagraphseizures.push({ value: 0, name: minDate, stringDate: minDate, types: [] })
-    }
-    var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
-    datagraphseizures.sort(this.sortService.DateSortInver("stringDate"));
-    for (var j = 0; j < datagraphseizures.length; j = j + 1) {
+      if(new Date(splitLastDate)<new Date(maxDate)){
+        datagraphseizures.push({value: 0,name:maxDate,stringDate:maxDate, types: []})
+      }
+      if(new Date(minDate)<new Date(splitFirstDate)){
+        datagraphseizures.push({value: 0,name:minDate,stringDate:minDate, types: []})
+      }
+      var copydatagraphseizures = JSON.parse(JSON.stringify(datagraphseizures));
+      datagraphseizures.sort(this.sortService.DateSortInver("stringDate"));
+    for (var j = 0; j < datagraphseizures.length; j=j+1) {
       var foundDate = false;
       var actualDate = datagraphseizures[j].stringDate;
-      if (datagraphseizures[j + 1] != undefined) {
-        var nextDate = datagraphseizures[j + 1].stringDate;
+      if(datagraphseizures[j+1]!=undefined){
+        var nextDate = datagraphseizures[j+1].stringDate;
         //stringDate
         for (var k = 0; actualDate != nextDate && !foundDate; k++) {
           var theDate = new Date(actualDate);
-          theDate.setDate(theDate.getDate() + 1);
+          theDate.setDate(theDate.getDate()+1);
           actualDate = theDate.toDateString();
-          if (actualDate != nextDate) {
-            copydatagraphseizures.push({ value: 0, name: actualDate, stringDate: actualDate, types: [] })
-          } else {
+          if(actualDate != nextDate){
+            copydatagraphseizures.push({value: 0,name:actualDate,stringDate:actualDate, types: []})
+          }else{
             foundDate = true;
           }
-
+          
         }
-        if (datagraphseizures[j + 2] != undefined) {
-          var actualDate = datagraphseizures[j + 1].stringDate;
-          var nextDate = datagraphseizures[j + 2].stringDate;
-          for (var k = 0; actualDate != nextDate && !foundDate; k++) {
-            var theDate = new Date(actualDate);
-            theDate.setDate(theDate.getDate() + 1);
-            actualDate = theDate.toDateString();
-            if (actualDate != nextDate) {
-              copydatagraphseizures.push({ value: 0, name: actualDate, stringDate: actualDate, types: [] })
-            }
-
+        if(datagraphseizures[j+2]!=undefined){
+        var actualDate = datagraphseizures[j+1].stringDate;
+        var nextDate = datagraphseizures[j+2].stringDate;
+        for (var k = 0; actualDate != nextDate && !foundDate; k++) {
+          var theDate = new Date(actualDate);
+          theDate.setDate(theDate.getDate()+1);
+          actualDate = theDate.toDateString();
+          if(actualDate != nextDate){
+            copydatagraphseizures.push({value: 0,name:actualDate,stringDate:actualDate, types: []})
           }
-
+          
+        }
+  
         }
       }
     }
@@ -835,20 +846,21 @@ cleanOrphas(xrefs) {
     return res;
   }
 
-  groupPerWeek(seizures) {
-
+  groupPerWeek(seizures){
+    
     var respseizures = [];
-    for (var i = 0; i < seizures.length; i++) {
+    for (var i=0; i < seizures.length; i++)
+    {
       var varweek = new Date(seizures[i].stringDate)
       seizures[i].name = this.getWeek(varweek, 1);
     }
     var copyseizures = JSON.parse(JSON.stringify(seizures));
-    for (var i = 0; i < copyseizures.length; i++) {
+    for (var i=0; i < copyseizures.length; i++){
       var foundElementIndex = this.searchService.searchIndex(respseizures, 'name', copyseizures[i].name);
-
-      if (foundElementIndex != -1) {
-        respseizures[foundElementIndex].value = respseizures[foundElementIndex].value + copyseizures[i].value;
-        for (var j = 0; j < copyseizures[i].types.length; j++) {
+      
+      if(foundElementIndex!=-1){
+        respseizures[foundElementIndex].value = respseizures[foundElementIndex].value+copyseizures[i].value;
+        for (var j=0; j < copyseizures[i].types.length; j++){
           var foundElementIndexType = this.searchService.searchIndex(respseizures[foundElementIndex].types, 'types', copyseizures[i].types[j].type);
           if (foundElementIndexType != -1) {
             respseizures[foundElementIndex].types[foundElementIndexType].count++;
@@ -856,44 +868,44 @@ cleanOrphas(xrefs) {
             respseizures[foundElementIndex].types.push({ type: copyseizures[i].types[j].type, count: 1 });
           }
         }
-
-      } else {
+        
+      }else{
         respseizures.push(copyseizures[i]);
       }
     }
     return respseizures;
-  }
+}
 
-  getWeek(newdate, dowOffset?) {
-    /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
-
-    dowOffset = typeof (dowOffset) == 'number' ? dowOffset : 0; //default dowOffset to zero
-    var newYear = new Date(newdate.getFullYear(), 0, 1);
-    var day = newYear.getDay() - dowOffset; //the day of week the year begins on
-    day = (day >= 0 ? day : day + 7);
-    var daynum = Math.floor((newdate.getTime() - newYear.getTime() -
-      (newdate.getTimezoneOffset() - newYear.getTimezoneOffset()) * 60000) / 86400000) + 1;
-    var weeknum;
-    //if the year starts before the middle of a week
-    if (day < 4) {
-      weeknum = Math.floor((daynum + day - 1) / 7) + 1;
-      if (weeknum > 52) {
-        var nYear = new Date(newdate.getFullYear() + 1, 0, 1);
-        var nday = nYear.getDay() - dowOffset;
-        nday = nday >= 0 ? nday : nday + 7;
-        /*if the next year starts before the middle of
-          the week, it is week #1 of that year*/
-        weeknum = nday < 4 ? 1 : 53;
+getWeek(newdate, dowOffset?) {
+  /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
+  
+      dowOffset = typeof(dowOffset) == 'number' ? dowOffset : 0; //default dowOffset to zero
+      var newYear = new Date(newdate.getFullYear(),0,1);
+      var day = newYear.getDay() - dowOffset; //the day of week the year begins on
+      day = (day >= 0 ? day : day + 7);
+      var daynum = Math.floor((newdate.getTime() - newYear.getTime() - 
+      (newdate.getTimezoneOffset()-newYear.getTimezoneOffset())*60000)/86400000) + 1;
+      var weeknum;
+      //if the year starts before the middle of a week
+      if(day < 4) {
+          weeknum = Math.floor((daynum+day-1)/7) + 1;
+          if(weeknum > 52) {
+              var nYear = new Date(newdate.getFullYear() + 1,0,1);
+              var nday = nYear.getDay() - dowOffset;
+              nday = nday >= 0 ? nday : nday + 7;
+              /*if the next year starts before the middle of
+                the week, it is week #1 of that year*/
+              weeknum = nday < 4 ? 1 : 53;
+          }
       }
-    }
-    else {
-      weeknum = Math.floor((daynum + day - 1) / 7);
-    }
-    var formatDate = this.getDateOfISOWeek(weeknum, newYear.getFullYear())
-    var pastDate = new Date(formatDate);
-    pastDate.setDate(pastDate.getDate() + 7);
-    var res = this.tickFormattingDay(formatDate) + ' - ' + this.tickFormattingDay(pastDate);
-    return res;
+      else {
+          weeknum = Math.floor((daynum+day-1)/7);
+      }
+      var formatDate = this.getDateOfISOWeek(weeknum, newYear.getFullYear())
+      var pastDate=new Date(formatDate);
+      pastDate.setDate(pastDate.getDate() +7);
+      var res = this.tickFormattingDay(formatDate)+ ' - ' +this.tickFormattingDay(pastDate);
+      return res;
   };
 
   getDateOfISOWeek(w, y) {
@@ -939,6 +951,21 @@ cleanOrphas(xrefs) {
           this.lineChartDrugs = this.getStructure(res);
           this.lineChartDrugs = this.add0Drugs(this.lineChartDrugs);
           this.lineChartDrugsCopy = JSON.parse(JSON.stringify(this.lineChartDrugs));
+          
+          // Get chartNames
+          var chartNames = this.lineChartDrugs.map((d: any) => d.name);
+          this.chartNames = [...new Set(chartNames)];
+          //this.chartNames = this.lineChartDrugs.map((d: any) => d.name);
+          // Convert hex colors to ColorHelper for consumption by legend
+          this.colors = new ColorHelper(this.lineChartColorScheme, 'ordinal', this.chartNames, this.lineChartColorScheme);
+          this.colors2 = new ColorHelper(this.lineChartOneColorScheme2, 'ordinal', this.chartNames, this.lineChartOneColorScheme2);
+            
+          //newColor
+          var tempColors = JSON.parse(JSON.stringify(this.lineChartColorScheme))
+          var tempColors2 = JSON.parse(JSON.stringify(this.lineChartOneColorScheme2))
+          tempColors.domain[this.chartNames.length]=tempColors2.domain[0];
+          this.colorsLineToll = new ColorHelper(tempColors, 'ordinal', this.chartNames, tempColors);
+
           this.normalizedChanged(this.normalized);
           if (this.events.length > 0) {
             this.getDataNormalizedDrugsVsSeizures();
@@ -1235,61 +1262,73 @@ cleanOrphas(xrefs) {
     return normalized;
   }
 
-  getDataNormalizedDrugsVsSeizures() {
+  getDataNormalizedDrugsVsSeizures(){
     var meds = this.getStructure(this.medications);
     var seizu = this.getStructure2(this.events);
     seizu = this.add0Seizures(seizu);
     meds = this.add0Drugs(meds);
     var copymeds = JSON.parse(JSON.stringify(meds));
-
-    if (this.rangeDate == 'quarter' || this.rangeDate == 'year') {
+    
+    if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
       //meds = this.groupPerWeekDrugs(meds)
-
+      
     }
-    if (this.rangeDate == 'quarter' || this.rangeDate == 'year') {
+    if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
       seizu = this.groupPerWeek(seizu);
       seizu = this.add0Seizures(seizu);
     }
 
     this.maxValueDrugsVsSeizu = 0;
     for (var i = 0; i < this.lineChartSeizures[0].series.length; i++) {
-      if (this.maxValueDrugsVsSeizu < Number(this.lineChartSeizures[0].series[i].value)) {
-        this.maxValueDrugsVsSeizu = Number(this.lineChartSeizures[0].series[i].value);
+      if(this.maxValueDrugsVsSeizu<Number(this.lineChartSeizures[0].series[i].value)){
+        this.maxValueDrugsVsSeizu=Number(this.lineChartSeizures[0].series[i].value);
       }
     }
-
+    
     var percen = 0;
-    if (this.maxValue > this.maxValueDrugsVsSeizu) {
-      percen = this.maxValue / this.maxValueDrugsVsSeizu
-    } else {
-      percen = this.maxValueDrugsVsSeizu / this.maxValue
+    if(this.maxValue>this.maxValueDrugsVsSeizu){
+      percen = this.maxValue/this.maxValueDrugsVsSeizu
+    }else{
+      percen = this.maxValueDrugsVsSeizu/this.maxValue
     }
-
+    
 
     this.barChart = seizu;
     this.lineChartSeries = copymeds;
-    if (this.normalized2) {
+    if(this.normalized2){
 
       var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartSeries));
       var maxValue = 0;
       for (var i = 0; i < this.lineChartSeries.length; i++) {
         var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartSeries[i].name);
-        if (maxValueRecommededDrug == 0) {
+        if(maxValueRecommededDrug==0){
           maxValueRecommededDrug = this.maxValue;
         }
         for (var j = 0; j < this.lineChartSeries[i].series.length; j++) {
-          if (this.normalized) {
+          /*if(this.normalized){
             templineChartDrugs[i].series[j].value = this.normalize(this.lineChartSeries[i].series[j].value, 0, maxValueRecommededDrug);
-          }
+          }*/
+          templineChartDrugs[i].series[j].value = this.normalize(this.lineChartSeries[i].series[j].value, 0, maxValueRecommededDrug);
           templineChartDrugs[i].series[j].name = this.lineChartSeries[i].series[j].name;
-          if (maxValue < this.lineChartSeries[i].series[j].value) {
-            maxValue = this.lineChartSeries[i].series[j].value;
+          if(maxValue<this.lineChartSeries[i].series[j].value){
+            maxValue= this.lineChartSeries[i].series[j].value;
           }
         }
         templineChartDrugs[i].series.sort(this.sortService.DateSortInver("name"));
       }
       this.lineChartSeries = JSON.parse(JSON.stringify(templineChartDrugs));
     }
+  }
+
+  normalizedChanged2(normalized){
+    this.normalized2 = normalized;
+    if(this.normalized2){
+      this.titleDrugsVsDrugs = this.titleDrugsVsNormalized;
+    }else{
+      this.titleDrugsVsDrugs = this.titleDrugsVsNoNormalized;
+    }
+     this.getDataNormalizedDrugsVsSeizures();
+    
   }
 
   loadDataRangeDate(rangeDate) {

@@ -18,6 +18,7 @@ import { NgbModal, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstr
 import { ToastrService } from 'ngx-toastr';
 import { IBlobAccessToken } from 'app/shared/services/blob-storage.service';
 import * as chartsData from 'app/shared/configs/general-charts.config';
+import { ColorHelper } from '@swimlane/ngx-charts';
 
 @Component({
   selector: 'app-land-page',
@@ -117,6 +118,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
 
   lineChartColorScheme = chartsData.lineChartColorScheme;
   lineChartOneColorScheme = chartsData.lineChartOneColorScheme;
+  lineChartOneColorScheme2 = chartsData.lineChartOneColorScheme2;
 
   // line, area
   lineChartAutoScale = chartsData.lineChartAutoScale;
@@ -157,15 +159,21 @@ export class LandPageComponent implements OnInit, OnDestroy {
     name: 'coolthree',
     selectable: true,
     group: 'Ordinal',
-    domain: ['#01579b', '#7aa3e5', '#a8385d', '#00bfa5']
+    domain: this.lineChartColorScheme.domain // ['#01579b', '#7aa3e5', '#a8385d', '#00bfa5']
   };
 
   comboBarScheme = {
     name: 'singleLightBlue',
     selectable: true,
     group: 'Ordinal',
-    domain: ['#01579b']
+    domain: this.lineChartOneColorScheme2.domain
   };
+
+  public chartNames: string[];
+  public colors: ColorHelper;
+  public colors2: ColorHelper;
+  public colorsLineToll: ColorHelper;
+  titleSeizuresLegend = [];
 
   showRightYAxisLabel: boolean = true;
   yAxisLabelRight: string;
@@ -536,6 +544,8 @@ cleanOrphas(xrefs) {
 
     this.translate.get('menu.Seizures').subscribe((res: string) => {
       this.titleSeizures = res;
+      var tempTitle = this.titleSeizures+' ('+this.translate.instant("charts.Vertical bars")+')';
+      this.titleSeizuresLegend = [tempTitle]
     });
     this.translate.get('medication.Dose mg').subscribe((res: string) => {
       this.yAxisLabelRight = res;
@@ -1033,6 +1043,21 @@ cleanOrphas(xrefs) {
           this.lineChartDrugs = this.getStructure(res);
           this.lineChartDrugs = this.add0Drugs(this.lineChartDrugs);
           this.lineChartDrugsCopy = JSON.parse(JSON.stringify(this.lineChartDrugs));
+
+           // Get chartNames
+          var chartNames = this.lineChartDrugs.map((d: any) => d.name);
+          this.chartNames = [...new Set(chartNames)];
+          //this.chartNames = this.lineChartDrugs.map((d: any) => d.name);
+          // Convert hex colors to ColorHelper for consumption by legend
+          this.colors = new ColorHelper(this.lineChartColorScheme, 'ordinal', this.chartNames, this.lineChartColorScheme);
+          this.colors2 = new ColorHelper(this.lineChartOneColorScheme2, 'ordinal', this.chartNames, this.lineChartOneColorScheme2);
+            
+          //newColor
+          var tempColors = JSON.parse(JSON.stringify(this.lineChartColorScheme))
+          var tempColors2 = JSON.parse(JSON.stringify(this.lineChartOneColorScheme2))
+          tempColors.domain[this.chartNames.length]=tempColors2.domain[0];
+          this.colorsLineToll = new ColorHelper(tempColors, 'ordinal', this.chartNames, tempColors);
+
           this.normalizedChanged(this.normalized);
           if (this.events.length > 0) {
             this.getDataNormalizedDrugsVsSeizures();
@@ -1329,55 +1354,56 @@ cleanOrphas(xrefs) {
     return normalized;
   }
 
-  getDataNormalizedDrugsVsSeizures() {
+  getDataNormalizedDrugsVsSeizures(){
     var meds = this.getStructure(this.medications);
     var seizu = this.getStructure2(this.events);
     seizu = this.add0Seizures(seizu);
     meds = this.add0Drugs(meds);
     var copymeds = JSON.parse(JSON.stringify(meds));
-
-    if (this.rangeDate == 'quarter' || this.rangeDate == 'year') {
+    
+    if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
       //meds = this.groupPerWeekDrugs(meds)
-
+      
     }
-    if (this.rangeDate == 'quarter' || this.rangeDate == 'year') {
+    if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
       seizu = this.groupPerWeek(seizu);
       seizu = this.add0Seizures(seizu);
     }
 
     this.maxValueDrugsVsSeizu = 0;
     for (var i = 0; i < this.lineChartSeizures[0].series.length; i++) {
-      if (this.maxValueDrugsVsSeizu < Number(this.lineChartSeizures[0].series[i].value)) {
-        this.maxValueDrugsVsSeizu = Number(this.lineChartSeizures[0].series[i].value);
+      if(this.maxValueDrugsVsSeizu<Number(this.lineChartSeizures[0].series[i].value)){
+        this.maxValueDrugsVsSeizu=Number(this.lineChartSeizures[0].series[i].value);
       }
     }
-
+    
     var percen = 0;
-    if (this.maxValue > this.maxValueDrugsVsSeizu) {
-      percen = this.maxValue / this.maxValueDrugsVsSeizu
-    } else {
-      percen = this.maxValueDrugsVsSeizu / this.maxValue
+    if(this.maxValue>this.maxValueDrugsVsSeizu){
+      percen = this.maxValue/this.maxValueDrugsVsSeizu
+    }else{
+      percen = this.maxValueDrugsVsSeizu/this.maxValue
     }
-
+    
 
     this.barChart = seizu;
     this.lineChartSeries = copymeds;
-    if (this.normalized2) {
+    if(this.normalized2){
 
       var templineChartDrugs = JSON.parse(JSON.stringify(this.lineChartSeries));
       var maxValue = 0;
       for (var i = 0; i < this.lineChartSeries.length; i++) {
         var maxValueRecommededDrug = this.getMaxValueRecommededDrug(this.lineChartSeries[i].name);
-        if (maxValueRecommededDrug == 0) {
+        if(maxValueRecommededDrug==0){
           maxValueRecommededDrug = this.maxValue;
         }
         for (var j = 0; j < this.lineChartSeries[i].series.length; j++) {
-          if (this.normalized) {
+          /*if(this.normalized){
             templineChartDrugs[i].series[j].value = this.normalize(this.lineChartSeries[i].series[j].value, 0, maxValueRecommededDrug);
-          }
+          }*/
+          templineChartDrugs[i].series[j].value = this.normalize(this.lineChartSeries[i].series[j].value, 0, maxValueRecommededDrug);
           templineChartDrugs[i].series[j].name = this.lineChartSeries[i].series[j].name;
-          if (maxValue < this.lineChartSeries[i].series[j].value) {
-            maxValue = this.lineChartSeries[i].series[j].value;
+          if(maxValue<this.lineChartSeries[i].series[j].value){
+            maxValue= this.lineChartSeries[i].series[j].value;
           }
         }
         templineChartDrugs[i].series.sort(this.sortService.DateSortInver("name"));

@@ -1543,6 +1543,7 @@
     "quarter": "trimestre",
     "year": "año",
     "Drugs vs Seizures": "Medicamentos vs crisis epilépticas",
+    "Vertical bars": "Barras verticales",
     "infoTitle": "Ayuda",
     "infoSeizures": "Las crisis epilépticas se representan en número total independientemente del tipo. Si se selecciona el último trimestre o el último año, los datos son el número medio de convulsiones de los 7 días anteriores.",
     "infoDrugs": "La medicación puede representarse en porcentaje de la dosis recomendada del fármaco o en dosis absoluta.",
