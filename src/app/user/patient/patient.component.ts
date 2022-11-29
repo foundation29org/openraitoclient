@@ -566,6 +566,7 @@ cleanOrphas(xrefs) {
   }
 
   getFeels() {
+    this.loadedFeels = false;
     this.feels = [];
     var info = { rangeDate: this.rangeDate,  userId: this.authService.getIdUser() }
     this.subscription.add( this.raitoService.getFeelsPatientV2(this.authService.getCurrentPatient().sub, info)
@@ -704,6 +705,7 @@ cleanOrphas(xrefs) {
 }
 
   getSeizures() {
+    this.loadedEvents = false;
     this.events = [];
     this.lineChartSeizures = [];
     this.drugsBefore = false;
@@ -930,6 +932,7 @@ getWeek(newdate, dowOffset?) {
   }
 
   getDrugs() {
+    this.loadedDrugs = false;
     this.lineChartDrugs = [];
     this.lineChartDrugsCopy = [];
     this.maxValue = 0;
