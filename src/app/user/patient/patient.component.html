@@ -79,9 +79,9 @@
                                                 <span>{{weight | number : '1.0-2'}} kg</span>
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!weight">
-                                                *****
+                                                {{'generics.Unknown' | translate }}
                                             </h5>
-                                            <span class="grey">Weight</span>
+                                            <span class="grey">{{'anthropometry.Weight' | translate }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -95,9 +95,9 @@
                                                 <span>{{height | number : '1.0-2'}} cm</span>
                                             </h5>
                                             <h5 class="mb-0" *ngIf="!height">
-                                                *****
+                                                {{'generics.Unknown' | translate }}
                                             </h5>
-                                            <span class="grey">Height</span>
+                                            <span class="grey">{{'anthropometry.Height' | translate }}</span>
                                         </div>
                                     </div>
                                 </div>
