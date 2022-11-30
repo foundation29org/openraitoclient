@@ -101,6 +101,40 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="d-flex justify-content-center align-items-center mt-3">
+                                <div class="dash-followers mr-4">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <button type="button" class="btn bg-light-secondary px-2">
+                                            <i class="fas fa-weight"></i>
+                                        </button>
+                                        <div class="ml-2">
+                                            <h5 class="mb-0" *ngIf="weight">
+                                                <span>{{weight | number : '1.0-2'}} kg</span>
+                                            </h5>
+                                            <h5 class="mb-0" *ngIf="!weight">
+                                                *****
+                                            </h5>
+                                            <span class="grey">Weight</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dash-followers mr-4">
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <button type="button" class="btn bg-light-secondary px-2">
+                                            <i class="fas fa-arrows-alt-v"></i>
+                                        </button>
+                                        <div class="ml-2">
+                                            <h5 class="mb-0" *ngIf="height">
+                                                <span>{{height | number : '1.0-2'}} cm</span>
+                                            </h5>
+                                            <h5 class="mb-0" *ngIf="!height">
+                                                *****
+                                            </h5>
+                                            <span class="grey">Height</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="ml-2">
@@ -232,6 +266,23 @@
                 </div>
             </div>
             <a id="linkdrugs" style="position: absolute;margin-top: -4em;"></a>
+            <div class="row" *ngIf="!loadedDrugs">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header pb-2">
+                            <h4 class="card-title mb-1"><span>{{'clinicalinfo.Medication' |translate }}</span></h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="center-elements">
+                                    <i class="fa fa-spinner fa-spin fa-fw"></i>
+                                </div>
+                            </div>
+                        </div> 
+                        
+                    </div>
+                </div>                
+            </div>
             <div class="row" *ngIf="medications.length > 0 && loadedDrugs">
                 <div class="col-12">
                     <div class="card">

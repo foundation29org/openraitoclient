@@ -254,6 +254,15 @@ export class RaitoService {
          })
     }
 
+    getPatientHeight(idPatient){
+      return this.http.get(environment.urlRaito+'/api/height/'+idPatient)
+        .map( (res : any) => {
+          return res;
+         }, (err) => {
+           console.log(err);
+         })
+    }
+
     getPatientPhenotypes(idPatient, info){
       if(info.token!=''){
         return this.http.post(environment.urlRaito+'/api/openraito/invitation/phenotypes/'+idPatient, info)

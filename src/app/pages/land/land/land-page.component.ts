@@ -89,6 +89,8 @@ export class LandPageComponent implements OnInit, OnDestroy {
   recommendedDoses: any = [];
   weight: string;
   age: number = null;
+  infoAge: string = '';
+  height: string = null;
 
   loadedSymptoms: boolean = false;
   phenotype: any = {};
@@ -303,7 +305,7 @@ cleanOrphas(xrefs) {
             if (this.patients[i].birthDate) {
               var dateRequest2 = new Date(this.patients[i].birthDate);
               var resul = ''
-              var temp = this.ageFromDateOfBirthday(dateRequest2);
+              var temp = this.getAge(dateRequest2);
               if (temp != null) {
                 if (temp.years > 0) {
                   if (temp.years > 1) {
@@ -351,6 +353,18 @@ cleanOrphas(xrefs) {
   }
 
   ageFromDateOfBirthday(dateOfBirth: any) {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    this.age = age;
+  }
+
+  getAge(dateOfBirth: any) {
     var res: any;
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -362,8 +376,8 @@ cleanOrphas(xrefs) {
     if (months > 0) {
       age = Math.floor(months / 12)
     }
-    var res = months <= 0 ? 0 : months;
-    var m = res % 12;
+    var res2 = months <= 0 ? 0 : months;
+    var m = res2 % 12;
     res = { years: age, months: m };
     return res;
   }
@@ -625,6 +639,7 @@ cleanOrphas(xrefs) {
       this.getDocs();
       this.loadSymptoms();
       this.getWeightAndAge();
+      this.getHeight();
     }
   }
 
@@ -639,18 +654,60 @@ cleanOrphas(xrefs) {
   }
 
   getWeightAndAge() {
+    this.infoAge = '';
     if (this.patientDataInfo.birthDate == null) {
       this.age = null;
     } else {
       this.ageFromDateOfBirthday(this.patientDataInfo.birthDate);
+      var temp = this.getAge(this.patientDataInfo.birthDate);
+      if (temp != null) {
+        if (temp.years > 0) {
+          if (temp.years > 1) {
+            this.infoAge = temp.years + " " + this.translate.instant("topnavbar.year") + "s";
+          } else {
+            this.infoAge = temp.years + " " + this.translate.instant("topnavbar.year");
+          }
+
+        }
+        if (temp.months > 0) {
+          if (temp.months > 1) {
+            this.infoAge = this.infoAge + " " + temp.months + " " + this.translate.instant("topnavbar.months")
+          } else {
+            this.infoAge = this.infoAge + " " + temp.months + " " + this.translate.instant("topnavbar.month")
+          }
+        }
+        if (temp.years == 0 && temp.months == 0) {
+          this.infoAge = "0 " + this.translate.instant("topnavbar.months")
+        }
+      }
+
     }
     this.subscription.add(this.raitoService.getPatientWeight(this.patientDataInfo.id)
       .subscribe((res: any) => {
+        console.log(res);
         if (res.message == 'There are no weight') {
+          this.weight = null;
         } else if (res.message == 'old weight') {
           this.weight = res.weight.value
         } else {
           this.weight = res.weight.value
+        }
+      }, (err) => {
+        console.log(err);
+        this.toastr.error('', this.translate.instant("generics.error try again"));
+      }));
+  }
+
+  getHeight() {
+    this.subscription.add(this.raitoService.getPatientHeight(this.patientDataInfo.id)
+      .subscribe((res: any) => {
+        console.log(res);
+        if (res.message == 'There are no height') {
+          this.height = null;
+        } else if (res.message == 'old height') {
+          this.height = res.height.value
+        } else {
+          this.height = res.height.value
         }
       }, (err) => {
         console.log(err);
@@ -1319,6 +1376,7 @@ cleanOrphas(xrefs) {
     if (actualRecommendedDoses == undefined || !this.weight) {
       return maxDose;
     } else {
+      console.log(this.age)
       if (this.age < 18) {
         if (actualRecommendedDoses.data != 'onlyadults') {
           if (actualRecommendedDoses.kids.perkg == 'no') {
@@ -1413,6 +1471,17 @@ cleanOrphas(xrefs) {
       }
       this.lineChartSeries = JSON.parse(JSON.stringify(templineChartDrugs));
     }
+  }
+
+  normalizedChanged2(normalized){
+    this.normalized2 = normalized;
+    if(this.normalized2){
+      this.titleDrugsVsDrugs = this.titleDrugsVsNormalized;
+    }else{
+      this.titleDrugsVsDrugs = this.titleDrugsVsNoNormalized;
+    }
+     this.getDataNormalizedDrugsVsSeizures();
+    
   }
 
   loadDataRangeDate(rangeDate) {
