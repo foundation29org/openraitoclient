@@ -119,6 +119,8 @@ export class PatientComponent implements OnInit, OnDestroy {
   basicInfoPatient: any;
   basicInfoPatientCopy: any;
   age: number = null;
+  infoAge: string = '';
+  height: string = null;
   weight: string;
   groups: Array<any> = [];
   private subscription: Subscription = new Subscription();
@@ -486,7 +488,19 @@ cleanOrphas(xrefs) {
 }
 
 
-  ageFromDateOfBirthday(dateOfBirth: any) {
+ageFromDateOfBirthday(dateOfBirth: any) {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  this.age = age;
+}
+
+  getAge(dateOfBirth: any) {
     var res: any;
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -498,8 +512,8 @@ cleanOrphas(xrefs) {
     if (months > 0) {
       age = Math.floor(months / 12)
     }
-    var res = months <= 0 ? 0 : months;
-    var m = res % 12;
+    var res2 = months <= 0 ? 0 : months;
+    var m = res2 % 12;
     res = { years: age, months: m };
     return res;
   }
@@ -532,6 +546,7 @@ cleanOrphas(xrefs) {
       this.getDocs();
       this.loadSymptoms();
       this.getWeightAndAge();
+      this.getHeight();
     }
   }
 
@@ -550,14 +565,52 @@ cleanOrphas(xrefs) {
       this.age = null;
     } else {
       this.ageFromDateOfBirthday(this.patientDataInfo.birthDate);
+      var temp = this.getAge(this.patientDataInfo.birthDate);
+      if (temp != null) {
+        if (temp.years > 0) {
+          if (temp.years > 1) {
+            this.infoAge = temp.years + " " + this.translate.instant("topnavbar.year") + "s";
+          } else {
+            this.infoAge = temp.years + " " + this.translate.instant("topnavbar.year");
+          }
+
+        }
+        if (temp.months > 0) {
+          if (temp.months > 1) {
+            this.infoAge = this.infoAge + " " + temp.months + " " + this.translate.instant("topnavbar.months")
+          } else {
+            this.infoAge = this.infoAge + " " + temp.months + " " + this.translate.instant("topnavbar.month")
+          }
+        }
+        if (temp.years == 0 && temp.months == 0) {
+          this.infoAge = "0 " + this.translate.instant("topnavbar.months")
+        }
+      }
     }
     this.subscription.add(this.raitoService.getPatientWeight(this.authService.getCurrentPatient().sub)
       .subscribe((res: any) => {
         if (res.message == 'There are no weight') {
+          this.weight = null;
         } else if (res.message == 'old weight') {
           this.weight = res.weight.value
         } else {
           this.weight = res.weight.value
+        }
+      }, (err) => {
+        console.log(err);
+        this.toastr.error('', this.translate.instant("generics.error try again"));
+      }));
+  }
+
+  getHeight() {
+    this.subscription.add(this.raitoService.getPatientHeight(this.authService.getCurrentPatient().sub)
+      .subscribe((res: any) => {
+        if (res.message == 'There are no height') {
+          this.height = null;
+        } else if (res.message == 'old height') {
+          this.height = res.height.value
+        } else {
+          this.height = res.height.value
         }
       }, (err) => {
         console.log(err);
