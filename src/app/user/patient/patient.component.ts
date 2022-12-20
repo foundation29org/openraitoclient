@@ -1566,8 +1566,7 @@ getWeek(newdate, dowOffset?) {
       data:{patientInfo:false, medicalInfo:false,devicesInfo:false, genomicsInfo:false},
       notes:'',
       date: stringDateNow,
-      token: '',
-      operations:[]
+      token: ''
     };
   }
 
