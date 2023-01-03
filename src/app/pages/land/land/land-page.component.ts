@@ -180,6 +180,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
   showRightYAxisLabel: boolean = true;
   yAxisLabelRight: string;
   xAxisTicks = [];
+  listDiagnosesAllPatients: any = [];
 
   private subscription: Subscription = new Subscription();
   constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService) {
@@ -297,6 +298,7 @@ cleanOrphas(xrefs) {
   getPatients() {
     this.loadedPatients = false;
     this.patients = [];
+    this.listDiagnosesAllPatients = [];
     this.subscription.add(this.patientService.getPatientsRequest()
       .subscribe((res: any) => {
         if (res != null) {
@@ -341,16 +343,64 @@ cleanOrphas(xrefs) {
             } else {
               this.patients[i].gender2 = '-';
             }
+
+            if(this.patients[i].previousDiagnosis!=null){
+              this.listDiagnosesAllPatients.push(this.patients[i].previousDiagnosis);
+            }
           }
-          this.alertSource = new LocalDataSource(this.patients);
-          this.loadSettingTable();
-          this.loadedPatients = true;
+
+          if(this.listDiagnosesAllPatients.length>0){
+            this.getInfoDiseases();
+          }else{
+            this.alertSource = new LocalDataSource(this.patients);
+            this.loadSettingTable();
+            this.loadedPatients = true;
+          }
+
+          
         }
       }, (err) => {
         console.log(err);
         this.loadedPatients = true;
       }));
   }
+
+  getInfoDiseases(){
+    this.subscription.add(this.apif29BioService.getInfoOfDiseasesLang(this.listDiagnosesAllPatients, this.lang)
+      .subscribe((res1: any) => {
+        for (var i = 0; i < this.patients.length; i++) {
+          if(this.patients[i].previousDiagnosis!=null){
+            var copy = JSON.parse(JSON.stringify(res1[this.patients[i].previousDiagnosis]));
+            this.patients[i].diagnosisInfo = this.cleanxrefs2(copy);
+          }
+          else{
+            this.patients[i].diagnosisInfo = null;
+          }
+        }
+        this.alertSource = new LocalDataSource(this.patients);
+        this.loadSettingTable();
+        this.loadedPatients = true;
+        
+      }, (err) => {
+          this.alertSource = new LocalDataSource(this.patients);
+          this.loadSettingTable();
+          this.loadedPatients = true;
+          console.log(err);
+      }));
+  }
+
+  cleanxrefs2(disease) {
+    if (disease.xrefs != undefined) {
+        if (disease.xrefs.length == 0) {
+            disease.xrefs.push(disease.id);
+        }
+        disease.xrefs.sort((one, two) => (one > two ? -1 : 1));
+        var xrefs = this.cleanOrphas(disease.xrefs)
+        disease.xrefs = xrefs;
+    }
+    disease.name = this.textTransform.transform(disease.name);
+    return disease;
+}
 
   ageFromDateOfBirthday(dateOfBirth: any) {
     const today = new Date();
@@ -401,6 +451,29 @@ cleanOrphas(xrefs) {
           title: this.translate.instant("diagnosis.Case"),
           placeholder: this.translate.instant("diagnosis.Case"),
           type: "html",
+        },
+        diagnosisInfo: {
+          title: this.translate.instant("clinicalinfo.Diagnosis"),
+          placeholder: this.translate.instant("clinicalinfo.Diagnosis"),
+          type: "html",
+          valuePrepareFunction: (diagnosis) => {
+            if (diagnosis) {
+              var dev = '<span class="">'+diagnosis.name+'</span><span class="d-block">'+diagnosis.xrefs[0].name+':'+diagnosis.xrefs[0].id +'</span>'
+              return dev;
+            }
+            else{
+                return null;
+            }
+        },
+        filterFunction(cell?: string, search?:string): boolean {
+          var infoDisease = JSON.stringify(cell).toLowerCase();
+          var searchLowercase = search.toLowerCase();
+          if(infoDisease.indexOf(searchLowercase)!=-1){
+            return true;
+          }else{
+            return false;
+          }
+        },
         },
         patientName: {
           title: this.translate.instant("generics.Name"),
