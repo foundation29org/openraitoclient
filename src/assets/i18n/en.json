@@ -1525,6 +1525,9 @@
     "Not normalized": "Not normalized data"
   },
   "charts":{
+    "GroupBy": "Group by",
+    "Weeks": "Weeks",
+    "Months": "Months",
     "Noseizures": "There are no saved seizures",
     "in the last": "in the last",
     "Quality of life": "Quality of life",
