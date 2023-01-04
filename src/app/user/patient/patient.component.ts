@@ -125,6 +125,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   groups: Array<any> = [];
   private subscription: Subscription = new Subscription();
   rangeDate: string = 'month';
+  groupBy: string = 'Months';
   normalized: boolean = true;
   normalized2: boolean = true;
   maxValue: number = 0;
@@ -212,6 +213,21 @@ export class PatientComponent implements OnInit, OnDestroy {
   @ViewChild('f') sendForm: NgForm;
   sending: boolean = false;
   xAxisTicks = [];
+  meses: any = 
+  [
+    {id: 1, es: 'Enero', en: 'January'},
+    {id: 2, es: 'Febrero', en: 'February'},
+    {id: 3, es: 'Marzo', en: 'March'},
+    {id: 4, es: 'Abril', en: 'April'},
+    {id: 5, es: 'Mayo', en: 'May'},
+    {id: 6, es: 'Junio', en: 'June'},
+    {id: 7, es: 'Julio', en: 'July'},
+    {id: 8, es: 'Agosto', en: 'August'},
+    {id: 9, es: 'Septiembre', en: 'September'},
+    {id: 10, es: 'Octubre', en: 'October'},
+    {id: 11, es: 'Noviembre', en: 'November'},
+    {id: 12, es: 'Diciembre', en: 'December'}
+  ];
 
   constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService) {
     this.adapter.setLocale(this.authService.getLang());
@@ -907,7 +923,11 @@ ageFromDateOfBirthday(dateOfBirth: any) {
     for (var i=0; i < seizures.length; i++)
     {
       var varweek = new Date(seizures[i].stringDate)
-      seizures[i].name = this.getWeek(varweek, 1);
+      if(this.groupBy=='Weeks'){
+        seizures[i].name = this.getWeek(varweek, 1);
+      }else{
+        seizures[i].name = this.getMonthLetter(varweek, 1);
+      }
     }
     var copyseizures = JSON.parse(JSON.stringify(seizures));
     for (var i=0; i < copyseizures.length; i++){
@@ -929,6 +949,14 @@ ageFromDateOfBirthday(dateOfBirth: any) {
       }
     }
     return respseizures;
+}
+
+getMonthLetter(newdate, dowOffset?){
+  if (this.lang != 'es') {
+    return this.meses[newdate.getMonth()].en
+  } else {
+      return this.meses[newdate.getMonth()].es
+  }
 }
 
 getWeek(newdate, dowOffset?) {
@@ -1393,6 +1421,11 @@ getWeek(newdate, dowOffset?) {
     this.normalized = true;
     this.normalized2 = true;
     this.loadPartData();
+  }
+
+  changeGroupBy(groupBy) {
+    this.groupBy = groupBy;
+    this.loadDataRangeDate(this.rangeDate);
   }
 
   getDocs() {

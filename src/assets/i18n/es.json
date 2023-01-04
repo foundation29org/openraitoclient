@@ -1526,6 +1526,9 @@
     "Not normalized": "Sin normalizar"
   },
   "charts":{
+    "GroupBy": "Agrupar por",
+    "Weeks": "Semanas",
+    "Months": "Meses",
     "Noseizures": "No hay crisis guardadas",
     "in the last": "en el último",
     "Quality of life": "Calidad de vida",
