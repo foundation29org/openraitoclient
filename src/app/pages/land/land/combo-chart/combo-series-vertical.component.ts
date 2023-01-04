@@ -20,7 +20,7 @@ import { formatLabel } from '@swimlane/ngx-charts';
   template: `
     <svg:g ngx-charts-bar *ngFor="let bar of bars; trackBy: trackBy"
       [@animationState]="'active'"
-      [width]="bar.width"
+      [width]="10"
       [height]="bar.height"
       [x]="bar.x"
       [y]="bar.y"
