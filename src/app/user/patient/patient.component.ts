@@ -1358,8 +1358,8 @@ getWeek(newdate, dowOffset?) {
       
     }
     if(this.rangeDate == 'quarter' || this.rangeDate == 'year'){
-      seizu = this.groupPerWeek(seizu);
       seizu = this.add0Seizures(seizu);
+      seizu = this.groupPerWeek(seizu);
     }
 
     this.maxValueDrugsVsSeizu = 0;
