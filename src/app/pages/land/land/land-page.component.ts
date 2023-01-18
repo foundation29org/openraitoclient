@@ -664,14 +664,14 @@ cleanOrphas(xrefs) {
   }
 
   loadTranslationsElements() {
+    this.drugsLang = [];
     this.loadingDataGroup = true;
     this.subscription.add( this.raitoService.loadDrugsGroup(this.patientDataInfo.group)
       .subscribe((res: any) => {
-        if (res.medications.data.length == 0) {
+        if (res.medications.data.drugs.length == 0) {
           //no tiene datos sobre el grupo
         } else {
           this.dataGroup = res.medications.data;
-          this.drugsLang = [];
           if (this.dataGroup.drugs.length > 0) {
             for (var i = 0; i < this.dataGroup.drugs.length; i++) {
               var found = false;
@@ -1238,11 +1238,15 @@ cleanOrphas(xrefs) {
   searchTranslationDrugs() {
     for (var i = 0; i < this.medications.length; i++) {
       var foundTranslation = false;
-      for (var j = 0; j < this.drugsLang.length && !foundTranslation; j++) {
-        if (this.drugsLang[j].name == this.medications[i].drug) {
-          for (var k = 0; k < this.drugsLang[j].translation.length && !foundTranslation; k++) {
-            this.medications[i].drugTranslate = this.drugsLang[j].translation;
-            foundTranslation = true;
+      if(this.drugsLang.length == 0){
+        this.medications[i].drugTranslate = this.medications[i].drug;
+      }else{
+        for (var j = 0; j < this.drugsLang.length && !foundTranslation; j++) {
+          if (this.drugsLang[j].name == this.medications[i].drug) {
+            for (var k = 0; k < this.drugsLang[j].translation.length && !foundTranslation; k++) {
+              this.medications[i].drugTranslate = this.drugsLang[j].translation;
+              foundTranslation = true;
+            }
           }
         }
       }
