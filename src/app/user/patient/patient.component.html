@@ -309,7 +309,7 @@
                                     aria-labelledby="HPO">
                                     <tbody>
                                         <tr *ngFor="let hpo of phenotype.data ; let i = index">
-                                            <td>
+                                            <td style="padding-left: 0px;">
                                                 <span>
                                                     <span class="float-right ml-1">
                                                         <button
@@ -320,11 +320,11 @@
                                                         </button>
                                                     </span>
                                                     <span>
-                                                        <span class="ml-1 custom-bold pointer"
+                                                        <span class="custom-bold pointer"
                                                             (click)="showMoreInfoSymptomPopup(i, contentInfoSymptomNcr);"><strong>{{hpo.name}}</strong>
                                                             - {{hpo.id}}</span>
 
-                                                        <div class="ml-1" style="line-height: 0.5em !important;">
+                                                        <div class="" style="line-height: 0.5em !important;">
                                                             <span *ngIf="!hpo.onset">
                                                                 {{'open.It has not been indicated when the symptom appeared' | translate }}
                                                             </span>
@@ -828,10 +828,14 @@
                                         <td><strong>{{doc.name}}</strong></td>
                                         <td>{{doc.description}}</td>
                                         <td>{{doc.dateDoc | date}}</td>
-                                        <td><span><a class="btn btn-sm btn-outline-dark mb-0"
+                                        <td>
+                                            <span *ngIf="doc.notes!=''" class="mr-2"><a class="btn btn-sm btn-outline-dark mb-0"
+                                                href="javascript:void(0)" (click)="openNotes(doc.notes, contentNotes);">
+                                                {{'generics.notes' |translate }}</a></span>
+                                            <span><a class="btn btn-sm btn-outline-dark mb-0"
                                             href="{{accessToken.blobAccountUrl}}{{accessToken.containerName}}/{{doc.url}}{{accessToken.sasToken}}"
                                             target="_blank" download>
-                                            <i class="fa fa-eye"></i></a></span>
+                                            <i class="fa fa-download"></i></a></span>
                                     <!--<span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
                                             (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span>--></td>
                                     </tr>
@@ -997,4 +1001,23 @@
     </div>
     </div>
   </form>
+</ng-template>
+<ng-template #contentNotes let-c="close" let-d="dismiss" appendTo="body">
+    <div class="modal-header" id="idHeader">
+        <div class="content-header text-left">
+            <h4>{{'generics.notes' |translate }}</h4>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="closeModal();">
+            &times;
+        </button>
+    </div>
+    <div class="modal-body content-wrapper p-2">
+        <div class="p-2">
+            <div>
+                <div class="mt-2">
+                    <p>{{notes}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </ng-template>

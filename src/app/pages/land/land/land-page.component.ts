@@ -19,6 +19,9 @@ import { ToastrService } from 'ngx-toastr';
 import { IBlobAccessToken } from 'app/shared/services/blob-storage.service';
 import * as chartsData from 'app/shared/configs/general-charts.config';
 import { ColorHelper } from '@swimlane/ngx-charts';
+import {Location} from '@angular/common';
+import { EventsService } from 'app/shared/services/events.service';
+import { Injectable, Injector } from '@angular/core';
 
 @Component({
   selector: 'app-land-page',
@@ -198,8 +201,10 @@ export class LandPageComponent implements OnInit, OnDestroy {
     {id: 12, es: 'Diciembre', en: 'December'}
   ];
 
+  notes: string = '';
+
   private subscription: Subscription = new Subscription();
-  constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService) {
+  constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService, private location: Location, private inj: Injector) {
     this.lang = sessionStorage.getItem('lang');
     var param = router.parseUrl(router.url).queryParams;
     if (param.key && param.token) {
@@ -371,6 +376,7 @@ cleanOrphas(xrefs) {
             this.alertSource = new LocalDataSource(this.patients);
             this.loadSettingTable();
             this.loadedPatients = true;
+            this.testIfUrlPatient();
           }
 
           
@@ -396,6 +402,7 @@ cleanOrphas(xrefs) {
         this.alertSource = new LocalDataSource(this.patients);
         this.loadSettingTable();
         this.loadedPatients = true;
+        this.testIfUrlPatient();
         
       }, (err) => {
           this.alertSource = new LocalDataSource(this.patients);
@@ -540,7 +547,36 @@ cleanOrphas(xrefs) {
     };
   }
 
+
+  async testIfUrlPatient(){
+    var param = this.router.parseUrl(this.router.url).queryParams;
+    var found = false;
+    if (param.patientid) {
+       await this.alertSource.getAll().then(result => {
+        result.forEach(element => {
+          console.log(element)
+          if(element.id == param.patientid){
+            console.log('found')
+            var info = {data:element}
+            found = true;
+            this.handleGridSelected(info);
+          }
+        });
+      });
+    }
+    if(!found){
+      this.location.replaceState('');
+    }
+  }
+  
+  lauchEventPagePatient(){
+    var events = this.inj.get(EventsService);
+    events.broadcast('patientSelected', true);
+  }
   handleGridSelected(e) {
+    //environment.api+this.router.url.split('?')[0] +'?patientid='+e.data.id;
+    this.location.replaceState('?patientid='+e.data.id);
+    this.lauchEventPagePatient();
     /*this.authService.setGroup(e.data.group)
     var info = {
       sub: e.data.id,
@@ -1739,6 +1775,15 @@ cleanOrphas(xrefs) {
         console.log(err);
       }));
 
+  }
+
+  openNotes(notes, contentNotes){
+    this.notes = notes;
+    let ngbModalOptions: NgbModalOptions = {
+      keyboard: false,
+      windowClass: 'ModalClass-sm'// xl, lg, sm
+    };
+    this.modalReference = this.modalService.open(contentNotes, ngbModalOptions);
   }
 
   goTo(url){

@@ -228,6 +228,7 @@ export class PatientComponent implements OnInit, OnDestroy {
     {id: 11, es: 'Noviembre', en: 'November'},
     {id: 12, es: 'Diciembre', en: 'December'}
   ];
+  notes: string = '';
 
   constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService) {
     this.adapter.setLocale(this.authService.getLang());
@@ -1565,6 +1566,15 @@ getWeek(newdate, dowOffset?) {
         console.log(err);
       }));
 
+  }
+
+  openNotes(notes, contentNotes){
+    this.notes = notes;
+    let ngbModalOptions: NgbModalOptions = {
+      keyboard: false,
+      windowClass: 'ModalClass-sm'// xl, lg, sm
+    };
+    this.modalReference = this.modalService.open(contentNotes, ngbModalOptions);
   }
 
   goTo(url){

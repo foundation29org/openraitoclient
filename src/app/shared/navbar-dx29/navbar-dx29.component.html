@@ -13,7 +13,7 @@
               <img  class="logo-img" src='assets/img/logo-raito.png' (click)="lauchEvent('Logo');"/>
               <span class="font-large-2 text-bold-600" style="position: absolute;top: 20%;font-size: 2rem !important;">OpenRaito</span>
             </span>
-            <span *ngIf="!isHomePage" routerLink="/." style="cursor: pointer;">
+            <span *ngIf="!isHomePage" (click)="goHome()" style="cursor: pointer;">
               <img class="logo-img" src='assets/img/logo-raito.png' (click)="lauchEvent('Logo');"/>
               <span class="font-large-2 text-bold-600" style="position: absolute;top: 20%;font-size: 2rem !important;">OpenRaito</span>
             </span>
