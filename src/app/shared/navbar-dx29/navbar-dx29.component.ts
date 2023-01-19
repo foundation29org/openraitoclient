@@ -9,6 +9,7 @@ import { LangService } from 'app/shared/services/lang.service';
 import { EventsService } from 'app/shared/services/events.service';
 import { ApiDx29ServerService } from 'app/shared/services/api-dx29-server.service';
 import { Injectable, Injector } from '@angular/core';
+import {Location} from '@angular/common';
 
 declare let gtag: any;
 
@@ -43,7 +44,7 @@ export class NavbarD29Component implements OnInit, AfterViewInit, OnDestroy {
   _startTime: any;
   private subscription: Subscription = new Subscription();
 
-  constructor(public translate: TranslateService, private layoutService: LayoutService, private configService: ConfigService, private langService: LangService, private router: Router, private route: ActivatedRoute, private inj: Injector, private apiDx29ServerService: ApiDx29ServerService, private eventsService: EventsService) {
+  constructor(public translate: TranslateService, private layoutService: LayoutService, private configService: ConfigService, private langService: LangService, private router: Router, private route: ActivatedRoute, private inj: Injector, private apiDx29ServerService: ApiDx29ServerService, private eventsService: EventsService, private location: Location) {
 
     this.loadLanguages();
 
@@ -51,7 +52,6 @@ export class NavbarD29Component implements OnInit, AfterViewInit, OnDestroy {
 
       event => {
         var tempUrl = (event.url).toString();
-        console.log(tempUrl);
         if (tempUrl.indexOf('/.') != -1 || tempUrl == '/') {
           this.isHomePage = true;
           this.isAboutPage = false;
@@ -89,14 +89,20 @@ export class NavbarD29Component implements OnInit, AfterViewInit, OnDestroy {
     }.bind(this));
   }
 
-  goHome(){
+  async goHome(){
     var param = this.router.parseUrl(this.router.url).queryParams;
     if (param.key || param.patientid) {
+      await this.delay(500);
       window.location.href = window.location.href.split("?")[0];
     }else{
-      this.router.navigate(['/']);
+      window.location.href = window.location.href.split("?")[0];
+      //this.router.navigate(['/']);
     }
     
+  }
+
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   ngAfterViewInit() {

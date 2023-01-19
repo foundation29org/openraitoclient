@@ -554,9 +554,7 @@ cleanOrphas(xrefs) {
     if (param.patientid) {
        await this.alertSource.getAll().then(result => {
         result.forEach(element => {
-          console.log(element)
           if(element.id == param.patientid){
-            console.log('found')
             var info = {data:element}
             found = true;
             this.handleGridSelected(info);
@@ -606,6 +604,7 @@ cleanOrphas(xrefs) {
   back() {
     this.selectedPatient = false;
     this.loadedInfoPatient = false;
+    this.location.replaceState('');
   }
 
   loadEnvironment() {
@@ -809,7 +808,6 @@ cleanOrphas(xrefs) {
     }
     this.subscription.add(this.raitoService.getPatientWeight(this.patientDataInfo.id)
       .subscribe((res: any) => {
-        console.log(res);
         if (res.message == 'There are no weight') {
           this.weight = null;
         } else if (res.message == 'old weight') {
@@ -826,7 +824,6 @@ cleanOrphas(xrefs) {
   getHeight() {
     this.subscription.add(this.raitoService.getPatientHeight(this.patientDataInfo.id)
       .subscribe((res: any) => {
-        console.log(res);
         if (res.message == 'There are no height') {
           this.height = null;
         } else if (res.message == 'old height') {
@@ -1517,7 +1514,6 @@ cleanOrphas(xrefs) {
     if (actualRecommendedDoses == undefined || !this.weight) {
       return maxDose;
     } else {
-      console.log(this.age)
       if (this.age < 18) {
         if (actualRecommendedDoses.data != 'onlyadults') {
           if (actualRecommendedDoses.kids.perkg == 'no') {
