@@ -9,7 +9,7 @@
                         </div>
                         <div class="card-content">
                             <div class="card-body p-0">
-                                <ng2-smart-table [settings]="alertsettings" [source]="alertSource"
+                                <ng2-smart-table class="tablePatients" [settings]="alertsettings" [source]="alertSource"
                                     (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
                             </div>
                         </div>
@@ -864,10 +864,14 @@
                                             <td><strong>{{doc.name}}</strong></td>
                                             <td>{{doc.description}}</td>
                                             <td>{{doc.dateDoc | date}}</td>
-                                            <td><span><a class="btn btn-sm btn-outline-dark mb-0"
+                                            <td>
+                                                <span *ngIf="doc.notes!=''" class="mr-2"><a class="btn btn-sm btn-outline-dark mb-0"
+                                                    href="javascript:void(0)" (click)="openNotes(doc.notes, contentNotes);">
+                                                    {{'generics.notes' |translate }}</a></span>
+                                                <span><a class="btn btn-sm btn-outline-dark mb-0"
                                                         href="{{accessToken.blobAccountUrl}}{{accessToken.containerName}}/{{doc.url}}{{accessToken.sasToken}}"
                                                         target="_blank" download>
-                                                        <i class="fa fa-eye"></i></a></span>
+                                                        <i class="fa fa-download"></i></a></span>
                                                 <!--<span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
                                             (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span>-->
                                             </td>
@@ -980,6 +984,26 @@
                 <div class="mt-2 text-center">
                     <a id="initpos"></a>
                     <div style="text-align: justify;" class="textExtractedNcr" [innerHTML]=resultTextNcr></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #contentNotes let-c="close" let-d="dismiss" appendTo="body">
+    <div class="modal-header" id="idHeader">
+        <div class="content-header text-left">
+            <h4>{{'generics.notes' |translate }}</h4>
+        </div>
+        <button type="button" class="close" aria-label="Close" (click)="closeModal();">
+            &times;
+        </button>
+    </div>
+    <div class="modal-body content-wrapper p-2">
+        <div class="p-2">
+            <div>
+                <div class="mt-2">
+                    <p>{{notes}}</p>
                 </div>
             </div>
         </div>

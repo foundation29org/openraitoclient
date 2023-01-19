@@ -36,7 +36,7 @@
               <router-outlet></router-outlet>
           </div>
       </div>
-      <app-footer-land></app-footer-land>
+      <app-footer-land *ngIf="!isPatientPage"></app-footer-land>
       <!--<app-footer *ngIf="!isHomePage"></app-footer>-->
       <button class="btn btn-primary scroll-top" type="button" *ngIf="isScrollTopVisible" (click)="scrollToTop()"><i class="ft-arrow-up"></i></button>
   </div>

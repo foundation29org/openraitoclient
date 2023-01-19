@@ -16,6 +16,7 @@ import { DOCUMENT } from "@angular/common";
 import { LayoutService } from "app/shared/services/layout.service";
 import { Subscription } from "rxjs";
 import { WINDOW } from 'app/shared/services/window.service';
+import { EventsService } from 'app/shared/services/events.service';
 
 var fireRefreshEventOnWindow = function() {
   var evt = document.createEvent("HTMLEvents");
@@ -46,6 +47,7 @@ export class LandPageLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   bgColor = "black";
   bgImage = "assets/img/sidebar-bg/01.jpg";
   isHomePage: boolean = false;
+  isPatientPage: boolean = false;
   isScrollTopVisible = false;
 
   public config: any = {};
@@ -60,12 +62,20 @@ export class LandPageLayoutComponent implements OnInit, AfterViewInit, OnDestroy
     private renderer: Renderer2,
     private router: Router,
     @Inject(WINDOW) private window: Window,
+    private eventsService: EventsService
   ) {
     if ((this.router.url).indexOf('/.') != -1 || (this.router.url)== '/') {
       this.isHomePage = true;
     }else{
       this.isHomePage = false;
     }
+
+    if ((this.router.url).indexOf('?key') != -1 || (this.router.url).indexOf('?patientid') != -1) {
+      this.isPatientPage = true;
+    }else{
+      this.isPatientPage = false;
+    }
+
     //event emitter call from customizer
     this.layoutSub = layoutService.customizerChangeEmitted$.subscribe(
       options => {
@@ -225,6 +235,11 @@ export class LandPageLayoutComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngAfterViewInit() {
+    
+    this.eventsService.on('patientSelected', function (obj) {
+      this.isPatientPage = true;
+    }.bind(this));
+
     this.router.events.filter((event: any) => event instanceof NavigationStart).subscribe(
 
       event => {
@@ -233,6 +248,11 @@ export class LandPageLayoutComponent implements OnInit, AfterViewInit, OnDestroy
           this.isHomePage = true;
         }else{
           this.isHomePage = false;
+        }
+        if ((this.router.url).indexOf('?key') != -1 || (this.router.url).indexOf('?patientid') != -1) {
+          this.isPatientPage = true;
+        }else{
+          this.isPatientPage = false;
         }
       }
     );
