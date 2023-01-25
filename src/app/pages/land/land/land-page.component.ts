@@ -202,6 +202,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
   ];
 
   notes: string = '';
+  showSeizuresModules: boolean = false;
 
   private subscription: Subscription = new Subscription();
   constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService, private location: Location, private inj: Injector) {
@@ -771,10 +772,30 @@ cleanOrphas(xrefs) {
     //cargar los datos del usuario
     this.loadedFeels = false;
     if (this.patientPermissions.data.medicalInfo) {
-      this.getFeels();
-      this.getSeizures();
-      this.calculateMinDate();
+      this.getModules();
     }
+  }
+
+  getModules(){
+    this.subscription.add(this.patientService.getModules(this.patientDataInfo.id)
+    .subscribe((res: any) => {
+      this.showSeizuresModules = res.modules.includes("seizures");
+      if(this.showSeizuresModules){
+        this.getFeels();
+        this.getSeizures();
+        this.calculateMinDate();
+      }else{
+        this.getFeels();
+        this.getDrugs();
+        this.calculateMinDate();
+      }
+    }, (err) => {
+      console.log(err);
+      this.showSeizuresModules = false;
+      this.getFeels();
+      this.getDrugs();
+      this.calculateMinDate();
+    }));
   }
 
   getWeightAndAge() {
