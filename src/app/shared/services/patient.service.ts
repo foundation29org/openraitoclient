@@ -30,6 +30,7 @@ export class PatientService {
       //cargar las faqs del knowledgeBaseID
       return this.http.get(environment.api+'/api/openraito/patientsrequest/'+this.authService.getIdUser())
         .map( (res : any) => {
+          console.log(res);
           if(res.listpatients.length>0){
             return (res.listpatients);
           }else{
@@ -82,5 +83,17 @@ export class PatientService {
            console.log(err);
          })
     }
+
+    getModules(patientId) {
+      return this.http.get(environment.api+'/api/openraito/users/modules/'+ patientId)
+      .map( (res : any) => {
+        return res;
+       }, (err) => {
+        console.log(err);
+        return err;
+       });
+    }
+
+
 
 }

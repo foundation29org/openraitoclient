@@ -229,6 +229,7 @@ export class PatientComponent implements OnInit, OnDestroy {
     {id: 12, es: 'Diciembre', en: 'December'}
   ];
   notes: string = '';
+  showSeizuresModules: boolean = false;
 
   constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService) {
     this.adapter.setLocale(this.authService.getLang());
@@ -571,10 +572,30 @@ ageFromDateOfBirthday(dateOfBirth: any) {
     //cargar los datos del usuario
     this.loadedFeels = false;
     if (this.patientPermissions.data.medicalInfo) {
-      this.getFeels();
-      this.getSeizures();
-      this.calculateMinDate();
+      this.getModules();
     }
+  }
+
+  getModules(){
+    this.subscription.add(this.patientService.getModules(this.authService.getCurrentPatient().sub)
+    .subscribe((res: any) => {
+      this.showSeizuresModules = res.modules.includes("seizures");
+      if(this.showSeizuresModules){
+        this.getFeels();
+        this.getSeizures();
+        this.calculateMinDate();
+      }else{
+        this.getFeels();
+        this.getDrugs();
+        this.calculateMinDate();
+      }
+    }, (err) => {
+      console.log(err);
+      this.showSeizuresModules = false;
+      this.getFeels();
+      this.getDrugs();
+      this.calculateMinDate();
+    }));
   }
 
   getWeightAndAge() {
