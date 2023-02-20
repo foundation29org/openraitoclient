@@ -206,11 +206,12 @@ export class LandPageComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
   constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService, private location: Location, private inj: Injector, private eventsService: EventsService) {
+    this.lang = sessionStorage.getItem('lang');
     this.initEnvironment();
   }
 
   initEnvironment(){
-    this.lang = sessionStorage.getItem('lang');
+    
     var param = this.router.parseUrl(this.router.url).queryParams;
     if (param.key && param.token) {
       this.key = param.key;
