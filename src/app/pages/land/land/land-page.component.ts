@@ -1003,7 +1003,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
     for (var j = 0; j < copydatagraphheight.length; j++) {
       copydatagraphheight[j].name = copydatagraphheight[j].stringDate
       var theDate = new Date(copydatagraphheight[j].name);
-      copydatagraphheight[j].name = this.tickFormattingDay(theDate)
+     // copydatagraphheight[j].name = this.tickFormattingDay(theDate)
     }
     return copydatagraphheight;
   }
