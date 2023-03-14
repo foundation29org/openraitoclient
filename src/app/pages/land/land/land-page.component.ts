@@ -71,7 +71,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
   minDateRange = new Date();
   loadedFeels: boolean = false;
   loadedEvents: boolean = false;
-  loadedDrugs: boolean = false;
+  loadedDrugs: boolean = true;
   loadedDocs: boolean = false;
   feels: any = [];
   events: any = [];

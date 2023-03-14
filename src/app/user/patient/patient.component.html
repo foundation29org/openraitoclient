@@ -236,7 +236,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header pb-2">
-                            <h4 class="card-title mb-1"><span>{{'clinicalinfo.Medication' |translate }}</span></h4>
+                            <h4 class="card-title mb-1"><span>{{'clinicalinfo.Medication' |translate }} ({{'medication.Currently taking' | translate }})</span></h4>
                         </div>
                         <div class="card-content">
                             <div class="card-body">
@@ -263,19 +263,99 @@
                                     <tr>
                                       <th>{{'generics.Name' |translate }}</th>
                                       <th>{{'medication.mg/day' | translate }} *</th>
+                                      <th *ngIf="age!=null && weight">Recommended dose</th>
                                       <th>{{'generics.Start Date' | translate}}</th>
-                                      <th>{{'generics.End Date' | translate }}</th>
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    <tr *ngFor="let drug of medications ; let i = index">
-                                        <td><strong>{{drug.drugTranslate}}</strong></td>
-                                        <td>{{drug.dose}}</td>
-                                        <td>{{drug.startDate | date}}</td>
-                                        <td><span
-                                            *ngIf="drug.endDate">{{drug.endDate | date}}</span><span
-                                            *ngIf="!drug.endDate">{{'medication.Currently taking' | translate
-                                            }}</span></td>
+                                    <tr *ngFor="let medication of medications ; let i = index">
+                                        <td><strong>{{medication.drugTranslate}}</strong></td>
+                                        <td>{{medication.dose}}</td>
+                                        <td *ngIf="age!=null && weight">
+                                            <span>
+                                                <span *ngIf="age!=null && weight">
+                                                <span *ngIf="recommendedDoses[medication.drug].data=='onlykids' && age<18">
+                                                    <span class="text-muted">
+                                                        <span *ngIf="recommendedDoses[medication.drug].kids.perkg=='yes'">
+                                                            <span *ngIf="recommendedDoses[medication.drug].kids.initialdose.min!='0' || recommendedDoses[medication.drug].kids.initialdose.max!='0'">
+                                                                {{'medication.Initial' | translate}}: 
+                                                                {{recommendedDoses[medication.drug].kids.initialdose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].kids.initialdose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}
+                                                            </span>
+                                                            <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].kids.maintenancedose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].kids.maintenancedose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}</span>
+                                                        </span>
+                                                        <span *ngIf="recommendedDoses[medication.drug].kids.perkg=='no'">
+                                                            <span *ngIf="recommendedDoses[medication.drug].kids.initialdose.min!='0' || recommendedDoses[medication.drug].kids.initialdose.max!='0'">
+                                                                {{'medication.Initial' | translate}}: 
+                                                                {{recommendedDoses[medication.drug].kids.initialdose.min}}-{{recommendedDoses[medication.drug].kids.initialdose.max}} {{'medication.mg/day' | translate}}
+                                                            </span>
+                                                            <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].kids.maintenancedose.min}}-{{recommendedDoses[medication.drug].kids.maintenancedose.max}} {{'medication.mg/day' | translate}}</span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                                <span *ngIf="recommendedDoses[medication.drug].data=='onlyadults' && age>=18">
+                                                    <span class="text-muted">
+                                                        <span *ngIf="recommendedDoses[medication.drug].adults.perkg=='yes'">
+                                                            <span *ngIf="recommendedDoses[medication.drug].adults.initialdose.min!='0' || recommendedDoses[medication.drug].adults.initialdose.max!='0'">
+                                                                {{'medication.Initial' | translate}}: 
+                                                                {{recommendedDoses[medication.drug].adults.initialdose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].adults.initialdose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}
+                                                            </span>
+                                                            <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].adults.maintenancedose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].adults.maintenancedose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}</span>
+                                                        </span>
+                                                        <span *ngIf="recommendedDoses[medication.drug].adults.perkg=='no'">
+                                                            <span *ngIf="recommendedDoses[medication.drug].adults.initialdose.min!='0' || recommendedDoses[medication.drug].adults.initialdose.max!='0'">
+                                                                {{'medication.Initial' | translate}}: 
+                                                                {{recommendedDoses[medication.drug].adults.initialdose.min}}-{{recommendedDoses[medication.drug].adults.initialdose.max}} {{'medication.mg/day' | translate}}
+                                                            </span>
+                                                            <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].adults.maintenancedose.min}}-{{recommendedDoses[medication.drug].adults.maintenancedose.max}} {{'medication.mg/day' | translate}}</span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                                <span *ngIf="recommendedDoses[medication.drug].data=='yes'">
+                                                    <span *ngIf="age<18">
+                                                        <span class="text-muted">
+                                                            <span *ngIf="recommendedDoses[medication.drug].kids.perkg=='yes'">
+                                                                <span *ngIf="recommendedDoses[medication.drug].kids.initialdose.min!='0' || recommendedDoses[medication.drug].kids.initialdose.max!='0'">
+                                                                    {{'medication.Initial' | translate}}: 
+                                                                    {{recommendedDoses[medication.drug].kids.initialdose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].kids.initialdose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}
+                                                                </span>
+                                                                <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].kids.maintenancedose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].kids.maintenancedose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}</span>
+                                                            </span>
+                                                            <span *ngIf="recommendedDoses[medication.drug].kids.perkg=='no'">
+                                                                <span *ngIf="recommendedDoses[medication.drug].kids.initialdose.min!='0' || recommendedDoses[medication.drug].kids.initialdose.max!='0'">
+                                                                    {{'medication.Initial' | translate}}: 
+                                                                    {{recommendedDoses[medication.drug].kids.initialdose.min}}-{{recommendedDoses[medication.drug].kids.initialdose.max}} {{'medication.mg/day' | translate}}
+                                                                </span>
+                                                                <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].kids.maintenancedose.min}}-{{recommendedDoses[medication.drug].kids.maintenancedose.max}} {{'medication.mg/day' | translate}}</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                    <span *ngIf="age>=18">
+                                                        <span class="text-muted">
+                                                            <span *ngIf="recommendedDoses[medication.drug].adults.perkg=='yes'">
+                                                                <span *ngIf="recommendedDoses[medication.drug].adults.initialdose.min!='0' || recommendedDoses[medication.drug].adults.initialdose.max!='0'">
+                                                                    {{'medication.Initial' | translate}}: 
+                                                                    {{recommendedDoses[medication.drug].adults.initialdose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].adults.initialdose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}
+                                                                </span>
+                                                                <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].adults.maintenancedose.min * weight | number : '1.0-2' }}-{{recommendedDoses[medication.drug].adults.maintenancedose.max * weight | number : '1.0-2'}} {{'medication.mg/day' | translate}}</span>
+                                                            </span>
+                                                            <span *ngIf="recommendedDoses[medication.drug].adults.perkg=='no'">
+                                                                <span *ngIf="recommendedDoses[medication.drug].adults.initialdose.min!='0' || recommendedDoses[medication.drug].adults.initialdose.max!='0'">
+                                                                    {{'medication.Initial' | translate}}: 
+                                                                    {{recommendedDoses[medication.drug].adults.initialdose.min}}-{{recommendedDoses[medication.drug].adults.initialdose.max}} {{'medication.mg/day' | translate}}
+                                                                </span>
+                                                                <span class="d-block">{{'medication.Maintenance' | translate}}: {{recommendedDoses[medication.drug].adults.maintenancedose.min}}-{{recommendedDoses[medication.drug].adults.maintenancedose.max}} {{'medication.mg/day' | translate}}</span>
+                                                            </span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                                <span *ngIf="recommendedDoses[medication.drug].data=='no' || (recommendedDoses[medication.drug].data=='onlyadults' && age<18) || (recommendedDoses[medication.drug].data=='onlykids' && age>=18)">
+                                                    <span class="text-muted">
+                                                        {{'medication.We do not have recommended dose data for this drug' | translate}}
+                                                    </span>
+                                                </span>
+                                            </span></span>
+                                        </td>
+                                        <td>{{medication.startDate | date}}</td>
                                     </tr>
                                   </tbody>
                                 </table>
