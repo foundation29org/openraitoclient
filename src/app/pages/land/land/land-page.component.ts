@@ -617,6 +617,11 @@ export class LandPageComponent implements OnInit, OnDestroy {
     this.selectedPatient = false;
     this.loadedInfoPatient = false;
     this.location.replaceState('');
+    this.patientPermissions = {};
+    this.phenotype = {};
+    this.events = [];
+    this.feels = [];
+    this.medications = [];
   }
 
   loadEnvironment() {
