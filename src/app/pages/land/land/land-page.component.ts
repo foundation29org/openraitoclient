@@ -670,7 +670,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
   }
 
   getSavedRecommendations() {
-    this.subscription.add( this.http.get(environment.urlRaito+'/api/dose/')
+    this.subscription.add( this.http.get(environment.urlRaito+'/api/dose/'+this.patientDataInfo.id)
         .subscribe( (resDoses : any) => {
           console.log(resDoses)
             this.savedRecommendations = resDoses;
@@ -1304,7 +1304,13 @@ export class LandPageComponent implements OnInit, OnDestroy {
               this.actualMedications[i].recommendedDose = {min : null, max : null};
               this.actualMedications[i].recommendedDose.min = this.savedRecommendations[j].min;
               this.actualMedications[i].recommendedDose.max = this.savedRecommendations[j].max;
-              found = true;
+              if(this.age!=null){
+                if(this.savedRecommendations[j].age == this.age){
+                  found = true;
+                }
+              }else{
+                found = true;
+              }
             }
           }
         }
@@ -1362,7 +1368,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
                         /*if (this.actualMedications[j].porcentajeDosis  > 100) {
                           this.actualMedications[j].porcentajeDosis = 100;
                         }*/
-                        drugsToSave.push({name: nameAndCommercialName[0], min: recommendedDose2.min, max: recommendedDose2.max});
+                        drugsToSave.push({name: nameAndCommercialName[0], min: recommendedDose2.min, max: recommendedDose2.max, age: this.age});
                       }
                     }
                     
