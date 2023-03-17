@@ -94,6 +94,15 @@ export class PatientService {
        });
     }
 
+    saveRecommendations(drugsToSave){
+      return this.http.post(environment.urlRaito+'/api/massiveseizuresdose/'+this.authService.getCurrentPatient().sub, drugsToSave)
+        .map( (res : any) => {
+          return res;
+          }, (err) => {
+            console.log(err);
+          })
+    }
+
 
 
 }
