@@ -782,7 +782,6 @@ export class LandPageComponent implements OnInit, OnDestroy {
     //cargar los datos del usuario
     this.loadedFeels = false;
     if (this.patientPermissions.data.medicalInfo) {
-      this.getSavedRecommendations();
       this.loadPartData();
       this.getDocs();
       this.loadSymptoms();
@@ -856,8 +855,10 @@ export class LandPageComponent implements OnInit, OnDestroy {
           this.weight = null;
         } else if (res.message == 'old weight') {
           this.weight = res.weight.value
+          this.getSavedRecommendations();
         } else {
           this.weight = res.weight.value
+          this.getSavedRecommendations();
         }
       }, (err) => {
         console.log(err);
