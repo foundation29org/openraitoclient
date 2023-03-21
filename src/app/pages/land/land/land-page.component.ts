@@ -782,6 +782,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
     //cargar los datos del usuario
     this.loadedFeels = false;
     if (this.patientPermissions.data.medicalInfo) {
+      this.getSavedRecommendations();
       this.loadPartData();
       this.getDocs();
       this.loadSymptoms();
@@ -855,10 +856,8 @@ export class LandPageComponent implements OnInit, OnDestroy {
           this.weight = null;
         } else if (res.message == 'old weight') {
           this.weight = res.weight.value
-          this.getSavedRecommendations();
         } else {
           this.weight = res.weight.value
-          this.getSavedRecommendations();
         }
       }, (err) => {
         console.log(err);
@@ -1295,6 +1294,8 @@ export class LandPageComponent implements OnInit, OnDestroy {
   getRecommendedDose(res2){
     if (this.actualMedications.length > 0) {
     var actualDrugs = '';
+    var prevDrugs = '';
+    
     
       for (var i = 0; i < this.actualMedications.length; i++) {
         var found = false;
@@ -1304,13 +1305,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
               this.actualMedications[i].recommendedDose = {min : null, max : null};
               this.actualMedications[i].recommendedDose.min = this.savedRecommendations[j].min;
               this.actualMedications[i].recommendedDose.max = this.savedRecommendations[j].max;
-              if(this.age!=null){
-                if(this.savedRecommendations[j].age == this.age){
-                  found = true;
-                }
-              }else{
-                found = true;
-              }
+              found = true;
             }
           }
         }
@@ -1320,6 +1315,22 @@ export class LandPageComponent implements OnInit, OnDestroy {
           }else{
             actualDrugs = actualDrugs + ', ' + this.actualMedications[i].drug;
           }
+        }
+        if(prevDrugs == ''){
+          prevDrugs = this.actualMedications[i].drug;
+        }else{
+          prevDrugs = prevDrugs + ', ' + this.actualMedications[i].drug;
+        }
+      }
+      if(prevDrugs != ''){
+        var finish = false;
+        for(var j = 0; j < this.savedRecommendations.length && !finish; j++){
+          if(prevDrugs!= this.savedRecommendations[j].actualDrugs){
+            finish = true;
+          }
+        }
+        if(finish){
+          actualDrugs = prevDrugs;
         }
       }
       if(actualDrugs != ''){
