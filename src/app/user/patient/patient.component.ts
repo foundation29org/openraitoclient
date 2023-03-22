@@ -1185,7 +1185,7 @@ getWeek(newdate, dowOffset?) {
   }
 
   saveRecommendations(drugsToSave){
-    this.subscription.add(this.patientService.saveRecommendations(drugsToSave)
+    this.subscription.add(this.patientService.saveRecommendations(drugsToSave, this.authService.getCurrentPatient().sub)
     .subscribe((res: any) => {
       console.log(res);
       this.getSavedRecommendations();
