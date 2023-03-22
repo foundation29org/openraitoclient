@@ -1090,6 +1090,7 @@ getWeek(newdate, dowOffset?) {
             if(this.actualMedications[i].drug.indexOf(this.savedRecommendations[j].name)!=-1){
               this.actualMedications[i].recommendedDose = null;
               this.actualMedications[i].recommendedDose = this.savedRecommendations[j].recommendedDose;
+              this.actualMedications[i].units = this.savedRecommendations[j].units;
               found = true;
             }
           }

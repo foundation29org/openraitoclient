@@ -270,7 +270,9 @@
                                   <tbody>
                                     <tr *ngFor="let medication of medications ; let i = index">
                                         <td><strong>{{medication.drugTranslate}}</strong></td>
-                                        <td>{{medication.dose}}
+                                        <td>
+                                            <span class="d-block">{{medication.dose}}</span>
+                                            <span class="d-block" *ngIf="medication.units=='mg/kg/day'">{{medication.dose / weight | number : '1.0-2'}} mg/kg/day</span>
                                             <span *ngIf="weight && medication.recommendedDose">
                                                 <span *ngIf="medication.dose >medication.recommendedDose" class="d-block mb-0 danger">
                                                     {{'medication.Out of range' | translate }}
@@ -279,8 +281,19 @@
                                         </td>
                                         <td *ngIf="weight">
                                             <span *ngIf="medication.recommendedDose" class="d-block">
-                                                <span class="d-block">{{medication.recommendedDose / weight | number : '1.0-2'}} mg/kg/day</span>
-											    <span class="d-block">Max: {{medication.recommendedDose}} mg/day</span>
+                                                
+											    <!--<span class="d-block">Max: {{medication.recommendedDose}} mg/day</span>-->
+                                                <span *ngIf="medication.dose <= medication.recommendedDose">
+                                                    <ngb-progressbar showValue="true" class="w-50" type="info" [value]="medication.porcentajeDosis" [min]="0" [max]="100"></ngb-progressbar>
+                                                </span>
+                                                <span *ngIf="medication.dose > medication.recommendedDose">
+                                                    <ngb-progressbar type="danger" class="w-50" [value]="medication.porcentajeDosis" [min]="0" [max]="medication.porcentajeDosis"></ngb-progressbar>
+                                                    <span *ngIf="medication.porcentajeDosis <0 || medication.porcentajeDosis >100" class="danger">
+                                                        {{'medication.Out of range' | translate }}: {{medication.porcentajeDosis}} %
+                                                   </span>
+                                                </span>
+                                                <span class="d-block" *ngIf="medication.units=='mg/kg/day'">{{medication.recommendedDose / weight | number : '1.0-2'}} mg/kg/day</span>
+                                                <span class="d-block" *ngIf="medication.units=='mg/day'">{{medication.recommendedDose | number : '1.0-2'}} mg/day</span>
                                             </span>
                                         </td>
                                         <td>{{medication.startDate | date}}</td>
