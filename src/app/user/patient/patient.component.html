@@ -263,7 +263,7 @@
                                     <tr>
                                       <th>{{'generics.Name' |translate }}</th>
                                       <th>{{'medication.mg/day' | translate }} *</th>
-                                      <th *ngIf="age!=null && weight">Recommended dose</th>
+                                      <th *ngIf="weight">Recommended dose</th>
                                       <th>{{'generics.Start Date' | translate}}</th>
                                     </tr>
                                   </thead>
@@ -271,16 +271,16 @@
                                     <tr *ngFor="let medication of medications ; let i = index">
                                         <td><strong>{{medication.drugTranslate}}</strong></td>
                                         <td>{{medication.dose}}
-                                            <span *ngIf="age!=null && weight && medication.recommendedDose">
-                                                <span *ngIf="medication.dose <medication.recommendedDose.min || medication.dose >medication.recommendedDose.max" class="d-block mb-0 danger">
+                                            <span *ngIf="weight && medication.recommendedDose">
+                                                <span *ngIf="medication.dose >medication.recommendedDose" class="d-block mb-0 danger">
                                                     {{'medication.Out of range' | translate }}
                                                </span>
                                             </span>
                                         </td>
-                                        <td *ngIf="age!=null && weight">
+                                        <td *ngIf="weight">
                                             <span *ngIf="medication.recommendedDose" class="d-block">
-                                                <span class="d-block">Min: {{medication.recommendedDose.min}}</span>
-                                                <span class="d-block">Max: {{medication.recommendedDose.max}}</span>
+                                                <span class="d-block">{{medication.recommendedDose / weight | number : '1.0-2'}} mg/kg/day</span>
+											    <span class="d-block">Max: {{medication.recommendedDose}} mg/day</span>
                                             </span>
                                         </td>
                                         <td>{{medication.startDate | date}}</td>
