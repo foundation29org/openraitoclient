@@ -788,6 +788,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
       this.loadPartData();
       this.getDocs();
       this.loadSymptoms();
+      console.log('entra')
       this.getWeightAndAge();
       this.getHeight();
     }
@@ -825,6 +826,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
 
   getWeightAndAge() {
     this.infoAge = '';
+    console.log(this.patientDataInfo.birthDate )
     if (this.patientDataInfo.birthDate == null) {
       this.age = null;
     } else {
@@ -852,8 +854,10 @@ export class LandPageComponent implements OnInit, OnDestroy {
       }
 
     }
+    console.log(this.patientDataInfo)
     this.subscription.add(this.raitoService.getPatientWeight(this.patientDataInfo.id)
       .subscribe((res: any) => {
+        console.log(res)
         if (res.message == 'There are no weight') {
           this.weight = null;
         } else if (res.message == 'old weight') {
@@ -1308,6 +1312,8 @@ export class LandPageComponent implements OnInit, OnDestroy {
             if(this.actualMedications[i].drug.indexOf(this.savedRecommendations[j].name)!=-1){
               this.actualMedications[i].recommendedDose = null;
               this.actualMedications[i].recommendedDose = this.savedRecommendations[j].recommendedDose;
+              this.actualMedications[i].porcentajeDosis = Math.round((this.actualMedications[i].dose / this.savedRecommendations[j].recommendedDose) * 100);
+              this.actualMedications[i].units = this.savedRecommendations[j].units;
               found = true;
             }
           }
