@@ -1408,7 +1408,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
   }
 
   saveRecommendations(drugsToSave){
-    this.subscription.add(this.patientService.saveRecommendations(drugsToSave)
+    this.subscription.add(this.patientService.saveRecommendations(drugsToSave, this.patientDataInfo.id)
     .subscribe((res: any) => {
       console.log(res);
       this.getSavedRecommendations();
