@@ -231,7 +231,7 @@ export class PatientComponent implements OnInit, OnDestroy {
   notes: string = '';
   showSeizuresModules: boolean = false;
   savedRecommendations: any = [];
-
+  finishloadData: boolean = false;
   constructor(private http: HttpClient, public translate: TranslateService, private authService: AuthService, private patientService: PatientService, public searchFilterPipe: SearchFilterPipe, public toastr: ToastrService, private dateService: DateService, private apiDx29ServerService: ApiDx29ServerService, private sortService: SortService, private adapter: DateAdapter<any>, private searchService: SearchService, private router: Router, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService, private openAiService: OpenAiService) {
     this.adapter.setLocale(this.authService.getLang());
     this.lang = this.authService.getLang();
@@ -1067,7 +1067,7 @@ getWeek(newdate, dowOffset?) {
           this.groupMedications();
           this.getRecommendedDose(res);
         } else {
-
+          this.finishloadData = true;
         }
         this.loadedDrugs = true;
       }, (err) => {
@@ -1216,6 +1216,8 @@ getWeek(newdate, dowOffset?) {
     this.normalizedChanged(this.normalized);
     if (this.events.length > 0) {
       this.getDataNormalizedDrugsVsSeizures();
+    }else{
+      this.finishloadData = true;
     }
   }
 
@@ -1541,6 +1543,7 @@ getWeek(newdate, dowOffset?) {
       }
       this.lineChartSeries = JSON.parse(JSON.stringify(templineChartDrugs));
     }
+    this.finishloadData = true;
   }
 
   normalizedChanged2(normalized){
@@ -1555,6 +1558,7 @@ getWeek(newdate, dowOffset?) {
   }
 
   loadDataRangeDate(rangeDate) {
+    this.finishloadData = false;
     this.rangeDate = rangeDate;
     this.calculateMinDate();
     this.normalized = true;

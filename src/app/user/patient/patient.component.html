@@ -396,7 +396,7 @@
                                 (click)="changeGroupBy('Months');">{{'charts.Months' | translate }}</button></span>
                     </span>
                 </div>
-                <div class="row">
+                <div class="row" *ngIf="finishloadData">
                     <div class="col-xl-6 col-md-12 col-sm-6" *ngIf="!loadedEvents && showSeizuresModules">
                         <div class="card">
                             <div class="card-content">
@@ -825,6 +825,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="row" *ngIf="!finishloadData">
+                    <div class="col-12 text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">{{'reports.Loading' | translate }}...</span>
+                        </div>
+                    </div> 
                 </div>
             </div>
             <a id="linkdocs" style="position: absolute;margin-top: -4em;"></a>
