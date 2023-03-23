@@ -206,6 +206,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
 
   private subscription: Subscription = new Subscription();
   savedRecommendations: any = [];
+  finishloadData: boolean = false;
   constructor(private router: Router, private patientService: PatientService, private authService: AuthService, public translate: TranslateService, private adapter: DateAdapter<any>, private http: HttpClient, private sortService: SortService, private searchService: SearchService, public toastr: ToastrService, private apiDx29ServerService: ApiDx29ServerService, private apif29BioService: Apif29BioService, private modalService: NgbModal, private textTransform: TextTransform, private raitoService: RaitoService, private location: Location, private inj: Injector, private eventsService: EventsService, private openAiService: OpenAiService) {
     this.lang = sessionStorage.getItem('lang');
     this.initEnvironment();
@@ -1288,7 +1289,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
           this.groupMedications();
           this.getRecommendedDose(res);
         } else {
-
+          this.finishloadData = true;
         }
         this.loadedDrugs = true;
       }, (err) => {
@@ -1439,6 +1440,8 @@ export class LandPageComponent implements OnInit, OnDestroy {
     this.normalizedChanged(this.normalized);
     if (this.events.length > 0) {
       this.getDataNormalizedDrugsVsSeizures();
+    }else{
+      this.finishloadData = true;
     }
   }
   
@@ -1764,6 +1767,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
       }
       this.lineChartSeries = JSON.parse(JSON.stringify(templineChartDrugs));
     }
+    this.finishloadData = true;
   }
 
   normalizedChanged2(normalized) {
@@ -1778,6 +1782,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
   }
 
   loadDataRangeDate(rangeDate) {
+    this.finishloadData = false;
     this.rangeDate = rangeDate;
     this.calculateMinDate();
     this.normalized = true;
