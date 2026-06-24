@@ -9,7 +9,7 @@ import { PatientService } from 'app/shared/services/patient.service';
 import { ApiDx29ServerService } from 'app/shared/services/api-dx29-server.service';
 import { Apif29BioService } from 'app/shared/services/api-f29bio.service';
 import { AuthService } from 'app/shared/auth/auth.service';
-import { LocalDataSource } from 'ng2-smart-table';
+import { LocalDataSource } from 'app/shared/components/smart-table-stub/local-data-source';
 import { DateAdapter } from '@angular/material/core';
 import { SortService } from 'app/shared/services/sort.service';
 import { SearchService } from 'app/shared/services/search.service';
@@ -18,13 +18,14 @@ import { NgbModal, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstr
 import { ToastrService } from 'ngx-toastr';
 import { IBlobAccessToken } from 'app/shared/services/blob-storage.service';
 import * as chartsData from 'app/shared/configs/general-charts.config';
-import { ColorHelper } from '@swimlane/ngx-charts';
+import { ColorHelper, ScaleType } from '@swimlane/ngx-charts';
 import { Location } from '@angular/common';
 import { EventsService } from 'app/shared/services/events.service';
 import { OpenAiService } from 'app/shared/services/openAi.service';
 import { Injectable, Injector } from '@angular/core';
 
 @Component({
+    standalone: false,
   selector: 'app-land-page',
   templateUrl: './land-page.component.html',
   styleUrls: ['./land-page.component.scss'],
@@ -1428,14 +1429,14 @@ export class LandPageComponent implements OnInit, OnDestroy {
     this.chartNames = [...new Set(chartNames)];
     //this.chartNames = this.lineChartDrugs.map((d: any) => d.name);
     // Convert hex colors to ColorHelper for consumption by legend
-    this.colors = new ColorHelper(this.lineChartColorScheme, 'ordinal', this.chartNames, this.lineChartColorScheme);
-    this.colors2 = new ColorHelper(this.lineChartOneColorScheme2, 'ordinal', this.chartNames, this.lineChartOneColorScheme2);
+    this.colors = new ColorHelper(this.lineChartColorScheme as any, ScaleType.Ordinal, this.chartNames, this.lineChartColorScheme);
+    this.colors2 = new ColorHelper(this.lineChartOneColorScheme2 as any, ScaleType.Ordinal, this.chartNames, this.lineChartOneColorScheme2);
 
     //newColor
     var tempColors = JSON.parse(JSON.stringify(this.lineChartColorScheme))
     var tempColors2 = JSON.parse(JSON.stringify(this.lineChartOneColorScheme2))
     tempColors.domain[this.chartNames.length] = tempColors2.domain[0];
-    this.colorsLineToll = new ColorHelper(tempColors, 'ordinal', this.chartNames, tempColors);
+    this.colorsLineToll = new ColorHelper(tempColors as any, ScaleType.Ordinal, this.chartNames, tempColors);
 
     this.normalizedChanged(this.normalized);
     if (this.events.length > 0) {

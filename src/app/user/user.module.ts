@@ -4,8 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { UserRoutingModule } from "./user-routing.module";
 
-import { CustomFormsModule } from 'ngx-custom-validators';
 import { TranslateModule } from '@ngx-translate/core';
+import { SmartTableStubModule } from 'app/shared/components/smart-table-stub/smart-table-stub.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { MatchHeightModule } from 'app/shared/directives/match-height.directive';
@@ -22,8 +22,6 @@ import { ComboChartComponent, ComboSeriesVerticalComponent } from './patient/com
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 
-import { Ng2SmartTableModule } from 'ng2-smart-table';
-
 
 @NgModule({
     exports: [
@@ -33,8 +31,8 @@ import { Ng2SmartTableModule } from 'ng2-smart-table';
         CommonModule,
         UserRoutingModule,
         FormsModule,
-        CustomFormsModule,
         NgbModule,
+        SmartTableStubModule,
         MatchHeightModule,
         TranslateModule,
         MatSelectModule,
@@ -43,8 +41,7 @@ import { Ng2SmartTableModule } from 'ng2-smart-table';
         MatDatepickerModule,
         MatNativeDateModule,
         NgxChartsModule,
-        MatCheckboxModule,
-        Ng2SmartTableModule
+        MatCheckboxModule
     ],
     declarations: [
         HomeComponent,

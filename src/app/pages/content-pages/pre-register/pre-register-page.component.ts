@@ -14,6 +14,7 @@ export function getCulture() {
 }
 
 @Component({
+    standalone: false,
   selector: 'app-pre-register-page',
   templateUrl: './pre-register-page.component.html',
   styleUrls: ['./pre-register-page.component.scss'],

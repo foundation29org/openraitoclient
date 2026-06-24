@@ -14,6 +14,7 @@ import {Location} from '@angular/common';
 declare let gtag: any;
 
 @Component({
+    standalone: false,
   selector: 'app-navbar-dx29',
   templateUrl: './navbar-dx29.component.html',
   styleUrls: ['./navbar-dx29.component.scss'],

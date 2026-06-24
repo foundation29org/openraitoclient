@@ -15,10 +15,11 @@ import { DateService } from 'app/shared/services/date.service';
 import { SearchFilterPipe } from 'app/shared/services/search-filter.service';
 import { TextTransform } from 'app/shared/services/transform-text.service';
 import { Subscription } from 'rxjs/Subscription';
-import { LocalDataSource } from 'ng2-smart-table';
+import { LocalDataSource } from 'app/shared/components/smart-table-stub/local-data-source';
 import { DateAdapter } from '@angular/material/core';
 
 @Component({
+    standalone: false,
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],

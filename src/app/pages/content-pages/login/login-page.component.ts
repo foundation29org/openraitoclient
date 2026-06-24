@@ -16,6 +16,7 @@ import Swal from 'sweetalert2';
 import { Subscription } from 'rxjs/Subscription';
 
 @Component({
+    standalone: false,
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss'],
