@@ -11,7 +11,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MatchHeightModule } from 'app/shared/directives/match-height.directive';
 
 import {MatSelectModule} from '@angular/material/select';
-import { TagInputModule } from 'ngx-chips';
 import { UiSwitchModule } from 'ngx-ui-switch';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -22,7 +21,6 @@ import { ComboChartComponent, ComboSeriesVerticalComponent } from './patient/com
 
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 
@@ -40,14 +38,12 @@ import { Ng2SmartTableModule } from 'ng2-smart-table';
         MatchHeightModule,
         TranslateModule,
         MatSelectModule,
-        TagInputModule,
         ReactiveFormsModule,
         UiSwitchModule,
         MatDatepickerModule,
         MatNativeDateModule,
         NgxChartsModule,
         MatCheckboxModule,
-        NgxSliderModule,
         Ng2SmartTableModule
     ],
     declarations: [
