@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from "@angular/router";
 import { environment } from 'environments/environment';
 import { HttpClient } from "@angular/common/http";
 import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { NgbCarouselConfig } from '@ng-bootstrap/ng-bootstrap';
 import { HighlightService } from 'app/shared/services/highlight.service';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';

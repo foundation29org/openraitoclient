@@ -2,9 +2,7 @@ import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from "@angular/common/http";
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs';
 import decode from 'jwt-decode';
 import { AuthService } from './auth.service';
 
@@ -51,14 +49,13 @@ export class TokenService {
 
   //deprecated
   testToken(): Observable<boolean>{
-    return this.http.get(environment.api+'/api/testToken')
-      .map( (res : any) => {
+    return this.http.get(environment.api+'/api/testToken').pipe(
+        map((res: any) => {
         console.log(res);
           return res;
-       }, (err) => {
-         console.log(err);
-         return false;
-       }
+       }),
+        catchError((err) => { console.log(err);
+         return false; })
       );
   }
 

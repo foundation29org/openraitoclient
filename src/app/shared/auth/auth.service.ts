@@ -2,9 +2,7 @@ import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from "@angular/common/http";
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs';
 import decode from 'jwt-decode';
 import { ICurrentPatient } from './ICurrentPatient.interface';
 
@@ -118,8 +116,8 @@ export class AuthService {
 
   signinUser(formValue: any): Observable<boolean> {
     //your code for signing up the new user
-    return this.http.post(environment.api+'/api/signin',formValue)
-      .map( (res : any) => {
+    return this.http.post(environment.api+'/api/signin',formValue).pipe(
+        map((res: any) => {
           if(res.message == "You have successfully logged in"){
             //entrar en la app
             this.setLang(res.lang);
@@ -138,14 +136,13 @@ export class AuthService {
           }
           this.setMessage(res.message);
           return this.isloggedIn;
-       }, (err) => {
-         console.log(err);
+       }),
+        catchError((err) => { console.log(err);
          //this.isLoginFailed = true;
          this.setMessage("Login failed");
          this.isloggedIn = false;
-         return this.isloggedIn;
-       }
-    );
+         return this.isloggedIn; })
+      );
   }
 
   logout() {

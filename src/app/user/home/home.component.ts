@@ -8,13 +8,11 @@ import { ApiDx29ServerService } from 'app/shared/services/api-dx29-server.servic
 import { ToastrService } from 'ngx-toastr';
 import { SearchService } from 'app/shared/services/search.service';
 import { SortService } from 'app/shared/services/sort.service';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/toPromise';
 import { Apif29BioService } from 'app/shared/services/api-f29bio.service';
 import { DateService } from 'app/shared/services/date.service';
 import { SearchFilterPipe } from 'app/shared/services/search-filter.service';
 import { TextTransform } from 'app/shared/services/transform-text.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { LocalDataSource } from 'app/shared/components/smart-table-stub/local-data-source';
 import { DateAdapter } from '@angular/material/core';
 

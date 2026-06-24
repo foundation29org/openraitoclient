@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { RaitoService } from 'app/shared/services/raito.service';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { PatientService } from 'app/shared/services/patient.service';
 import { ApiDx29ServerService } from 'app/shared/services/api-dx29-server.service';
 import { Apif29BioService } from 'app/shared/services/api-f29bio.service';

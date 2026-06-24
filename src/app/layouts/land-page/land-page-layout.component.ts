@@ -1,3 +1,4 @@
+import { filter } from 'rxjs/operators';
 import {
   Component,
   OnInit,
@@ -241,7 +242,7 @@ export class LandPageLayoutComponent implements OnInit, AfterViewInit, OnDestroy
       this.isPatientPage = true;
     }.bind(this));
 
-    this.router.events.filter((event: any) => event instanceof NavigationStart).subscribe(
+    this.router.events.pipe(filter((event: any) => event instanceof NavigationStart)).subscribe(
 
       event => {
         var tempUrl = (event.url).toString();
