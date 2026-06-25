@@ -1,69 +1,89 @@
-<div *ngIf="loadedPatients && patients.length>0">
+@if (loadedPatients && patients.length>0) {
+  <div>
     <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header pb-2">
-                    <h4 class="card-title mb-1"><span>{{'open.All cases' | translate }}</span></h4>
-                </div>
-                <div class="card-content">
-                    <div class="card-body p-0">
-                        <ng2-smart-table class="tablePatients" [settings]="alertsettings" [source]="alertSource"  (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
-                    </div>
-                  </div>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header pb-2">
+            <h4 class="card-title mb-1"><span>{{'open.All cases' | translate }}</span></h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body p-0">
+              <ng2-smart-table class="tablePatients" [settings]="alertsettings" [source]="alertSource"  (userRowSelect)="handleGridSelected($event)"></ng2-smart-table>
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    <div *ngIf="especialRequest.length>0">
+    @if (especialRequest.length>0) {
+      <div>
         <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header pb-2">
-                        <h4 class="card-title mb-1"><span>{{'open.My cases' | translate }}</span></h4>
-                    </div>
-                    <div class="card-content">
-                        <div class="card-body p-0">
-                          <div class="table-responsive">
-                            <table class="table text-center m-0">
-                              <thead>
-                                <tr>
-                                  <th>{{'open.Case' | translate }}</th>
-                                  <th>{{'clinicalinfo.Diagnosis' | translate }}</th>
-                                  <th>{{'generics.Name' |translate }}</th>
-                                  <th>{{'personalinfo.Last Name' |translate }}</th>
-                                  <th>{{'generics.Status' |translate }}</th>
-                                  <th></th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr *ngFor="let oneRequest of especialRequest ; let i = index" (click)="selectPatient(oneRequest);">
-                                    <td>{{oneRequest.id}}</td>
-                                    <td>
-                                        <span *ngIf="oneRequest.diagnosisInfo!=null">{{oneRequest.diagnosisInfo.name}} ({{oneRequest.diagnosisInfo.xrefs[0].name}}:{{oneRequest.diagnosisInfo.xrefs[0].id}})</span>
-                                        <span *ngIf="oneRequest.diagnosisInfo==null">-</span>
-                                    </td>
-                                    <td>{{oneRequest.patientName}}</td>
-                                    <td>{{oneRequest.surname}}</td>
-                                    <td>
-                                        <span *ngIf="oneRequest.status=='Pending'">{{'generics.Pending' |translate }}</span>
-                                        <span *ngIf="oneRequest.status=='Accepted'">{{'generics.Accepted' |translate }}</span>
-                                        <span *ngIf="oneRequest.status=='Rejected'">{{'generics.Rejected' |translate }}</span>
-                                    </td>
-                                    <td><button class="mb-0 btn btn-sm btn-dark round me-1"
-                                        (click)="selectPatient(oneRequest);">{{'generics.View' |translate }}</button></td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header pb-2">
+                <h4 class="card-title mb-1"><span>{{'open.My cases' | translate }}</span></h4>
+              </div>
+              <div class="card-content">
+                <div class="card-body p-0">
+                  <div class="table-responsive">
+                    <table class="table text-center m-0">
+                      <thead>
+                        <tr>
+                          <th>{{'open.Case' | translate }}</th>
+                          <th>{{'clinicalinfo.Diagnosis' | translate }}</th>
+                          <th>{{'generics.Name' |translate }}</th>
+                          <th>{{'personalinfo.Last Name' |translate }}</th>
+                          <th>{{'generics.Status' |translate }}</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (oneRequest of especialRequest ; track oneRequest; let i = $index) {
+                          <tr (click)="selectPatient(oneRequest);">
+                            <td>{{oneRequest.id}}</td>
+                            <td>
+                              @if (oneRequest.diagnosisInfo!=null) {
+                                <span>{{oneRequest.diagnosisInfo.name}} ({{oneRequest.diagnosisInfo.xrefs[0].name}}:{{oneRequest.diagnosisInfo.xrefs[0].id}})</span>
+                              }
+                              @if (oneRequest.diagnosisInfo==null) {
+                                <span>-</span>
+                              }
+                            </td>
+                            <td>{{oneRequest.patientName}}</td>
+                            <td>{{oneRequest.surname}}</td>
+                            <td>
+                              @if (oneRequest.status=='Pending') {
+                                <span>{{'generics.Pending' |translate }}</span>
+                              }
+                              @if (oneRequest.status=='Accepted') {
+                                <span>{{'generics.Accepted' |translate }}</span>
+                              }
+                              @if (oneRequest.status=='Rejected') {
+                                <span>{{'generics.Rejected' |translate }}</span>
+                              }
+                            </td>
+                            <td><button class="mb-0 btn btn-sm btn-dark round me-1"
+                            (click)="selectPatient(oneRequest);">{{'generics.View' |translate }}</button></td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-</div>
-<div *ngIf="loadedPatients && patients.length==0">
+      </div>
+    }
+  </div>
+}
+@if (loadedPatients && patients.length==0) {
+  <div>
     {{'open.No patients' | translate }}
-</div>
-<div *ngIf="!loadedPatients">
+  </div>
+}
+@if (!loadedPatients) {
+  <div>
     <div class="center-elements mt-3"><p class="centerSpinner"><i class="fa fa-spinner fa-spin fa-3x fa-fw pink"></i></p></div>
-</div>
+  </div>
+}

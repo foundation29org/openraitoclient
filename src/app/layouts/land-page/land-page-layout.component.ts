@@ -8,12 +8,13 @@ import {
   AfterViewInit,
   OnDestroy,
   ViewChild,
-  HostListener
+  HostListener,
+  DOCUMENT
 } from "@angular/core";
 import { Router, NavigationStart } from '@angular/router';
 import { TranslateService } from "@ngx-translate/core";
 import { ConfigService } from "app/shared/services/config.service";
-import { DOCUMENT } from "@angular/common";
+
 import { LayoutService } from "app/shared/services/layout.service";
 import { Subscription } from "rxjs";
 import { WINDOW } from 'app/shared/services/window.service';

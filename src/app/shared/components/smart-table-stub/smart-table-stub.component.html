@@ -2,13 +2,19 @@
   <table class="table tablePatients mb-0">
     <thead>
       <tr>
-        <th *ngFor="let key of columnKeys">{{ settings.columns[key]?.title }}</th>
+        @for (key of columnKeys; track key) {
+          <th>{{ settings.columns[key]?.title }}</th>
+        }
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let row of rows" (click)="onRowClick(row)" style="cursor: pointer">
-        <td *ngFor="let key of columnKeys" [innerHTML]="cellValue(row, key)"></td>
-      </tr>
+      @for (row of rows; track row) {
+        <tr (click)="onRowClick(row)" style="cursor: pointer">
+          @for (key of columnKeys; track key) {
+            <td [innerHTML]="cellValue(row, key)"></td>
+          }
+        </tr>
+      }
     </tbody>
   </table>
 </div>
