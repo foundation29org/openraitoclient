@@ -2,7 +2,8 @@ import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from "@angular/common/http";
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import decode from 'jwt-decode';
 import { ICurrentPatient } from './ICurrentPatient.interface';
 
@@ -141,7 +142,7 @@ export class AuthService {
          //this.isLoginFailed = true;
          this.setMessage("Login failed");
          this.isloggedIn = false;
-         return this.isloggedIn; })
+         return of(this.isloggedIn); })
       );
   }
 

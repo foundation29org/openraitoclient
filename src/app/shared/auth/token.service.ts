@@ -2,7 +2,8 @@ import { Router } from '@angular/router';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from "@angular/common/http";
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import decode from 'jwt-decode';
 import { AuthService } from './auth.service';
 
@@ -55,7 +56,7 @@ export class TokenService {
           return res;
        }),
         catchError((err) => { console.log(err);
-         return false; })
+         return of(false); })
       );
   }
 

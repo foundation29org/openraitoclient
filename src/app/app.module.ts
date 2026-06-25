@@ -34,6 +34,7 @@ import { EventsService } from 'app/shared/services/events.service';
 import { DialogService } from 'app/shared/services/dialog.service';
 import { Data } from 'app/shared/services/data.service';
 import { GoogleAnalyticsService } from './shared/services/google-analytics.service';
+import { WINDOW_PROVIDERS } from './shared/services/window.service';
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -89,6 +90,7 @@ export function createTranslateLoader(http: HttpClient) {
     DialogService,
     Data,
     GoogleAnalyticsService,
+    WINDOW_PROVIDERS,
     provideHttpClient(withInterceptorsFromDi())
   ],
   bootstrap: [AppComponent]
