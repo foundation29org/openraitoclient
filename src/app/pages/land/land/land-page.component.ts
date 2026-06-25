@@ -487,7 +487,7 @@ export class LandPageComponent implements OnInit, OnDestroy {
       },
       edit: {
         confirmSave: false,
-        editButtonContent: '<i class="ft-edit-2 info font-medium-1 mr-2"></i>'
+        editButtonContent: '<i class="ft-edit-2 info font-medium-1 me-2"></i>'
       },
       columns: {
         id: {
