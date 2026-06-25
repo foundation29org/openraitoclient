@@ -395,6 +395,11 @@ export class LandPageComponent implements OnInit, OnDestroy {
           }
 
 
+        } else {
+          this.alertSource = new LocalDataSource(this.patients);
+          this.loadSettingTable();
+          this.loadedPatients = true;
+          this.testIfUrlPatient();
         }
       }, (err) => {
         console.log(err);

@@ -135,6 +135,8 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.loadAllPatientsToTable();
           }
           
+        } else {
+          this.loadAllPatientsToTable();
         }
       }, (err) => {
         console.log(err);
