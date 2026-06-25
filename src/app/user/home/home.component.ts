@@ -8,17 +8,16 @@ import { ApiDx29ServerService } from 'app/shared/services/api-dx29-server.servic
 import { ToastrService } from 'ngx-toastr';
 import { SearchService } from 'app/shared/services/search.service';
 import { SortService } from 'app/shared/services/sort.service';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/toPromise';
 import { Apif29BioService } from 'app/shared/services/api-f29bio.service';
 import { DateService } from 'app/shared/services/date.service';
 import { SearchFilterPipe } from 'app/shared/services/search-filter.service';
 import { TextTransform } from 'app/shared/services/transform-text.service';
-import { Subscription } from 'rxjs/Subscription';
-import { LocalDataSource } from 'ng2-smart-table';
+import { Subscription } from 'rxjs';
+import { LocalDataSource } from 'app/shared/components/smart-table-stub/local-data-source';
 import { DateAdapter } from '@angular/material/core';
 
 @Component({
+    standalone: false,
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
@@ -136,6 +135,8 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.loadAllPatientsToTable();
           }
           
+        } else {
+          this.loadAllPatientsToTable();
         }
       }, (err) => {
         console.log(err);
@@ -180,7 +181,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       edit: {
         confirmSave: false,
-        editButtonContent: '<i class="ft-edit-2 info font-medium-1 mr-2"></i>'
+        editButtonContent: '<i class="ft-edit-2 info font-medium-1 me-2"></i>'
       },
       columns: {
         id: {

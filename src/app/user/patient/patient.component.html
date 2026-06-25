@@ -22,19 +22,19 @@
                         <div class="text-center mb-4 mt-3">
                             <em class="ft-user avatar mb-2 fa-4x"></em>
                             <h4 class="mb-0 mt-2" *ngIf="patientPermissions.data.patientInfo">
-                                <span *ngIf="patientDataInfo.patientName" class="mr-1">{{patientDataInfo.patientName}}</span> <span *ngIf="patientDataInfo.surname">{{patientDataInfo.surname}}</span>
+                                <span *ngIf="patientDataInfo.patientName" class="me-1">{{patientDataInfo.patientName}}</span> <span *ngIf="patientDataInfo.surname">{{patientDataInfo.surname}}</span>
                                 <span *ngIf="!patientDataInfo.patientName && !patientDataInfo.surname">{{'open.Unknown name' | translate }}</span>                                 
                             </h4>
                             <h4 class="mb-0 mt-2" *ngIf="!patientPermissions.data.patientInfo">
                                 ********* **********
                             </h4>
                             <div class="d-flex justify-content-center align-items-center mt-3">
-                                <div class="dash-followers mr-4">
+                                <div class="dash-followers me-4">
                                     <div class="d-flex justify-content-center align-items-center">
                                         <button type="button" class="btn bg-light-secondary px-2">
                                             <i class="ft-user"></i>
                                         </button>
-                                        <div class="ml-2">
+                                        <div class="ms-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
                                                 <span *ngIf="patientDataInfo.gender">
                                                     <span *ngIf="patientDataInfo.gender=='male'">{{'personalinfo.Male' | translate }}</span>
@@ -55,7 +55,7 @@
                                         <button type="button" class="btn bg-light-secondary px-2">
                                             <i class="ft-star"></i>
                                         </button>
-                                        <div class="ml-2">
+                                        <div class="ms-2">
                                             <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
                                                 <span *ngIf="patientDataInfo.birthDate">{{patientDataInfo.birthDate |date}}</span>
                                                 <span *ngIf="!patientDataInfo.birthDate">{{'generics.Unknown' | translate }}</span>
@@ -69,12 +69,12 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-center align-items-center mt-3">
-                                <div class="dash-followers mr-4">
+                                <div class="dash-followers me-4">
                                     <div class="d-flex justify-content-center align-items-center">
                                         <button type="button" class="btn bg-light-secondary px-2">
                                             <i class="fas fa-weight"></i>
                                         </button>
-                                        <div class="ml-2">
+                                        <div class="ms-2">
                                             <h5 class="mb-0" *ngIf="weight">
                                                 <span>{{weight | number : '1.0-2'}} kg</span>
                                             </h5>
@@ -85,12 +85,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="dash-followers mr-4">
+                                <div class="dash-followers me-4">
                                     <div class="d-flex justify-content-center align-items-center">
                                         <button type="button" class="btn bg-light-secondary px-2">
                                             <i class="fas fa-arrows-alt-v"></i>
                                         </button>
-                                        <div class="ml-2">
+                                        <div class="ms-2">
                                             <h5 class="mb-0" *ngIf="height">
                                                 <span>{{height | number : '1.0-2'}} cm</span>
                                             </h5>
@@ -104,7 +104,7 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-center align-items-center">
-                            <div class="ml-2">
+                            <div class="ms-2">
                                 <h5 class="mb-0" *ngIf="patientPermissions.data.patientInfo">
                                     <span *ngIf="infoOneDisease.name">{{infoOneDisease.name}}</span>
                                     <span *ngIf="!infoOneDisease.name">{{'generics.Unknown' | translate }}</span>
@@ -117,7 +117,7 @@
                                                     infoOneDisease.xrefs[0].id}}</span>
                                                 <span *ngIf="infoOneDisease.xrefs.length==0">{{ infoOneDisease.id }}</span>
                                             </span>
-                                            <span *ngIf="infoOneDisease.xrefs!=undefined" class="ml-1">
+                                            <span *ngIf="infoOneDisease.xrefs!=undefined" class="ms-1">
                                                 <span *ngFor="let xref of infoOneDisease.xrefs ; let i = index">
                                                     <a *ngIf="xref.name=='Orphanet'" class="info"
                                                         href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{xref.id}}&lng={{lang}}"
@@ -158,13 +158,13 @@
                         <div class="card-content">
                             <div class="card-body py-0">
                                 <div class="media pb-1">
-                                    <div class="media-body white text-left">
+                                    <div class="media-body white text-start">
                                         <h3 class="font-large-1 white mb-0" *ngIf="phenotype.data">
                                             {{phenotype.data.length}}</h3>
                                         <h3 class="font-large-1 white mb-0" *ngIf="!phenotype.data">0</h3>
                                         <span>{{'diagnosis.Symptoms' | translate }}</span>
                                     </div>
-                                    <div class="media-right white text-right">
+                                    <div class="media-right white text-end">
                                         <em class="fa-solid fa-file-waveform font-large-1"></em>
                                     </div>
                                 </div>
@@ -177,11 +177,11 @@
                         <div class="card-content">
                             <div class="card-body py-0">
                                 <div class="media pb-1">
-                                    <div class="media-body white text-left">
+                                    <div class="media-body white text-start">
                                         <h3 class="font-large-1 white mb-0">{{docs.length}}</h3>
                                         <span>{{'land.Documents' | translate }}</span>
                                     </div>
-                                    <div class="media-right white text-right">
+                                    <div class="media-right white text-end">
                                         <em class="fa-solid fa-book-medical font-large-1"></em>
                                     </div>
                                 </div>
@@ -194,7 +194,7 @@
                         <div class="card-content">
                             <div class="card-body py-0">
                                 <div class="media pb-1">
-                                    <div class="media-body white text-left">
+                                    <div class="media-body white text-start">
                                         <h3 class="font-large-1 white mb-0">{{events.length}}</h3>
                                         <span>{{'open.Seizures in the last' | translate }}
                                             <span *ngIf="rangeDate=='month'">{{'charts.month' |
@@ -205,7 +205,7 @@
                                                 }}</span>
                                         </span>
                                     </div>
-                                    <div class="media-right white text-right">
+                                    <div class="media-right white text-end">
                                         <em class="fa-solid fa-bed-pulse font-large-1"></em>
                                     </div>
                                 </div>
@@ -218,11 +218,11 @@
                         <div class="card-content">
                             <div class="card-body py-0">
                                 <div class="media pb-1">
-                                    <div class="media-body white text-left">
+                                    <div class="media-body white text-start">
                                         <h3 class="font-large-1 white mb-0">{{medications.length}}</h3>
                                         <span>{{'clinicalinfo.Medication' | translate}}</span>
                                     </div>
-                                    <div class="media-right white text-right">
+                                    <div class="media-right white text-end">
                                         <em class="fa-solid fa-prescription-bottle-medical font-large-1"></em>
                                     </div>
                                 </div>
@@ -332,10 +332,10 @@
                                         <tr *ngFor="let hpo of phenotype.data ; let i = index">
                                             <td style="padding-left: 0px;">
                                                 <span>
-                                                    <span class="float-right ml-1">
+                                                    <span class="float-end ms-1">
                                                         <button
                                                             (click)="showMoreInfoSymptomPopup(i, contentInfoSymptomNcr);"
-                                                            class="btn-outline-secondary btn btn-sm mr-1 mb-0 btn-fab round"
+                                                            class="btn-outline-secondary btn btn-sm me-1 mb-0 btn-fab round"
                                                             title="{{'generics.More information' | translate }} ({{hpo.id}})">
                                                             <em class="fa fa-info w-13"></em>
                                                         </button>
@@ -378,21 +378,21 @@
                         <span>{{'menu.Charts' | translate }}</span>
                     </h4>
                     <span class="optionsCharts">
-                        <span><button class="mb-0 btn btn-sm btn-dark round mr-1" [disabled]="rangeDate=='month'"
+                        <span><button class="mb-0 btn btn-sm btn-dark round me-1" [disabled]="rangeDate=='month'"
                                 (click)="loadDataRangeDate('month');">{{'charts.Last month' |
                                 translate }}</button></span>
-                        <span><button class="mb-0 btn btn-sm btn-dark round mr-1" [disabled]="rangeDate=='quarter'"
+                        <span><button class="mb-0 btn btn-sm btn-dark round me-1" [disabled]="rangeDate=='quarter'"
                                 (click)="loadDataRangeDate('quarter');">{{'charts.Last quarter' |
                                 translate }}</button></span>
-                        <span><button class="mb-0 btn btn-sm btn-dark round mr-1" [disabled]="rangeDate=='year'"
+                        <span><button class="mb-0 btn btn-sm btn-dark round me-1" [disabled]="rangeDate=='year'"
                                 (click)="loadDataRangeDate('year');">{{'charts.Last year' |
                                 translate }}</button></span>
                     </span>
                     <span class="d-block mt-3">
-                        <span class="mr-2">{{'charts.GroupBy' | translate }}:</span>
-                        <span><button class="mb-0 btn btn-sm btn-white round mr-1" [disabled]="groupBy=='Weeks'"
+                        <span class="me-2">{{'charts.GroupBy' | translate }}:</span>
+                        <span><button class="mb-0 btn btn-sm btn-white round me-1" [disabled]="groupBy=='Weeks'"
                                 (click)="changeGroupBy('Weeks');">{{'charts.Weeks' | translate }}</button></span>
-                        <span><button class="mb-0 btn btn-sm btn-white round mr-1" [disabled]="groupBy=='Months'"
+                        <span><button class="mb-0 btn btn-sm btn-white round me-1" [disabled]="groupBy=='Months'"
                                 (click)="changeGroupBy('Months');">{{'charts.Months' | translate }}</button></span>
                     </span>
                 </div>
@@ -403,7 +403,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'menu.Seizures' | translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentseizures"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentseizures>
@@ -427,7 +427,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'menu.Seizures' | translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentseizures"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentseizures>
@@ -465,14 +465,14 @@
                                         </ngx-charts-bar-vertical-2d>
                                     </div>
                                     <div *ngIf="rangeDate=='month'" class="center-elements col-12">
-                                        <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                        <span class="float-start font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                         <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
-                                        <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                        <span class="float-end font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                     </div>
                                     <div *ngIf="rangeDate!='month'" class="center-elements col-12">
-                                        <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                        <span class="float-start font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
                                         <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
-                                        <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                        <span class="float-end font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -484,7 +484,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'menu.Seizures' | translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentseizures"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentseizures>
@@ -516,7 +516,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'charts.Quality of life' |translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentfeel"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentfeel>
@@ -540,7 +540,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'charts.Quality of life' |translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentfeel"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentfeel>
@@ -592,14 +592,14 @@
                                         
                                     </div>
                                     <div *ngIf="rangeDate=='month'" class="center-elements col-12">
-                                        <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                        <span class="float-start font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                         <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
-                                        <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                        <span class="float-end font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                     </div>
                                     <div *ngIf="rangeDate!='month'" class="center-elements col-12">
-                                        <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                        <span class="float-start font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
                                         <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
-                                        <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                        <span class="float-end font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
                                     </div>
                                 </div>
                             </div>
@@ -611,7 +611,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'charts.Quality of life' |translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentfeel"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentfeel>
@@ -641,7 +641,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'clinicalinfo.Medication' |translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentdrugs"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentdrugs>
@@ -667,7 +667,7 @@
                                         <div class="col-12">
                                             <h4 class="card-title mb-2">
                                                 <span>{{'clinicalinfo.Medication' |translate }}</span>
-                                                <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down" #p1="ngbPopover" [ngbPopover]="popContentdrugs" popoverTitle="{{'charts.infoTitle' | translate }}"></em>
+                                                <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down" #p1="ngbPopover" [ngbPopover]="popContentdrugs" popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                                 <ng-template #popContentdrugs>
                                                     <span>
                                                         {{'charts.infoDrugs' | translate }}
@@ -675,7 +675,7 @@
                                                     </ng-template>
                                             </h4>
                                             <span class="text-muted"> 
-                                                <label class="container pl-0">
+                                                <label class="container ps-0">
                                                     <input type="checkbox" [(ngModel)]="normalized" (change)="normalizedChanged(normalized)">
                                                     <span class="checkmark"></span>
                                                     </label><span style="margin-left: 0.2rem !important;">{{titleDose}}</span>
@@ -695,14 +695,14 @@
                                             </ngx-charts-line-chart>                                    
                                         </div>
                                         <div *ngIf="rangeDate=='month'" class="center-elements col-12">
-                                            <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                            <span class="float-start font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                             <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
-                                            <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                            <span class="float-end font-small-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                         </div>
                                         <div *ngIf="rangeDate!='month'" class="center-elements col-12">
-                                            <span class="float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                            <span class="float-start font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
                                             <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
-                                            <span class="float-right font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                            <span class="float-end font-small-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
                                         </div>
                                         <ngx-charts-legend fxFlex="100%" 
                                                             class="chart-legend" 
@@ -721,7 +721,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title mb-2">
                                         <span>{{'clinicalinfo.Medication' |translate }}</span>
-                                        <em class="ft-info font-small-2 ml-1" style="cursor: pointer;" placement="down"
+                                        <em class="ft-info font-small-2 ms-1" style="cursor: pointer;" placement="down"
                                             #p1="ngbPopover" [ngbPopover]="popContentdrugs"
                                             popoverTitle="{{'charts.infoTitle' | translate }}"></em>
                                         <ng-template #popContentdrugs>
@@ -756,7 +756,7 @@
                                                 <span>{{'charts.Drugs vs Seizures' | translate}}</span>
                                             </h4>
                                             <span class="text-muted">
-                                                <label class="container pl-0">
+                                                <label class="container ps-0">
                                                     <input type="checkbox" [(ngModel)]="normalized2" (change)="normalizedChanged2(normalized2)">
                                                     <span class="checkmark"></span>
                                                 </label><span style="margin-left: 0.2rem !important;">{{titleDrugsVsDrugs}}</span> 
@@ -794,14 +794,14 @@
                                         
                                     </div>
                                     <div *ngIf="rangeDate=='month'" class="center-elements col-12">
-                                        <span class="ml-3 float-left font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                        <span class="ms-3 float-start font-small-3">{{xAxisTicks[0] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                         <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'dd MMM': '' : translate.currentLang}}</span>
-                                        <span class="float-right font-small-3 mr-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
+                                        <span class="float-end font-small-3 me-3">{{xAxisTicks[2] | date: 'dd MMM': '' : translate.currentLang}}</span>
                                     </div>
                                     <div *ngIf="rangeDate!='month'" class="center-elements col-12">
-                                        <span class="ml-3 float-left font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                        <span class="ms-3 float-start font-small-3">{{xAxisTicks[0] | date: 'MMM y': '' : translate.currentLang}}</span>
                                         <span class="d-none d-sm-inline font-small-3">{{xAxisTicks[1] | date: 'MMM y': '' : translate.currentLang}}</span>
-                                        <span class="float-right font-small-3 mr-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
+                                        <span class="float-end font-small-3 me-3">{{xAxisTicks[2] | date: 'MMM y': '' : translate.currentLang}}</span>
                                     </div>
                                     <ngx-charts-legend fxFlex="100%" 
                                                             class="chart-legend" 
@@ -829,7 +829,7 @@
                 <div class="row" *ngIf="!finishloadData">
                     <div class="col-12 text-center">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">{{'reports.Loading' | translate }}...</span>
+                            <span class="visually-hidden">{{'reports.Loading' | translate }}...</span>
                         </div>
                     </div> 
                 </div>
@@ -858,14 +858,14 @@
                                         <td>{{doc.description}}</td>
                                         <td>{{doc.dateDoc | date}}</td>
                                         <td>
-                                            <span *ngIf="doc.notes!=''" class="mr-2"><a class="btn btn-sm btn-outline-dark mb-0"
+                                            <span *ngIf="doc.notes!=''" class="me-2"><a class="btn btn-sm btn-outline-dark mb-0"
                                                 href="javascript:void(0)" (click)="openNotes(doc.notes, contentNotes);">
                                                 {{'generics.notes' |translate }}</a></span>
                                             <span><a class="btn btn-sm btn-outline-dark mb-0"
                                             href="{{accessToken.blobAccountUrl}}{{accessToken.containerName}}/{{doc.url}}{{accessToken.sasToken}}"
                                             target="_blank" download>
                                             <i class="fa fa-download"></i></a></span>
-                                    <!--<span><a class="ml-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
+                                    <!--<span><a class="ms-1 btn btn-sm btn-outline-dark mb-0" href="javascript:void(0)"
                                             (click)="openResults(doc.url, contentviewDoc, doc.name);"><i class="fa fa-eye"></i></a></span>--></td>
                                     </tr>
                                   </tbody>
@@ -913,13 +913,11 @@
 
 <ng-template #contentInfoSymptomNcr let-c="close" let-d="dismiss" appendTo="body">
     <div class="modal-header" id="idHeader">
-        <div class="content-header text-left">
+        <div class="content-header text-start">
             <h4>{{phenotype.data[selectedInfoSymptomIndex].name }} - {{phenotype.data[selectedInfoSymptomIndex].id }}
             </h4>
         </div>
-        <button type="button" class="close" aria-label="Close" (click)="closeModal();">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModal();"></button>
     </div>
     <div class="modal-body content-wrapper p-2" id="idBody">
         <div class="row col-md-12" class="p-2">
@@ -965,12 +963,10 @@
 
 <ng-template #contentviewDoc id="contentviewDoc" let-c="close" let-d="dismiss" appendTo="body">
     <div class="modal-header" id="idHeader">
-        <div class="content-header text-left">
+        <div class="content-header text-start">
             <h4>{{nameTitle}}</h4>
         </div>
-        <button type="button" class="close" aria-label="Close" (click)="closeModal();">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModal();"></button>
     </div>
     <div class="modal-body content-wrapper p-2" id="idBody">
         <div class="p-2">
@@ -993,9 +989,7 @@
     <span class="font-small-2 d-block mt-1"></span>
   </h4>
 
-        <button type="button" class="close" aria-label="Close" (click)="closeModalShare();">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModalShare();"></button>
     </div>
   <form #f="ngForm">
     <div>
@@ -1014,13 +1008,13 @@
     </div>
     <div class="col-md-12">
       <div class="center-elements" *ngIf="!sending">
-        <button class="btn btn-secondary mr-1" (click)="cancelCustom()"><span>{{'generics.Cancel' |translate }}</span></button>
+        <button class="btn btn-secondary me-1" (click)="cancelCustom()"><span>{{'generics.Cancel' |translate }}</span></button>
         <div *ngIf="f.valid;then formValid else formError"></div>
         <ng-template #formValid>
-          <button class="btn btn-dark ml-1" [disabled]="!newPermission.data.patientInfo && !newPermission.data.medicalInfo" (click)="sendShare()">{{'generics.Add' |translate }}</button>
+          <button class="btn btn-dark ms-1" [disabled]="!newPermission.data.patientInfo && !newPermission.data.medicalInfo" (click)="sendShare()">{{'generics.Add' |translate }}</button>
         </ng-template>
         <ng-template #formError>
-          <button class="btn btn-dark ml-1" type="button" disabled="true" (click)="submitInvalidForm()"> <span *ngIf="newPermission._id==null">{{'generics.Add' |translate }}</span><span *ngIf="newPermission._id!=null">{{'generics.Update' |translate }}</span></button>
+          <button class="btn btn-dark ms-1" type="button" disabled="true" (click)="submitInvalidForm()"> <span *ngIf="newPermission._id==null">{{'generics.Add' |translate }}</span><span *ngIf="newPermission._id!=null">{{'generics.Update' |translate }}</span></button>
         </ng-template>
         
       </div>
@@ -1033,12 +1027,10 @@
 </ng-template>
 <ng-template #contentNotes let-c="close" let-d="dismiss" appendTo="body">
     <div class="modal-header" id="idHeader">
-        <div class="content-header text-left">
+        <div class="content-header text-start">
             <h4>{{'generics.notes' |translate }}</h4>
         </div>
-        <button type="button" class="close" aria-label="Close" (click)="closeModal();">
-            &times;
-        </button>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModal();"></button>
     </div>
     <div class="modal-body content-wrapper p-2">
         <div class="p-2">

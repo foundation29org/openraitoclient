@@ -2,8 +2,8 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-faded damemarger custom-navbar" style="padding: 0 25px !important;">
     <div class="container-fluid">
       <div class="d-none">
-          <button type="button" class="d-lg-none navbar-toggle float-left white" data-toggle="collapse" (click)="toggleSidebar()">
-              <span class="sr-only">{{'navbar.Toggle navigation' | translate }}</span>
+          <button type="button" class="d-lg-none navbar-toggle float-start white" data-toggle="collapse" (click)="toggleSidebar()">
+              <span class="visually-hidden">{{'navbar.Toggle navigation' | translate }}</span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -13,7 +13,7 @@
             <!--<img *ngIf="!isHomePage" style="cursor:pointer;" class="logo-img" src='assets/img/logo-raito.png' [routerLink]="redirectUrl" />-->
           </span>
       </div>
-        <div class="navbar-container pl-0 pt-1">
+        <div class="navbar-container ps-0 pt-1">
             <div  id="navbarSupportedContent">
                 <ul class="navbar-nav m-r-0">
                   <li class="nav-item">
@@ -29,27 +29,27 @@
                       </a>
                       <div ngbDropdownMenu aria-labelledby="dropdownBasic3">
                           <a class="dropdown-item" routerLink="/pages/profile">
-                              <i class="ft-edit fa-xs mr-2"></i>
+                              <i class="ft-edit fa-xs me-2"></i>
                               <span>{{'navbar.My Profile' | translate }}</span>
                           </a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" routerLink="/pages/support">
-                            <i class="ft-mail fa-xs mr-2"></i>
+                            <i class="ft-mail fa-xs me-2"></i>
                             <span>{{'support.support' | translate }}</span>
                           </a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" routerLink="/privacy-policy">
-                            <i class="ft-shield fa-xs mr-2"></i>
+                            <i class="ft-shield fa-xs me-2"></i>
                             <span>{{'registration.Privacy Policy' | translate }}</span>
                           </a>
                           <div class="dropdown-divider"></div>
                           <a class="dropdown-item" href="javascript:;" (click)="logout()">
-                              <i class="ft-power fa-xs mr-2"></i>
+                              <i class="ft-power fa-xs me-2"></i>
                               <span>{{'navbar.Logout' | translate }}</span>
                           </a>
                           <div *ngIf="isApp && isAndroid" class="dropdown-divider"></div>
                           <a *ngIf="isApp && isAndroid" class="dropdown-item" href="javascript:;" (click)="exit()">
-                              <i class="ft-log-out fa-xs mr-2"></i>
+                              <i class="ft-log-out fa-xs me-2"></i>
                               <span>{{'navbar.Exit' | translate }}</span>
                           </a>
                       </div>
